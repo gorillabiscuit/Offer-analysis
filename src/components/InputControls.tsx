@@ -37,25 +37,26 @@ const InputControls: React.FC<InputControlsProps> = ({
 
   const handleLoanAmountChange = (value: string) => {
     setLoanAmount(value);
-    const numValue = Number(value);
-    if (!isNaN(numValue)) {
-      onUserOfferChange({ loanAmount: numValue });
-    }
   };
 
   const handleDurationChange = (value: string) => {
     setDuration(value);
-    const numValue = Number(value);
-    if (!isNaN(numValue)) {
-      onUserOfferChange({ duration: numValue });
-    }
   };
 
   const handleInterestRateChange = (value: string) => {
     setInterestRate(value);
+  };
+
+  const handleInputComplete = (field: keyof LoanOffer, value: string) => {
     const numValue = Number(value);
     if (!isNaN(numValue)) {
-      onUserOfferChange({ interestRate: numValue });
+      onUserOfferChange({ [field]: numValue });
+    }
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>, field: keyof LoanOffer, value: string) => {
+    if (event.key === 'Enter') {
+      handleInputComplete(field, value);
     }
   };
 
@@ -100,6 +101,8 @@ const InputControls: React.FC<InputControlsProps> = ({
           type="number"
           value={loanAmount}
           onChange={(e) => handleLoanAmountChange(e.target.value)}
+          onBlur={() => handleInputComplete('loanAmount', loanAmount)}
+          onKeyPress={(e) => handleKeyPress(e, 'loanAmount', loanAmount)}
           InputProps={{
             endAdornment: <Typography variant="body2">ETH</Typography>
           }}
@@ -112,6 +115,8 @@ const InputControls: React.FC<InputControlsProps> = ({
           type="number"
           value={duration}
           onChange={(e) => handleDurationChange(e.target.value)}
+          onBlur={() => handleInputComplete('duration', duration)}
+          onKeyPress={(e) => handleKeyPress(e, 'duration', duration)}
           InputProps={{
             endAdornment: <Typography variant="body2">days</Typography>
           }}
@@ -124,6 +129,8 @@ const InputControls: React.FC<InputControlsProps> = ({
           type="number"
           value={interestRate}
           onChange={(e) => handleInterestRateChange(e.target.value)}
+          onBlur={() => handleInputComplete('interestRate', interestRate)}
+          onKeyPress={(e) => handleKeyPress(e, 'interestRate', interestRate)}
           InputProps={{
             endAdornment: <Typography variant="body2">%</Typography>
           }}

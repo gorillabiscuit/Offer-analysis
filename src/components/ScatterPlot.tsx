@@ -9,6 +9,8 @@ interface ScatterPlotProps {
   userOffer?: LoanOffer;
   selectedCurrency: Currency;
   onCurrencyChange: (currency: Currency) => void;
+  onUserOfferDrag?: (update: { loanAmount: number; interestRate: number }) => void;
+  domain: { x: [number, number]; y: [number, number] };
 }
 
 const PADDING_PERCENTAGE = 0.1; // 10% padding
@@ -18,11 +20,14 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   data = [], 
   userOffer,
   selectedCurrency,
-  onCurrencyChange 
+  onCurrencyChange,
+  onUserOfferDrag,
+  domain
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const prevScalesRef = useRef<{ x: d3.ScaleLinear<number, number>; y: d3.ScaleLinear<number, number> } | null>(null);
+  const isDraggingRef = useRef(false);
 
   // Create tooltip once when component mounts
   useEffect(() => {
@@ -83,18 +88,9 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .attr('transform', `translate(${margin.left},${margin.top})`)
       : svg.select<SVGGElement>('g');
 
-    // Calculate domains with padding
-    const loanAmounts = data.map(d => d.loanAmount);
-    const interestRates = data.map(d => d.interestRate);
-    
-    // Add user offer to the data for domain calculation if it exists
-    if (userOffer) {
-      loanAmounts.push(userOffer.loanAmount);
-      interestRates.push(userOffer.interestRate);
-    }
-
-    const [xMin, xMax] = calculateDomainWithPadding(loanAmounts);
-    const [yMin, yMax] = calculateDomainWithPadding(interestRates);
+    // Use domain from props instead of calculating from data
+    const [xMin, xMax] = domain.x;
+    const [yMin, yMax] = domain.y;
 
     // Create scales with padding
     const xScale = d3.scaleLinear()
@@ -116,14 +112,19 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     const xAxisGroup = g.select<SVGGElement>('.x-axis');
     const yAxisGroup = g.select<SVGGElement>('.y-axis');
 
+    // Helper to conditionally transition or not
+    function maybeTransition(selection: any) {
+      return isDraggingRef.current ? selection : selection.transition().duration(TRANSITION_DURATION);
+    }
+
+    // Update axes with transitions or immediate
     if (xAxisGroup.empty()) {
       g.append('g')
         .attr('class', 'x-axis')
         .attr('transform', `translate(0,${height})`)
         .call(xAxis);
     } else {
-      xAxisGroup.transition()
-        .duration(TRANSITION_DURATION)
+      maybeTransition(xAxisGroup)
         .call(xAxis as any);
     }
 
@@ -132,8 +133,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .attr('class', 'y-axis')
         .call(yAxis);
     } else {
-      yAxisGroup.transition()
-        .duration(TRANSITION_DURATION)
+      maybeTransition(yAxisGroup)
         .call(yAxis as any);
     }
 
@@ -148,8 +148,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .style('text-anchor', 'middle')
         .text(`Loan Amount (${selectedCurrency})`);
     } else {
-      xLabel.transition()
-        .duration(TRANSITION_DURATION)
+      maybeTransition(xLabel)
         .text(`Loan Amount (${selectedCurrency})`);
     }
 
@@ -164,8 +163,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     }
 
     // Calculate statistics
-    const sortedLoanAmounts = [...loanAmounts].sort((a, b) => a - b);
-    const sortedInterestRates = [...interestRates].sort((a, b) => a - b);
+    const sortedLoanAmounts = [...data.map(d => d.loanAmount)].sort((a, b) => a - b);
+    const sortedInterestRates = [...data.map(d => d.interestRate)].sort((a, b) => a - b);
     
     const medianLoanAmount = d3.median(sortedLoanAmounts) || 0;
     const medianInterestRate = d3.median(sortedInterestRates) || 0;
@@ -175,7 +174,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     const q1InterestRate = d3.quantile(sortedInterestRates, 0.25) || 0;
     const q3InterestRate = d3.quantile(sortedInterestRates, 0.75) || 0;
 
-    // Update reference lines with transitions
+    // Update reference lines with transitions or immediate
     const updateReferenceLine = (className: string, x1: number, x2: number, y1: number, y2: number, color: string, dashArray: string) => {
       const line = g.select<SVGLineElement>(`.${className}`);
       if (line.empty()) {
@@ -189,8 +188,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .attr('stroke-width', 1)
           .attr('stroke-dasharray', dashArray);
       } else {
-        line.transition()
-          .duration(TRANSITION_DURATION)
+        maybeTransition(line)
           .attr('x1', x1)
           .attr('x2', x2)
           .attr('y1', y1)
@@ -208,7 +206,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     updateReferenceLine('q1-y', 0, width, yScale(q1InterestRate), yScale(q1InterestRate), '#999', '2,2');
     updateReferenceLine('q3-y', 0, width, yScale(q3InterestRate), yScale(q3InterestRate), '#999', '2,2');
 
-    // Update annotations with transitions
+    // Update annotations with transitions or immediate
     const updateAnnotation = (className: string, x: number, y: number, text: string, anchor: string = 'start') => {
       const annotation = g.select<SVGTextElement>(`.${className}`);
       if (annotation.empty()) {
@@ -221,8 +219,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .style('fill', '#666')
           .text(text);
       } else {
-        annotation.transition()
-          .duration(TRANSITION_DURATION)
+        maybeTransition(annotation)
           .attr('x', x)
           .attr('y', y)
           .text(text);
@@ -306,11 +303,50 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .attr('stroke', '#fff')
         .attr('stroke-width', 2);
 
-      userPoint.merge(userPointEnter)
-        .transition()
-        .duration(TRANSITION_DURATION)
-        .attr('cx', d => xScale(d.loanAmount))
-        .attr('cy', d => yScale(d.interestRate));
+      // Add D3 drag behavior
+      const drag = d3.drag<SVGCircleElement, LoanOffer>()
+        .on('start', function (event, d) {
+          event.sourceEvent.stopPropagation();
+          isDraggingRef.current = true;
+          d3.select(this).interrupt(); // Interrupt any ongoing transitions
+          d3.select(this).raise().attr('stroke', '#000');
+        })
+        .on('drag', function (event, d) {
+          const x = Math.max(0, Math.min(width, event.x));
+          const y = Math.max(0, Math.min(height, event.y));
+          d3.select(this)
+            .attr('cx', x)
+            .attr('cy', y);
+          // Do NOT update React state here!
+        })
+        .on('end', function (event, d) {
+          isDraggingRef.current = false;
+          d3.select(this).attr('stroke', '#fff');
+          const x = Math.max(0, Math.min(width, event.x));
+          const y = Math.max(0, Math.min(height, event.y));
+          const newLoanAmount = xScale.invert(x);
+          const newInterestRate = yScale.invert(y);
+          if (typeof onUserOfferDrag === 'function') {
+            onUserOfferDrag({ loanAmount: newLoanAmount, interestRate: newInterestRate });
+          }
+        });
+
+      // Update user offer point position
+      const merged = userPoint.merge(userPointEnter);
+      if (isDraggingRef.current) {
+        merged
+          .attr('cx', d => xScale(d.loanAmount))
+          .attr('cy', d => yScale(d.interestRate))
+          .call(drag);
+      } else {
+        merged
+          .transition()
+          .duration(TRANSITION_DURATION)
+          .attr('cx', d => xScale(d.loanAmount))
+          .attr('cy', d => yScale(d.interestRate))
+          .selection()
+          .call(drag);
+      }
 
       // Add user offer label
       const userLabel = g.selectAll<SVGTextElement, LoanOffer>('.user-label')
@@ -326,16 +362,22 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .style('fill', '#f50057')
         .text('Your Offer');
 
-      userLabel.merge(userLabelEnter)
-        .transition()
-        .duration(TRANSITION_DURATION)
-        .attr('x', d => xScale(d.loanAmount))
-        .attr('y', d => yScale(d.interestRate));
+      if (isDraggingRef.current) {
+        userLabel.merge(userLabelEnter)
+          .attr('x', d => xScale(d.loanAmount))
+          .attr('y', d => yScale(d.interestRate));
+      } else {
+        userLabel.merge(userLabelEnter)
+          .transition()
+          .duration(TRANSITION_DURATION)
+          .attr('x', d => xScale(d.loanAmount))
+          .attr('y', d => yScale(d.interestRate));
+      }
     } else {
       // Remove user point and label if no user offer
       g.selectAll('.user-point, .user-label').remove();
     }
-  }, [data, userOffer, selectedCurrency]);
+  }, [data, userOffer, selectedCurrency, onUserOfferDrag, domain]);
 
   return (
     <Paper elevation={3} sx={{ p: 2, height: '100%' }}>

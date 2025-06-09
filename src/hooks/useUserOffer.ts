@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-interface UserOfferState {
+export interface UserOfferState {
   loanAmount: number;
   interestRate: number;
   duration: number;

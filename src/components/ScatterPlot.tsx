@@ -9,7 +9,7 @@ interface ScatterPlotProps {
   userOffer?: LoanOffer;
   selectedCurrency: Currency;
   onCurrencyChange: (currency: Currency) => void;
-  onUserOfferDrag?: (update: { loanAmount: number; interestRate: number; dragX?: number; dragY?: number; width?: number; height?: number; dragging?: boolean; isNearEdge?: boolean }) => void;
+  onUserOfferDrag?: (update: { loanAmount: number; interestRate: number; dragX?: number; dragY?: number; width?: number; height?: number; dragging?: boolean }) => void;
   domain: { x: [number, number]; y: [number, number] };
 }
 
@@ -26,16 +26,18 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const dragTooltipRef = useRef<HTMLDivElement | null>(null);
   const prevScalesRef = useRef<{ x: d3.ScaleLinear<number, number>; y: d3.ScaleLinear<number, number> } | null>(null);
   const isDraggingRef = useRef(false);
   const lastDragPosRef = useRef<{ x: number; y: number } | null>(null);
   const pendingDragEndRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Create tooltip once when component mounts
+  // Create tooltips once when component mounts
   useEffect(() => {
     let tooltip: HTMLDivElement | null = null;
+    let dragTooltip: HTMLDivElement | null = null;
 
-    // Create tooltip div if it doesn't exist
+    // Create main tooltip div if it doesn't exist
     if (!tooltipRef.current) {
       tooltip = document.createElement('div');
       tooltip.style.position = 'absolute';
@@ -54,12 +56,35 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       tooltipRef.current = tooltip;
     }
 
-    // Cleanup tooltip when component unmounts
+    // Create drag tooltip div if it doesn't exist
+    if (!dragTooltipRef.current) {
+      dragTooltip = document.createElement('div');
+      dragTooltip.style.position = 'absolute';
+      dragTooltip.style.visibility = 'hidden';
+      dragTooltip.style.backgroundColor = 'rgba(245, 0, 87, 0.95)';
+      dragTooltip.style.color = 'white';
+      dragTooltip.style.borderRadius = '4px';
+      dragTooltip.style.padding = '8px 12px';
+      dragTooltip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+      dragTooltip.style.zIndex = '1000';
+      dragTooltip.style.fontSize = '14px';
+      dragTooltip.style.lineHeight = '1.4';
+      dragTooltip.style.pointerEvents = 'none';
+      dragTooltip.style.fontWeight = 'bold';
+      document.body.appendChild(dragTooltip);
+      dragTooltipRef.current = dragTooltip;
+    }
+
+    // Cleanup tooltips when component unmounts
     return () => {
       if (tooltipRef.current && document.body.contains(tooltipRef.current)) {
         document.body.removeChild(tooltipRef.current);
       }
+      if (dragTooltipRef.current && document.body.contains(dragTooltipRef.current)) {
+        document.body.removeChild(dragTooltipRef.current);
+      }
       tooltipRef.current = null;
+      dragTooltipRef.current = null;
     };
   }, []);
 
@@ -324,6 +349,10 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           pendingDragEndRef.current = null;
           d3.select(this).interrupt();
           d3.select(this).raise().attr('stroke', '#000');
+          // Show drag tooltip
+          if (dragTooltipRef.current) {
+            dragTooltipRef.current.style.visibility = 'visible';
+          }
         })
         .on('drag', function (event, d) {
           const x = Math.max(0, Math.min(width, event.x));
@@ -336,14 +365,15 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           g.selectAll('.user-label')
             .attr('x', x)
             .attr('y', y);
+          // Update drag tooltip
+          if (dragTooltipRef.current) {
+            const loanAmount = xScale.invert(x);
+            const interestRate = yScale.invert(y);
+            dragTooltipRef.current.style.left = (event.pageX + 15) + 'px';
+            dragTooltipRef.current.style.top = (event.pageY - 10) + 'px';
+            dragTooltipRef.current.innerHTML = `${loanAmount.toFixed(2)} ${selectedCurrency}<br/>${interestRate.toFixed(2)}% APR`;
+          }
           if (typeof onUserOfferDrag === 'function') {
-            // Check if we're near the edges and need to expand
-            const isNearEdge = 
-              x >= width * 0.95 || 
-              x <= width * 0.05 || 
-              y >= height * 0.95 || 
-              y <= height * 0.05;
-            
             onUserOfferDrag({
               loanAmount: xScale.invert(x),
               interestRate: yScale.invert(y),
@@ -351,8 +381,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
               dragY: y,
               width,
               height,
-              dragging: true,
-              isNearEdge // Add this flag to indicate we're near an edge
+              dragging: true
             });
           }
         })
@@ -364,6 +393,10 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           // Store the final position for after domain update
           pendingDragEndRef.current = { x, y };
           lastDragPosRef.current = null;
+          // Hide drag tooltip
+          if (dragTooltipRef.current) {
+            dragTooltipRef.current.style.visibility = 'hidden';
+          }
         });
 
       // Update user offer point position

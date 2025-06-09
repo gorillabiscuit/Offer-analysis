@@ -29,6 +29,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   const prevScalesRef = useRef<{ x: d3.ScaleLinear<number, number>; y: d3.ScaleLinear<number, number> } | null>(null);
   const isDraggingRef = useRef(false);
   const lastDragPosRef = useRef<{ x: number; y: number } | null>(null);
+  const pendingDragEndRef = useRef<{ x: number; y: number } | null>(null);
 
   // Create tooltip once when component mounts
   useEffect(() => {
@@ -321,6 +322,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .on('start', function (event, d) {
           event.sourceEvent.stopPropagation();
           isDraggingRef.current = true;
+          pendingDragEndRef.current = null;
           d3.select(this).interrupt();
           d3.select(this).raise().attr('stroke', '#000');
         })
@@ -352,12 +354,9 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           d3.select(this).attr('stroke', '#fff');
           const x = Math.max(0, Math.min(width, event.x));
           const y = Math.max(0, Math.min(height, event.y));
+          // Store the final position for after domain update
+          pendingDragEndRef.current = { x, y };
           lastDragPosRef.current = null;
-          const newLoanAmount = xScale.invert(x);
-          const newInterestRate = yScale.invert(y);
-          if (typeof onUserOfferDrag === 'function') {
-            onUserOfferDrag({ loanAmount: newLoanAmount, interestRate: newInterestRate });
-          }
         });
 
       // Update user offer point position
@@ -371,6 +370,25 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         g.selectAll('.user-label')
           .attr('x', lastDragPosRef.current.x)
           .attr('y', lastDragPosRef.current.y);
+      } else if (pendingDragEndRef.current) {
+        // If we have a pending drag end, use the stored position
+        const { x, y } = pendingDragEndRef.current;
+        merged
+          .attr('cx', x)
+          .attr('cy', y)
+          .call(drag);
+        // Move label instantly as well
+        g.selectAll('.user-label')
+          .attr('x', x)
+          .attr('y', y);
+        // Convert to data space using the new scale
+        const newLoanAmount = xScale.invert(x);
+        const newInterestRate = yScale.invert(y);
+        if (typeof onUserOfferDrag === 'function') {
+          onUserOfferDrag({ loanAmount: newLoanAmount, interestRate: newInterestRate });
+        }
+        // Clear the pending drag end
+        pendingDragEndRef.current = null;
       } else {
         // If not dragging, update position immediately (no transition) to avoid jump after domain expansion
         merged

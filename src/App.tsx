@@ -40,39 +40,59 @@ function App() {
       const xRange = xMax - xMin;
       const yRange = yMax - yMin;
       let changed = false;
+
+      // During drag, expand more aggressively to prevent edge cases
+      const expandPercent = dragging ? DOMAIN_EXPAND_PERCENT * 2 : DOMAIN_EXPAND_PERCENT;
+
       // Expand right
-      if (dragging && width !== undefined && dragX !== undefined && dragX >= width) {
-        xMax += xRange * DOMAIN_EXPAND_PERCENT;
+      if (dragging && width !== undefined && dragX !== undefined && dragX >= width * 0.95) {
+        xMax += xRange * expandPercent;
         changed = true;
       } else if (loanAmount > xMax - xRange * 0.1) {
-        xMax += xRange * 0.05;
+        xMax += xRange * expandPercent;
         changed = true;
       }
       // Expand left
-      if (dragging && dragX !== undefined && dragX <= 0) {
-        xMin = Math.max(0, xMin - xRange * DOMAIN_EXPAND_PERCENT);
+      if (dragging && dragX !== undefined && width !== undefined && dragX <= width * 0.05) {
+        xMin = Math.max(0, xMin - xRange * expandPercent);
         changed = true;
       } else if (loanAmount < xMin + xRange * 0.1) {
-        xMin = Math.max(0, xMin - xRange * 0.05);
+        xMin = Math.max(0, xMin - xRange * expandPercent);
         changed = true;
       }
       // Expand top
-      if (dragging && height !== undefined && dragY !== undefined && dragY <= 0) {
-        yMax += yRange * DOMAIN_EXPAND_PERCENT;
+      if (dragging && height !== undefined && dragY !== undefined && dragY <= height * 0.05) {
+        yMax += yRange * expandPercent;
         changed = true;
       } else if (interestRate > yMax - yRange * 0.1) {
-        yMax += yRange * 0.05;
+        yMax += yRange * expandPercent;
         changed = true;
       }
       // Expand bottom
-      if (dragging && height !== undefined && dragY !== undefined && dragY >= height) {
-        yMin = Math.max(0, yMin - yRange * DOMAIN_EXPAND_PERCENT);
+      if (dragging && height !== undefined && dragY !== undefined && dragY >= height * 0.95) {
+        yMin = Math.max(0, yMin - yRange * expandPercent);
         changed = true;
       } else if (interestRate < yMin + yRange * 0.1) {
-        yMin = Math.max(0, yMin - yRange * 0.05);
+        yMin = Math.max(0, yMin - yRange * expandPercent);
         changed = true;
       }
-      if (changed) return { x: [xMin, xMax] as [number, number], y: [yMin, yMax] as [number, number] };
+
+      if (changed) {
+        // Ensure we maintain a minimum range to prevent collapse
+        const minXRange = xRange * 0.1;
+        const minYRange = yRange * 0.1;
+        if (xMax - xMin < minXRange) {
+          const center = (xMax + xMin) / 2;
+          xMin = center - minXRange / 2;
+          xMax = center + minXRange / 2;
+        }
+        if (yMax - yMin < minYRange) {
+          const center = (yMax + yMin) / 2;
+          yMin = center - minYRange / 2;
+          yMax = center + minYRange / 2;
+        }
+        return { x: [xMin, xMax] as [number, number], y: [yMin, yMax] as [number, number] };
+      }
       return prev;
     });
   }, []);
@@ -92,7 +112,7 @@ function App() {
         loanAmount: roundETH(Math.max(0, update.loanAmount)),
         interestRate: roundPercentage(Math.max(0, update.interestRate)),
       });
-      expandDomainIfNeeded(update.loanAmount, update.interestRate);
+      // Don't expand domain on drag end - let the ScatterPlot component handle it
     }
   };
 

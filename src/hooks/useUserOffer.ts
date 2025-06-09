@@ -1,0 +1,37 @@
+import { useState, useCallback } from 'react';
+
+interface UserOfferState {
+  loanAmount: number;
+  interestRate: number;
+  duration: number;
+  collection?: string;
+}
+
+export const useUserOffer = () => {
+  const [userOffer, setUserOffer] = useState<UserOfferState>({
+    loanAmount: 1.0,
+    interestRate: 5.0,
+    duration: 30,
+  });
+
+  const updateUserOffer = useCallback((updates: Partial<UserOfferState>) => {
+    setUserOffer(prev => ({
+      ...prev,
+      ...updates,
+    }));
+  }, []);
+
+  const resetUserOffer = useCallback(() => {
+    setUserOffer({
+      loanAmount: 1.0,
+      interestRate: 5.0,
+      duration: 30,
+    });
+  }, []);
+
+  return {
+    userOffer,
+    updateUserOffer,
+    resetUserOffer,
+  };
+}; 

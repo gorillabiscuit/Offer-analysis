@@ -1,0 +1,111 @@
+Here is your finalized Product Requirements Document (PRD) for the NFT Loan Offer Analysis Scatter Plot, based on your detailed answers and corrections:
+
+---
+
+## Product Requirements Document: NFT Loan Offer Analysis Scatter Plot
+
+### 1. Project Overview
+**Goal:**  
+Create an interactive, standalone scatter plot component that enables NFT lenders to visualize their proposed loan offers against existing market offers, helping them make competitive offers with a higher likelihood of acceptance.
+
+**Target Users:**  
+Sophisticated NFT lenders seeking to optimize returns by lending against NFTs as collateral. Users are familiar with the NFT market and want actionable, data-driven insights.
+
+---
+
+### 2. Data Source & Structure
+- **API Endpoint:**  
+  `https://api.us-east.tinybird.co/v0/pipes/market_offers_pipe.json`
+- **Collections:**  
+  Dynamic via `collection_address` parameter.
+- **Data Fields:**  
+  Principal amount, APR (aprBps), creation date, lender info, capacity, collection details.
+- **Protocols:**  
+  Gondi and NFTFI normalized data.
+
+---
+
+### 3. Component Layout
+- **Standalone Component:**  
+  - **Left Panel (Input Controls):**
+    - Loan parameter inputs (principal, APR, loan term).
+    - Collection dropdown selector.
+    - NFT collateral type toggle (if applicable).
+  - **Right Panel (Visualization):**
+    - D3.js scatter plot with dynamic reference lines.
+    - Hover tooltips and loan depth indicators.
+
+- **Responsive Behavior:**  
+  - Desktop: 50/50 split (inputs left, plot right).
+  - Mobile: Inputs stack above plot.
+
+---
+
+### 4. Chart Specifications
+- **X-Axis:** Principal amount (loan amount in ETH/USDC).
+- **Y-Axis:** APR percentage.
+- **Reference Lines:** Dotted median lines for both APR and principal.
+- **Point Representation:** Each loan offer as a scatter point.
+- **Recency Indicator:** Brightness/opacity based on offer age (bright = recent, faded = old).
+- **Loan Depth:** Blue intensity (#1D7AFC) indicating offer depth/capacity (if data available).
+- **User Offer:** Highlighted point that moves dynamically with user input.
+- **Collection Selector:** Dropdown to switch between NFT collections.
+
+---
+
+### 5. Interactive Features
+- **Real-time Updates:** User's offer point moves as they adjust principal/APR values.
+- **Hover Tooltips:** Display loan details (principal, APR, lender, date, capacity).
+- **Collection Switching:** Dropdown updates entire chart dataset.
+- **Responsive Design:** Compatible with web3 browsers and MetaMask.
+
+---
+
+### 6. Input Specifications
+- **Principal Input:** Numeric field with ETH/USDC toggle.  
+- **APR Input:** Slider or numeric field (basis points or percentage).
+- **Collection Selector:** Dropdown populated via API (`collection_address` parameter).
+- **Dynamic Updates:** Changing inputs instantly updates user’s offer point position.
+- **Validation:** No minimum required.
+
+---
+
+### 7. User Experience Flow
+1. **Initial Load:** Display scatter plot for default collection.
+2. **Input Changes:** User adjusts loan parameters → their offer point moves in real-time.
+3. **Collection Switch:** User selects different collection → chart reloads with new data.
+4. **Hover Interaction:** User hovers over points → tooltip shows loan details.
+5. **Visual Analysis:** User can see their competitive position via reference lines and point distribution.
+
+---
+
+### 8. Success Metrics
+- **Competitive Positioning:** Users can quickly identify if their offer is above/below market median.
+- **Market Context:** Clear visualization of offer density and depth.
+- **Decision Speed:** Faster loan offer creation with visual market feedback.
+
+---
+
+### 9. Technical Constraints
+- **Data Availability:** Loan depth may be limited by API data structure.
+- **Performance:** Handle large datasets efficiently for popular collections.
+- **Real-time:** Smooth animations for user input changes.
+
+---
+
+### 10. Design References
+- **Styling:** MUI Minimal theme (provided CSS and PDF references).
+- **Color Scheme:** Blue depth indicators, standard chart colors.
+- **Layout:** Standalone component with left input panel and right scatter plot visualization.
+
+---
+
+**This PRD is ready for use with Taskmaster to generate your project’s task breakdown.** Let me know if you’d like to proceed to the next step!
+
+Sources
+[1] [PDF] A Taxonomy of Non-fungible Tokens - DiVA portal https://www.diva-portal.org/smash/get/diva2:1672740/FULLTEXT01.pdf
+[2] [PDF] Austria - Loan 0102 - P037349 - Summary Progress Reports https://thedocs.worldbank.org/en/doc/535741557136193519-0240021963/render/WorldBankGroupArchivesFolder1516790.pdf
+[3] Implications of NFT as a sustainable fintech innovation for ... https://www.sciencedirect.com/science/article/pii/S2773032825000045
+[4] Volatility spillovers across NFTs news attention and financial markets https://www.sciencedirect.com/science/article/pii/S1057521922002666
+[5] [PDF] Financing for Sustainable Development Report 2022 https://financing.desa.un.org/sites/default/files/2023-04/FSDR_2022_0.pdf
+[6] [PDF] Financial Results for FY2024 ended March 2025 https://www.chibabank.co.jp/english/pdf/full/fy_2024fin_1.pdf

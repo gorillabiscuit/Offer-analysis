@@ -9,7 +9,7 @@ interface ScatterPlotProps {
   userOffer?: LoanOffer;
   selectedCurrency: Currency;
   onCurrencyChange: (currency: Currency) => void;
-  onUserOfferDrag?: (update: { loanAmount: number; interestRate: number }) => void;
+  onUserOfferDrag?: (update: { loanAmount: number; interestRate: number; dragX?: number; dragY?: number; width?: number; height?: number; dragging?: boolean }) => void;
   domain: { x: [number, number]; y: [number, number] };
 }
 
@@ -28,6 +28,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const prevScalesRef = useRef<{ x: d3.ScaleLinear<number, number>; y: d3.ScaleLinear<number, number> } | null>(null);
   const isDraggingRef = useRef(false);
+  const lastDragPosRef = useRef<{ x: number; y: number } | null>(null);
 
   // Create tooltip once when component mounts
   useEffect(() => {
@@ -69,6 +70,23 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     const padding = range * PADDING_PERCENTAGE;
     return [Math.max(0, min - padding), max + padding];
   };
+
+  // Helper to format age as 'xx days ago', 'xx hours ago', or 'xx minutes ago'
+  function formatAge(timestamp?: number): string {
+    if (!timestamp) return 'N/A';
+    const now = Date.now();
+    const diffMs = now - timestamp;
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays >= 1) {
+      return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+    } else if (diffHours >= 1) {
+      return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+    } else {
+      return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`;
+    }
+  }
 
   useEffect(() => {
     if (!svgRef.current || data.length === 0 || !tooltipRef.current) return;
@@ -169,11 +187,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     const medianLoanAmount = d3.median(sortedLoanAmounts) || 0;
     const medianInterestRate = d3.median(sortedInterestRates) || 0;
     
-    const q1LoanAmount = d3.quantile(sortedLoanAmounts, 0.25) || 0;
-    const q3LoanAmount = d3.quantile(sortedLoanAmounts, 0.75) || 0;
-    const q1InterestRate = d3.quantile(sortedInterestRates, 0.25) || 0;
-    const q3InterestRate = d3.quantile(sortedInterestRates, 0.75) || 0;
-
     // Update reference lines with transitions or immediate
     const updateReferenceLine = (className: string, x1: number, x2: number, y1: number, y2: number, color: string, dashArray: string) => {
       const line = g.select<SVGLineElement>(`.${className}`);
@@ -200,12 +213,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     updateReferenceLine('median-x', xScale(medianLoanAmount), xScale(medianLoanAmount), 0, height, '#666', '5,5');
     updateReferenceLine('median-y', 0, width, yScale(medianInterestRate), yScale(medianInterestRate), '#666', '5,5');
 
-    // Update quartile lines
-    updateReferenceLine('q1-x', xScale(q1LoanAmount), xScale(q1LoanAmount), 0, height, '#999', '2,2');
-    updateReferenceLine('q3-x', xScale(q3LoanAmount), xScale(q3LoanAmount), 0, height, '#999', '2,2');
-    updateReferenceLine('q1-y', 0, width, yScale(q1InterestRate), yScale(q1InterestRate), '#999', '2,2');
-    updateReferenceLine('q3-y', 0, width, yScale(q3InterestRate), yScale(q3InterestRate), '#999', '2,2');
-
     // Update annotations with transitions or immediate
     const updateAnnotation = (className: string, x: number, y: number, text: string, anchor: string = 'start') => {
       const annotation = g.select<SVGTextElement>(`.${className}`);
@@ -230,15 +237,17 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     updateAnnotation('median-x-annotation', xScale(medianLoanAmount) + 5, 15, `Median: ${medianLoanAmount.toFixed(2)} ${selectedCurrency}`);
     updateAnnotation('median-y-annotation', width - 5, yScale(medianInterestRate) - 5, `Median: ${medianInterestRate.toFixed(2)}%`, 'end');
 
-    // Update quartile annotations
-    updateAnnotation('q1-x-annotation', xScale(q1LoanAmount) + 5, 30, `Q1: ${q1LoanAmount.toFixed(2)} ${selectedCurrency}`);
-    updateAnnotation('q3-x-annotation', xScale(q3LoanAmount) + 5, 45, `Q3: ${q3LoanAmount.toFixed(2)} ${selectedCurrency}`);
-    updateAnnotation('q1-y-annotation', width - 5, yScale(q1InterestRate) - 20, `Q1: ${q1InterestRate.toFixed(2)}%`, 'end');
-    updateAnnotation('q3-y-annotation', width - 5, yScale(q3InterestRate) - 35, `Q3: ${q3InterestRate.toFixed(2)}%`, 'end');
-
     // Log the keys for debugging
     const keys = data.map(d => d.id || `${d.collection}-${d.loanAmount}-${d.interestRate}-${d.duration}`);
     console.log('Loan keys:', keys);
+
+    // Color scale for offer age (newest: red, oldest: blue)
+    const timestamps = data.map(d => d.timestamp ?? 0);
+    const minTimestamp = d3.min(timestamps) ?? 0;
+    const maxTimestamp = d3.max(timestamps) ?? 0;
+    const timeScale = d3.scaleLinear<string>()
+      .domain([minTimestamp, maxTimestamp])
+      .range(["#4D96FF", "#FF6B6B"]); // Oldest: blue, Newest: red
 
     // Update dots with transitions
     const dots = g.selectAll<SVGCircleElement, LoanOffer>('.data-point')
@@ -256,7 +265,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       .append('circle')
       .attr('class', 'data-point')
       .attr('r', 5)
-      .attr('fill', '#2196f3')
+      // Color by age
+      .attr('fill', d => timeScale(d.timestamp ?? 0))
       .attr('opacity', 0.7)
       .on('mouseover', function(event, d) {
         if (!tooltipRef.current) return;
@@ -268,7 +278,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           <strong>Collection:</strong> ${d.collection}<br/>
           <strong>Loan Amount:</strong> ${d.loanAmount} ${selectedCurrency}<br/>
           <strong>Interest Rate:</strong> ${d.interestRate}%<br/>
-          <strong>Duration:</strong> ${d.duration} days
+          <strong>Duration:</strong> ${d.duration} days<br/>
+          <strong>Loan created:</strong> ${formatAge(d.timestamp)}
         `;
       })
       .on('mousemove', function(event) {
@@ -283,10 +294,12 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
     // Update all dots (including new ones)
     dots.merge(dotsEnter)
-      .transition()
-      .duration(TRANSITION_DURATION)
-      .attr('cx', d => xScale(d.loanAmount))
-      .attr('cy', d => yScale(d.interestRate));
+      // Use maybeTransition to decide if we animate or not
+      .call(sel => maybeTransition(sel)
+        .attr('cx', (d: LoanOffer) => xScale(d.loanAmount))
+        .attr('cy', (d: LoanOffer) => yScale(d.interestRate))
+        .attr('fill', (d: LoanOffer) => timeScale(d.timestamp ?? 0))
+      );
 
     // Update user offer point if it exists
     if (userOffer) {
@@ -308,22 +321,38 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .on('start', function (event, d) {
           event.sourceEvent.stopPropagation();
           isDraggingRef.current = true;
-          d3.select(this).interrupt(); // Interrupt any ongoing transitions
+          d3.select(this).interrupt();
           d3.select(this).raise().attr('stroke', '#000');
         })
         .on('drag', function (event, d) {
           const x = Math.max(0, Math.min(width, event.x));
           const y = Math.max(0, Math.min(height, event.y));
+          lastDragPosRef.current = { x, y };
           d3.select(this)
             .attr('cx', x)
             .attr('cy', y);
-          // Do NOT update React state here!
+          // Move label instantly as well
+          g.selectAll('.user-label')
+            .attr('x', x)
+            .attr('y', y);
+          if (typeof onUserOfferDrag === 'function') {
+            onUserOfferDrag({
+              loanAmount: xScale.invert(x),
+              interestRate: yScale.invert(y),
+              dragX: x,
+              dragY: y,
+              width,
+              height,
+              dragging: true
+            });
+          }
         })
         .on('end', function (event, d) {
           isDraggingRef.current = false;
           d3.select(this).attr('stroke', '#fff');
           const x = Math.max(0, Math.min(width, event.x));
           const y = Math.max(0, Math.min(height, event.y));
+          lastDragPosRef.current = null;
           const newLoanAmount = xScale.invert(x);
           const newInterestRate = yScale.invert(y);
           if (typeof onUserOfferDrag === 'function') {
@@ -333,43 +362,36 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
       // Update user offer point position
       const merged = userPoint.merge(userPointEnter);
-      if (isDraggingRef.current) {
+      if (isDraggingRef.current && lastDragPosRef.current) {
+        merged
+          .attr('cx', lastDragPosRef.current.x)
+          .attr('cy', lastDragPosRef.current.y)
+          .call(drag);
+        // Move label instantly as well
+        g.selectAll('.user-label')
+          .attr('x', lastDragPosRef.current.x)
+          .attr('y', lastDragPosRef.current.y);
+      } else {
+        // If not dragging, update position immediately (no transition) to avoid jump after domain expansion
         merged
           .attr('cx', d => xScale(d.loanAmount))
           .attr('cy', d => yScale(d.interestRate))
           .call(drag);
-      } else {
-        merged
-          .transition()
-          .duration(TRANSITION_DURATION)
-          .attr('cx', d => xScale(d.loanAmount))
-          .attr('cy', d => yScale(d.interestRate))
-          .selection()
-          .call(drag);
-      }
+        // Update label instantly as well
+        const userLabel = g.selectAll<SVGTextElement, LoanOffer>('.user-label')
+          .data([userOffer]);
 
-      // Add user offer label
-      const userLabel = g.selectAll<SVGTextElement, LoanOffer>('.user-label')
-        .data([userOffer]);
+        userLabel.exit().remove();
 
-      userLabel.exit().remove();
+        const userLabelEnter = userLabel.enter()
+          .append('text')
+          .attr('class', 'user-label')
+          .attr('dy', -10)
+          .style('font-size', '12px')
+          .style('fill', '#f50057')
+          .text('Your Offer');
 
-      const userLabelEnter = userLabel.enter()
-        .append('text')
-        .attr('class', 'user-label')
-        .attr('dy', -10)
-        .style('font-size', '12px')
-        .style('fill', '#f50057')
-        .text('Your Offer');
-
-      if (isDraggingRef.current) {
         userLabel.merge(userLabelEnter)
-          .attr('x', d => xScale(d.loanAmount))
-          .attr('y', d => yScale(d.interestRate));
-      } else {
-        userLabel.merge(userLabelEnter)
-          .transition()
-          .duration(TRANSITION_DURATION)
           .attr('x', d => xScale(d.loanAmount))
           .attr('y', d => yScale(d.interestRate));
       }

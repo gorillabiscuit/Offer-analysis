@@ -16,68 +16,64 @@ import { LoanOffer } from '../types';
 interface InputControlsProps {
   collections: string[];
   onUserOfferChange: (userOffer: Partial<LoanOffer>) => void;
-  initialValues?: Partial<LoanOffer>;
+  userOffer: Partial<LoanOffer>;
 }
 
 const InputControls: React.FC<InputControlsProps> = ({ 
   collections, 
   onUserOfferChange,
-  initialValues = {}
+  userOffer
 }) => {
-  const [loanAmount, setLoanAmount] = React.useState<string>(initialValues.loanAmount?.toString() || '');
-  const [duration, setDuration] = React.useState<string>(initialValues.duration?.toString() || '');
-  const [interestRate, setInterestRate] = React.useState<string>(initialValues.interestRate?.toString() || '');
-  const [collection, setCollection] = React.useState<string>(initialValues.collection || '');
-
+  // Handlers for controlled fields
   const handleCollectionChange = (event: SelectChangeEvent) => {
     const value = event.target.value;
-    setCollection(value);
     onUserOfferChange({ collection: value });
   };
 
   const handleLoanAmountChange = (value: string) => {
-    setLoanAmount(value);
+    const numValue = Number(value);
+    if (!isNaN(numValue)) {
+      onUserOfferChange({ loanAmount: numValue });
+    } else {
+      onUserOfferChange({ loanAmount: undefined });
+    }
   };
 
-  const handleDurationChange = (value: string) => {
-    setDuration(value);
+  const handleDurationDropdownChange = (event: SelectChangeEvent) => {
+    const value = event.target.value;
+    if (value === 'all') {
+      onUserOfferChange({ duration: undefined });
+    } else {
+      onUserOfferChange({ duration: Number(value) });
+    }
   };
 
   const handleInterestRateChange = (value: string) => {
-    setInterestRate(value);
-  };
-
-  const handleInputComplete = (field: keyof LoanOffer, value: string) => {
     const numValue = Number(value);
     if (!isNaN(numValue)) {
-      onUserOfferChange({ [field]: numValue });
+      onUserOfferChange({ interestRate: numValue });
+    } else {
+      onUserOfferChange({ interestRate: undefined });
     }
   };
 
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>, field: keyof LoanOffer, value: string) => {
-    if (event.key === 'Enter') {
-      handleInputComplete(field, value);
-    }
-  };
-
-  // Handle immediate updates for stepper controls
-  const handleStepperChange = (field: keyof LoanOffer, value: string) => {
-    const numValue = Number(value);
-    if (!isNaN(numValue)) {
-      // Update local state
-      switch (field) {
-        case 'loanAmount':
-          setLoanAmount(value);
-          break;
-        case 'duration':
-          setDuration(value);
-          break;
-        case 'interestRate':
-          setInterestRate(value);
-          break;
+  // Add rounding on blur for loan amount
+  const handleLoanAmountBlur = () => {
+    if (userOffer.loanAmount !== undefined && !isNaN(userOffer.loanAmount)) {
+      const rounded = Math.round(userOffer.loanAmount * 1000) / 1000;
+      if (rounded !== userOffer.loanAmount) {
+        onUserOfferChange({ loanAmount: rounded });
       }
-      // Immediately update the graph
-      onUserOfferChange({ [field]: numValue });
+    }
+  };
+
+  // Add rounding on blur for interest rate
+  const handleInterestRateBlur = () => {
+    if (userOffer.interestRate !== undefined && !isNaN(userOffer.interestRate)) {
+      const rounded = Math.round(userOffer.interestRate * 100) / 100;
+      if (rounded !== userOffer.interestRate) {
+        onUserOfferChange({ interestRate: rounded });
+      }
     }
   };
 
@@ -103,7 +99,7 @@ const InputControls: React.FC<InputControlsProps> = ({
           <Select
             labelId="collection-select-label"
             id="collection-select"
-            value={collection}
+            value={userOffer.collection || ''}
             label="Collection"
             onChange={handleCollectionChange}
           >
@@ -120,41 +116,41 @@ const InputControls: React.FC<InputControlsProps> = ({
           fullWidth
           label="Loan Amount"
           type="number"
-          value={loanAmount}
+          value={userOffer.loanAmount ?? ''}
           onChange={(e) => handleLoanAmountChange(e.target.value)}
-          onBlur={() => handleInputComplete('loanAmount', loanAmount)}
-          onKeyPress={(e) => handleKeyPress(e, 'loanAmount', loanAmount)}
-          onInput={(e) => handleStepperChange('loanAmount', (e.target as HTMLInputElement).value)}
+          onBlur={handleLoanAmountBlur}
           InputProps={{
             endAdornment: <Typography variant="body2">ETH</Typography>
           }}
         />
 
-        {/* Duration Input */}
-        <TextField
-          fullWidth
-          label="Duration"
-          type="number"
-          value={duration}
-          onChange={(e) => handleDurationChange(e.target.value)}
-          onBlur={() => handleInputComplete('duration', duration)}
-          onKeyPress={(e) => handleKeyPress(e, 'duration', duration)}
-          onInput={(e) => handleStepperChange('duration', (e.target as HTMLInputElement).value)}
-          InputProps={{
-            endAdornment: <Typography variant="body2">days</Typography>
-          }}
-        />
+        {/* Duration Dropdown */}
+        <FormControl fullWidth>
+          <InputLabel id="duration-select-label">Duration</InputLabel>
+          <Select
+            labelId="duration-select-label"
+            id="duration-select"
+            value={userOffer.duration === undefined ? 'all' : String(userOffer.duration)}
+            label="Duration"
+            onChange={handleDurationDropdownChange}
+          >
+            <MenuItem value="all">All durations</MenuItem>
+            <MenuItem value="7">7 days</MenuItem>
+            <MenuItem value="14">14 days</MenuItem>
+            <MenuItem value="30">30 days</MenuItem>
+            <MenuItem value="60">60 days</MenuItem>
+            <MenuItem value="180">180 days</MenuItem>
+          </Select>
+        </FormControl>
 
         {/* Interest Rate Input */}
         <TextField
           fullWidth
           label="Interest Rate"
           type="number"
-          value={interestRate}
+          value={userOffer.interestRate ?? ''}
           onChange={(e) => handleInterestRateChange(e.target.value)}
-          onBlur={() => handleInputComplete('interestRate', interestRate)}
-          onKeyPress={(e) => handleKeyPress(e, 'interestRate', interestRate)}
-          onInput={(e) => handleStepperChange('interestRate', (e.target as HTMLInputElement).value)}
+          onBlur={handleInterestRateBlur}
           InputProps={{
             endAdornment: <Typography variant="body2">%</Typography>
           }}
@@ -168,13 +164,13 @@ const InputControls: React.FC<InputControlsProps> = ({
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           <Typography variant="body2">
-            Loan Amount: {loanAmount ? formatETH(Number(loanAmount)) : '-'}
+            Loan Amount: {userOffer.loanAmount !== undefined ? formatETH(Number(userOffer.loanAmount)) : '-'}
           </Typography>
           <Typography variant="body2">
-            Duration: {duration ? formatDuration(Number(duration)) : '-'}
+            Duration: {userOffer.duration !== undefined ? formatDuration(Number(userOffer.duration)) : '-'}
           </Typography>
           <Typography variant="body2">
-            Interest Rate: {interestRate ? formatPercentage(Number(interestRate)) : '-'}
+            Interest Rate: {userOffer.interestRate !== undefined ? formatPercentage(Number(userOffer.interestRate)) : '-'}
           </Typography>
         </Box>
       </Box>

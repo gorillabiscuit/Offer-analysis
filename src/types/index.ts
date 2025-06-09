@@ -2,7 +2,7 @@ export interface LoanOffer {
   id?: string;
   loanAmount: number;
   interestRate: number;
-  duration: number;
+  duration?: number;
   collection?: string;
   timestamp?: number;
   lender?: string;

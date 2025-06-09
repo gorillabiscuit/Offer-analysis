@@ -5,6 +5,7 @@ import ScatterPlot from './components/ScatterPlot';
 import { useLoanOffers } from './hooks/useLoanOffers';
 import { useUserOffer, UserOfferState } from './hooks/useUserOffer';
 import { LoanOffer } from './types';
+import { roundETH, roundPercentage } from './utils/formatting';
 
 // Move getInitialDomain outside the component to avoid dependency issues
 function getInitialDomain(offers: LoanOffer[], userOffer: UserOfferState) {
@@ -28,8 +29,11 @@ function App() {
 
   const [domain, setDomain] = useState(() => getInitialDomain(loanOffers, userOffer));
 
-  // Expand domain if user offer is in buffer zone
-  const expandDomainIfNeeded = useCallback((loanAmount: number, interestRate: number) => {
+  // Add a constant for the expansion percentage
+  const DOMAIN_EXPAND_PERCENT = 0.01; // 1%
+
+  // Expand domain if user offer is in buffer zone or at edge
+  const expandDomainIfNeeded = useCallback((loanAmount: number, interestRate: number, dragging = false, dragX?: number, dragY?: number, width?: number, height?: number) => {
     setDomain(prev => {
       let [xMin, xMax] = prev.x;
       let [yMin, yMax] = prev.y;
@@ -37,22 +41,34 @@ function App() {
       const yRange = yMax - yMin;
       let changed = false;
       // Expand right
-      if (loanAmount > xMax - xRange * 0.1) {
+      if (dragging && width !== undefined && dragX !== undefined && dragX >= width) {
+        xMax += xRange * DOMAIN_EXPAND_PERCENT;
+        changed = true;
+      } else if (loanAmount > xMax - xRange * 0.1) {
         xMax += xRange * 0.05;
         changed = true;
       }
       // Expand left
-      if (loanAmount < xMin + xRange * 0.1) {
+      if (dragging && dragX !== undefined && dragX <= 0) {
+        xMin = Math.max(0, xMin - xRange * DOMAIN_EXPAND_PERCENT);
+        changed = true;
+      } else if (loanAmount < xMin + xRange * 0.1) {
         xMin = Math.max(0, xMin - xRange * 0.05);
         changed = true;
       }
       // Expand top
-      if (interestRate > yMax - yRange * 0.1) {
+      if (dragging && height !== undefined && dragY !== undefined && dragY <= 0) {
+        yMax += yRange * DOMAIN_EXPAND_PERCENT;
+        changed = true;
+      } else if (interestRate > yMax - yRange * 0.1) {
         yMax += yRange * 0.05;
         changed = true;
       }
       // Expand bottom
-      if (interestRate < yMin + yRange * 0.1) {
+      if (dragging && height !== undefined && dragY !== undefined && dragY >= height) {
+        yMin = Math.max(0, yMin - yRange * DOMAIN_EXPAND_PERCENT);
+        changed = true;
+      } else if (interestRate < yMin + yRange * 0.1) {
         yMin = Math.max(0, yMin - yRange * 0.05);
         changed = true;
       }
@@ -62,18 +78,33 @@ function App() {
   }, []);
 
   // Callback for dragging the user offer point
-  const handleUserOfferDrag = (update: { loanAmount: number; interestRate: number }) => {
-    updateUserOffer({
-      loanAmount: Math.max(0, update.loanAmount),
-      interestRate: Math.max(0, update.interestRate),
-    });
-    expandDomainIfNeeded(update.loanAmount, update.interestRate);
+  const handleUserOfferDrag = (update: { loanAmount: number; interestRate: number, dragX?: number, dragY?: number, width?: number, height?: number, dragging?: boolean }) => {
+    if (update.dragging && update.dragX !== undefined && update.dragY !== undefined && update.width !== undefined && update.height !== undefined) {
+      // During drag: update user offer state with live, unrounded value for real-time feedback
+      updateUserOffer({
+        loanAmount: Math.max(0, update.loanAmount),
+        interestRate: Math.max(0, update.interestRate),
+      });
+      expandDomainIfNeeded(update.loanAmount, update.interestRate, true, update.dragX, update.dragY, update.width, update.height);
+    } else {
+      // On drag end: round values before updating state
+      updateUserOffer({
+        loanAmount: roundETH(Math.max(0, update.loanAmount)),
+        interestRate: roundPercentage(Math.max(0, update.interestRate)),
+      });
+      expandDomainIfNeeded(update.loanAmount, update.interestRate);
+    }
   };
 
   // Reset domain if data changes significantly (optional, for robustness)
   React.useEffect(() => {
     setDomain(getInitialDomain(loanOffers, userOffer));
   }, [loanOffers, userOffer]);
+
+  // Filter offers by selected duration
+  const filteredOffers = userOffer.duration
+    ? loanOffers.filter(offer => offer.duration === userOffer.duration)
+    : loanOffers;
 
   return (
     <Container maxWidth="xl">
@@ -83,7 +114,7 @@ function App() {
             <InputControls
               collections={collections}
               onUserOfferChange={updateUserOffer}
-              initialValues={userOffer}
+              userOffer={userOffer}
             />
           </Grid>
           <Grid item xs={12} md={8}>
@@ -95,7 +126,7 @@ function App() {
               <Box sx={{ color: 'error.main', p: 2 }}>{error}</Box>
             ) : (
               <ScatterPlot
-                data={loanOffers}
+                data={filteredOffers}
                 userOffer={userOffer}
                 selectedCurrency={selectedCurrency}
                 onCurrencyChange={setSelectedCurrency}

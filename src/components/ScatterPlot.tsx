@@ -32,23 +32,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   const lastDragPosRef = useRef<{ x: number; y: number } | null>(null);
   const pendingDragEndRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Calculate statistics
-  const sortedLoanAmounts = [...data.map(d => d.loanAmount)].sort((a, b) => a - b);
-  const sortedInterestRates = [...data.map(d => d.interestRate)].sort((a, b) => a - b);
-  const medianLoanAmount = d3.median(sortedLoanAmounts) || 0;
-  const medianInterestRate = d3.median(sortedInterestRates) || 0;
-
-  // If userOffer exists but has no position, set it to median values
-  useEffect(() => {
-    if (userOffer && typeof onUserOfferDrag === 'function' && 
-        (!userOffer.loanAmount || !userOffer.interestRate)) {
-      onUserOfferDrag({
-        loanAmount: medianLoanAmount,
-        interestRate: medianInterestRate
-      });
-    }
-  }, [userOffer, medianLoanAmount, medianInterestRate, onUserOfferDrag]);
-
   // Create tooltips once when component mounts
   useEffect(() => {
     let tooltip: HTMLDivElement | null = null;
@@ -223,6 +206,13 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .text('Interest Rate (%)');
     }
 
+    // Calculate statistics
+    const sortedLoanAmounts = [...data.map(d => d.loanAmount)].sort((a, b) => a - b);
+    const sortedInterestRates = [...data.map(d => d.interestRate)].sort((a, b) => a - b);
+    
+    const medianLoanAmount = d3.median(sortedLoanAmounts) || 0;
+    const medianInterestRate = d3.median(sortedInterestRates) || 0;
+    
     // Update reference lines with transitions or immediate
     const updateReferenceLine = (className: string, x1: number, x2: number, y1: number, y2: number, color: string, dashArray: string) => {
       const line = g.select<SVGLineElement>(`.${className}`);

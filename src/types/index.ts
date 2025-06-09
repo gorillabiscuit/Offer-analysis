@@ -1,4 +1,5 @@
 export interface LoanOffer {
+  id?: string;
   loanAmount: number;
   interestRate: number;
   duration: number;

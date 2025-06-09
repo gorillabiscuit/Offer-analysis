@@ -239,9 +239,13 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     updateAnnotation('q1-y-annotation', width - 5, yScale(q1InterestRate) - 20, `Q1: ${q1InterestRate.toFixed(2)}%`, 'end');
     updateAnnotation('q3-y-annotation', width - 5, yScale(q3InterestRate) - 35, `Q3: ${q3InterestRate.toFixed(2)}%`, 'end');
 
+    // Log the keys for debugging
+    const keys = data.map(d => d.id || `${d.collection}-${d.loanAmount}-${d.interestRate}-${d.duration}`);
+    console.log('Loan keys:', keys);
+
     // Update dots with transitions
     const dots = g.selectAll<SVGCircleElement, LoanOffer>('.data-point')
-      .data(data, (d: any) => d.loanAmount + '-' + d.interestRate);
+      .data(data, (d: any) => d.id || `${d.collection}-${d.loanAmount}-${d.interestRate}-${d.duration}`);
 
     // Remove old dots
     dots.exit()
@@ -251,157 +255,85 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       .remove();
 
     // Add new dots
-    const newDots = dots.enter()
+    const dotsEnter = dots.enter()
       .append('circle')
       .attr('class', 'data-point')
-      .attr('r', 0)
-      .style('fill', '#1976d2')
-      .style('opacity', 0.7)
-      .style('cursor', 'pointer');
-
-    // Update all dots
-    const allDots = dots.merge(newDots);
-    allDots
-      .transition()
-      .duration(TRANSITION_DURATION)
-      .attr('cx', (d: LoanOffer) => xScale(d.loanAmount))
-      .attr('cy', (d: LoanOffer) => yScale(d.interestRate))
       .attr('r', 5)
-      .style('opacity', 0.7);
-
-    // Add event listeners to dots
-    allDots
-      .on('mouseover', function(event: MouseEvent, d: LoanOffer) {
-        d3.select(this)
-          .transition()
-          .duration(200)
-          .attr('r', 8)
-          .style('opacity', 1)
-          .style('stroke', '#000')
-          .style('stroke-width', 2);
-
-        const tooltipContent = `
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-            <div style="margin-bottom: 4px;"><strong>Loan Amount:</strong> ${d.loanAmount.toFixed(2)} ${d.currency || selectedCurrency}</div>
-            <div style="margin-bottom: 4px;"><strong>Interest Rate:</strong> ${d.interestRate.toFixed(2)}%</div>
-            <div style="margin-bottom: 4px;"><strong>Duration:</strong> ${d.duration} days</div>
-            ${d.lender ? `<div style="margin-bottom: 4px;"><strong>Lender:</strong> ${d.lender}</div>` : ''}
-            ${d.collection ? `<div style="margin-bottom: 4px;"><strong>Collection:</strong> ${d.collection}</div>` : ''}
-            ${d.maximumRepayment ? `<div style="margin-bottom: 4px;"><strong>Max Repayment:</strong> ${d.maximumRepayment.toFixed(2)} ${d.currency || selectedCurrency}</div>` : ''}
-            ${d.createdAt ? `<div><strong>Created:</strong> ${new Date(d.createdAt).toLocaleDateString()}</div>` : ''}
-          </div>
+      .attr('fill', '#2196f3')
+      .attr('opacity', 0.7)
+      .on('mouseover', function(event, d) {
+        if (!tooltipRef.current) return;
+        const tooltip = tooltipRef.current;
+        tooltip.style.visibility = 'visible';
+        tooltip.style.left = (event.pageX + 10) + 'px';
+        tooltip.style.top = (event.pageY - 10) + 'px';
+        tooltip.innerHTML = `
+          <strong>Collection:</strong> ${d.collection}<br/>
+          <strong>Loan Amount:</strong> ${d.loanAmount} ${selectedCurrency}<br/>
+          <strong>Interest Rate:</strong> ${d.interestRate}%<br/>
+          <strong>Duration:</strong> ${d.duration} days
         `;
-
-        if (tooltipRef.current) {
-          tooltipRef.current.innerHTML = tooltipContent;
-          tooltipRef.current.style.visibility = 'visible';
-          tooltipRef.current.style.top = `${event.pageY - 10}px`;
-          tooltipRef.current.style.left = `${event.pageX + 10}px`;
-        }
       })
-      .on('mousemove', function(event: MouseEvent) {
-        if (tooltipRef.current) {
-          tooltipRef.current.style.top = `${event.pageY - 10}px`;
-          tooltipRef.current.style.left = `${event.pageX + 10}px`;
-        }
+      .on('mousemove', function(event) {
+        if (!tooltipRef.current) return;
+        tooltipRef.current.style.left = (event.pageX + 10) + 'px';
+        tooltipRef.current.style.top = (event.pageY - 10) + 'px';
       })
       .on('mouseout', function() {
-        d3.select(this)
-          .transition()
-          .duration(200)
-          .attr('r', 5)
-          .style('opacity', 0.7)
-          .style('stroke', 'none');
-
-        if (tooltipRef.current) {
-          tooltipRef.current.style.visibility = 'hidden';
-        }
+        if (!tooltipRef.current) return;
+        tooltipRef.current.style.visibility = 'hidden';
       });
 
-    // Update user offer point with transitions
+    // Update all dots (including new ones)
+    dots.merge(dotsEnter)
+      .transition()
+      .duration(TRANSITION_DURATION)
+      .attr('cx', d => xScale(d.loanAmount))
+      .attr('cy', d => yScale(d.interestRate));
+
+    // Update user offer point if it exists
     if (userOffer) {
-      const userPoint = g.select<SVGCircleElement>('.user-offer-point');
-      if (userPoint.empty()) {
-        g.append('circle')
-          .attr('class', 'user-offer-point')
-          .attr('cx', xScale(userOffer.loanAmount))
-          .attr('cy', yScale(userOffer.interestRate))
-          .attr('r', 8)
-          .style('fill', '#ff4444')
-          .style('stroke', '#000')
-          .style('stroke-width', 2)
-          .style('cursor', 'pointer');
-      } else {
-        userPoint.transition()
-          .duration(TRANSITION_DURATION)
-          .attr('cx', xScale(userOffer.loanAmount))
-          .attr('cy', yScale(userOffer.interestRate));
-      }
+      const userPoint = g.selectAll<SVGCircleElement, LoanOffer>('.user-point')
+        .data([userOffer]);
 
-      // Update user offer label
-      const userLabel = g.select<SVGTextElement>('.user-offer-label');
-      if (userLabel.empty()) {
-        g.append('text')
-          .attr('class', 'user-offer-label')
-          .attr('x', xScale(userOffer.loanAmount) + 10)
-          .attr('y', yScale(userOffer.interestRate) - 10)
-          .attr('text-anchor', 'start')
-          .attr('font-size', '12px')
-          .attr('font-weight', 'bold')
-          .attr('fill', '#ff4444')
-          .text('Your Offer');
-      } else {
-        userLabel.transition()
-          .duration(TRANSITION_DURATION)
-          .attr('x', xScale(userOffer.loanAmount) + 10)
-          .attr('y', yScale(userOffer.interestRate) - 10);
-      }
+      userPoint.exit().remove();
 
-      // Add hover effect for user offer point
-      userPoint
-        .on('mouseover', function(event: MouseEvent) {
-          d3.select(this)
-            .transition()
-            .duration(200)
-            .attr('r', 10)
-            .style('stroke-width', 3);
+      const userPointEnter = userPoint.enter()
+        .append('circle')
+        .attr('class', 'user-point')
+        .attr('r', 7)
+        .attr('fill', '#f50057')
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 2);
 
-          const tooltipContent = `
-            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-              <div style="margin-bottom: 4px;"><strong>Your Loan Amount:</strong> ${userOffer.loanAmount.toFixed(2)} ${selectedCurrency}</div>
-              <div style="margin-bottom: 4px;"><strong>Your Interest Rate:</strong> ${userOffer.interestRate.toFixed(2)}%</div>
-              <div style="margin-bottom: 4px;"><strong>Duration:</strong> ${userOffer.duration} days</div>
-            </div>
-          `;
+      userPoint.merge(userPointEnter)
+        .transition()
+        .duration(TRANSITION_DURATION)
+        .attr('cx', d => xScale(d.loanAmount))
+        .attr('cy', d => yScale(d.interestRate));
 
-          if (tooltipRef.current) {
-            tooltipRef.current.innerHTML = tooltipContent;
-            tooltipRef.current.style.visibility = 'visible';
-            tooltipRef.current.style.top = `${event.pageY - 10}px`;
-            tooltipRef.current.style.left = `${event.pageX + 10}px`;
-          }
-        })
-        .on('mousemove', function(event: MouseEvent) {
-          if (tooltipRef.current) {
-            tooltipRef.current.style.top = `${event.pageY - 10}px`;
-            tooltipRef.current.style.left = `${event.pageX + 10}px`;
-          }
-        })
-        .on('mouseout', function() {
-          d3.select(this)
-            .transition()
-            .duration(200)
-            .attr('r', 8)
-            .style('stroke-width', 2);
+      // Add user offer label
+      const userLabel = g.selectAll<SVGTextElement, LoanOffer>('.user-label')
+        .data([userOffer]);
 
-          if (tooltipRef.current) {
-            tooltipRef.current.style.visibility = 'hidden';
-          }
-        });
+      userLabel.exit().remove();
+
+      const userLabelEnter = userLabel.enter()
+        .append('text')
+        .attr('class', 'user-label')
+        .attr('dy', -10)
+        .style('font-size', '12px')
+        .style('fill', '#f50057')
+        .text('Your Offer');
+
+      userLabel.merge(userLabelEnter)
+        .transition()
+        .duration(TRANSITION_DURATION)
+        .attr('x', d => xScale(d.loanAmount))
+        .attr('y', d => yScale(d.interestRate));
     } else {
-      // Remove user offer point and label if no user offer
-      g.select('.user-offer-point').remove();
-      g.select('.user-offer-label').remove();
+      // Remove user point and label if no user offer
+      g.selectAll('.user-point, .user-label').remove();
     }
   }, [data, userOffer, selectedCurrency]);
 

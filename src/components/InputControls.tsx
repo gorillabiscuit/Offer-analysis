@@ -60,6 +60,27 @@ const InputControls: React.FC<InputControlsProps> = ({
     }
   };
 
+  // Handle immediate updates for stepper controls
+  const handleStepperChange = (field: keyof LoanOffer, value: string) => {
+    const numValue = Number(value);
+    if (!isNaN(numValue)) {
+      // Update local state
+      switch (field) {
+        case 'loanAmount':
+          setLoanAmount(value);
+          break;
+        case 'duration':
+          setDuration(value);
+          break;
+        case 'interestRate':
+          setInterestRate(value);
+          break;
+      }
+      // Immediately update the graph
+      onUserOfferChange({ [field]: numValue });
+    }
+  };
+
   return (
     <Paper 
       elevation={3} 
@@ -103,6 +124,7 @@ const InputControls: React.FC<InputControlsProps> = ({
           onChange={(e) => handleLoanAmountChange(e.target.value)}
           onBlur={() => handleInputComplete('loanAmount', loanAmount)}
           onKeyPress={(e) => handleKeyPress(e, 'loanAmount', loanAmount)}
+          onInput={(e) => handleStepperChange('loanAmount', (e.target as HTMLInputElement).value)}
           InputProps={{
             endAdornment: <Typography variant="body2">ETH</Typography>
           }}
@@ -117,6 +139,7 @@ const InputControls: React.FC<InputControlsProps> = ({
           onChange={(e) => handleDurationChange(e.target.value)}
           onBlur={() => handleInputComplete('duration', duration)}
           onKeyPress={(e) => handleKeyPress(e, 'duration', duration)}
+          onInput={(e) => handleStepperChange('duration', (e.target as HTMLInputElement).value)}
           InputProps={{
             endAdornment: <Typography variant="body2">days</Typography>
           }}
@@ -131,6 +154,7 @@ const InputControls: React.FC<InputControlsProps> = ({
           onChange={(e) => handleInterestRateChange(e.target.value)}
           onBlur={() => handleInputComplete('interestRate', interestRate)}
           onKeyPress={(e) => handleKeyPress(e, 'interestRate', interestRate)}
+          onInput={(e) => handleStepperChange('interestRate', (e.target as HTMLInputElement).value)}
           InputProps={{
             endAdornment: <Typography variant="body2">%</Typography>
           }}

@@ -27,6 +27,7 @@ export const useLoanOffers = () => {
         
         // Transform the data to match our LoanOffer type
         const transformedOffers: LoanOffer[] = (data.data || []).map((offer: any) => ({
+          id: offer._id,
           loanAmount: offer.loanPrincipalCanonicalAmount,
           interestRate: offer.eAPR || offer.apr, // Use effective APR if available
           duration: offer.loanDuration / (24 * 60 * 60), // Convert seconds to days

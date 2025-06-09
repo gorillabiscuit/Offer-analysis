@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { LoanOffer } from '../types';
 
 export interface UserOfferState {
   loanAmount: number;
@@ -29,9 +30,36 @@ export const useUserOffer = () => {
     });
   }, []);
 
+  const initializeWithMedianValues = useCallback((offers: LoanOffer[]) => {
+    if (offers.length === 0) return;
+
+    // Calculate median loan amount
+    const sortedAmounts = [...offers.map(o => o.loanAmount)].sort((a, b) => a - b);
+    const medianAmount = sortedAmounts[Math.floor(sortedAmounts.length / 2)];
+
+    // Calculate median interest rate
+    const sortedRates = [...offers.map(o => o.interestRate)].sort((a, b) => a - b);
+    const medianRate = sortedRates[Math.floor(sortedRates.length / 2)];
+
+    // Get most common duration if available
+    const durations = offers.map(o => o.duration).filter((d): d is number => d !== undefined);
+    const mostCommonDuration = durations.length > 0 
+      ? durations.reduce((a, b, i, arr) => 
+          arr.filter(v => v === a).length >= arr.filter(v => v === b).length ? a : b
+        )
+      : undefined;
+
+    setUserOffer({
+      loanAmount: medianAmount,
+      interestRate: medianRate,
+      duration: mostCommonDuration,
+    });
+  }, []);
+
   return {
     userOffer,
     updateUserOffer,
     resetUserOffer,
+    initializeWithMedianValues,
   };
 }; 

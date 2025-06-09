@@ -276,7 +276,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         tooltip.style.left = (event.pageX + 10) + 'px';
         tooltip.style.top = (event.pageY - 10) + 'px';
         tooltip.innerHTML = `
-          <strong>Collection:</strong> ${d.collection}<br/>
           <strong>Loan Amount:</strong> ${d.loanAmount} ${selectedCurrency}<br/>
           <strong>Interest Rate:</strong> ${d.interestRate}%<br/>
           <strong>Duration:</strong> ${d.duration} days<br/>

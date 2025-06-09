@@ -366,11 +366,15 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
             .attr('x', x)
             .attr('y', y);
           // Update drag tooltip
-          if (dragTooltipRef.current) {
+          if (dragTooltipRef.current && svgRef.current) {
             const loanAmount = xScale.invert(x);
             const interestRate = yScale.invert(y);
-            dragTooltipRef.current.style.left = (event.pageX + 15) + 'px';
-            dragTooltipRef.current.style.top = (event.pageY - 10) + 'px';
+            // Convert SVG coordinates to page coordinates
+            const svgRect = svgRef.current.getBoundingClientRect();
+            const tooltipX = svgRect.left + margin.left + x;
+            const tooltipY = svgRect.top + margin.top + y;
+            dragTooltipRef.current.style.left = (tooltipX + 15) + 'px';
+            dragTooltipRef.current.style.top = (tooltipY - 10) + 'px';
             dragTooltipRef.current.innerHTML = `${loanAmount.toFixed(2)} ${selectedCurrency}<br/>${interestRate.toFixed(2)}% APR`;
           }
           if (typeof onUserOfferDrag === 'function') {

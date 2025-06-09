@@ -33,7 +33,7 @@ function App() {
   const DOMAIN_EXPAND_PERCENT = 0.01; // 1%
 
   // Expand domain if user offer is in buffer zone or at edge
-  const expandDomainIfNeeded = useCallback((loanAmount: number, interestRate: number, dragging = false, dragX?: number, dragY?: number, width?: number, height?: number) => {
+  const expandDomainIfNeeded = useCallback((loanAmount: number, interestRate: number, dragging = false, dragX?: number, dragY?: number, width?: number, height?: number, isNearEdge = false) => {
     setDomain(prev => {
       let [xMin, xMax] = prev.x;
       let [yMin, yMax] = prev.y;
@@ -44,37 +44,46 @@ function App() {
       // During drag, expand more aggressively to prevent edge cases
       const expandPercent = dragging ? DOMAIN_EXPAND_PERCENT * 2 : DOMAIN_EXPAND_PERCENT;
 
-      // Expand right
-      if (dragging && width !== undefined && dragX !== undefined && dragX >= width * 0.95) {
-        xMax += xRange * expandPercent;
-        changed = true;
-      } else if (loanAmount > xMax - xRange * 0.1) {
-        xMax += xRange * expandPercent;
-        changed = true;
-      }
-      // Expand left
-      if (dragging && dragX !== undefined && width !== undefined && dragX <= width * 0.05) {
-        xMin = Math.max(0, xMin - xRange * expandPercent);
-        changed = true;
-      } else if (loanAmount < xMin + xRange * 0.1) {
-        xMin = Math.max(0, xMin - xRange * expandPercent);
-        changed = true;
-      }
-      // Expand top
-      if (dragging && height !== undefined && dragY !== undefined && dragY <= height * 0.05) {
-        yMax += yRange * expandPercent;
-        changed = true;
-      } else if (interestRate > yMax - yRange * 0.1) {
-        yMax += yRange * expandPercent;
-        changed = true;
-      }
-      // Expand bottom
-      if (dragging && height !== undefined && dragY !== undefined && dragY >= height * 0.95) {
-        yMin = Math.max(0, yMin - yRange * expandPercent);
-        changed = true;
-      } else if (interestRate < yMin + yRange * 0.1) {
-        yMin = Math.max(0, yMin - yRange * expandPercent);
-        changed = true;
+      // Only expand if we're near an edge during drag
+      if (dragging && isNearEdge) {
+        // Expand right
+        if (dragX !== undefined && width !== undefined && dragX >= width * 0.95) {
+          xMax += xRange * expandPercent;
+          changed = true;
+        }
+        // Expand left
+        if (dragX !== undefined && width !== undefined && dragX <= width * 0.05) {
+          xMin = Math.max(0, xMin - xRange * expandPercent);
+          changed = true;
+        }
+        // Expand top
+        if (dragY !== undefined && height !== undefined && dragY <= height * 0.05) {
+          yMax += yRange * expandPercent;
+          changed = true;
+        }
+        // Expand bottom
+        if (dragY !== undefined && height !== undefined && dragY >= height * 0.95) {
+          yMin = Math.max(0, yMin - yRange * expandPercent);
+          changed = true;
+        }
+      } else {
+        // Non-drag expansion (when point is near edge but not dragging)
+        if (loanAmount > xMax - xRange * 0.1) {
+          xMax += xRange * expandPercent;
+          changed = true;
+        }
+        if (loanAmount < xMin + xRange * 0.1) {
+          xMin = Math.max(0, xMin - xRange * expandPercent);
+          changed = true;
+        }
+        if (interestRate > yMax - yRange * 0.1) {
+          yMax += yRange * expandPercent;
+          changed = true;
+        }
+        if (interestRate < yMin + yRange * 0.1) {
+          yMin = Math.max(0, yMin - yRange * expandPercent);
+          changed = true;
+        }
       }
 
       if (changed) {
@@ -98,14 +107,14 @@ function App() {
   }, []);
 
   // Callback for dragging the user offer point
-  const handleUserOfferDrag = (update: { loanAmount: number; interestRate: number, dragX?: number, dragY?: number, width?: number, height?: number, dragging?: boolean }) => {
+  const handleUserOfferDrag = (update: { loanAmount: number; interestRate: number, dragX?: number, dragY?: number, width?: number, height?: number, dragging?: boolean, isNearEdge?: boolean }) => {
     if (update.dragging && update.dragX !== undefined && update.dragY !== undefined && update.width !== undefined && update.height !== undefined) {
       // During drag: update user offer state with live, unrounded value for real-time feedback
       updateUserOffer({
         loanAmount: Math.max(0, update.loanAmount),
         interestRate: Math.max(0, update.interestRate),
       });
-      expandDomainIfNeeded(update.loanAmount, update.interestRate, true, update.dragX, update.dragY, update.width, update.height);
+      expandDomainIfNeeded(update.loanAmount, update.interestRate, true, update.dragX, update.dragY, update.width, update.height, update.isNearEdge);
     } else {
       // On drag end: round values before updating state
       updateUserOffer({

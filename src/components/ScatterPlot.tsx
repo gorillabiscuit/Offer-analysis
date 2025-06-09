@@ -9,7 +9,7 @@ interface ScatterPlotProps {
   userOffer?: LoanOffer;
   selectedCurrency: Currency;
   onCurrencyChange: (currency: Currency) => void;
-  onUserOfferDrag?: (update: { loanAmount: number; interestRate: number; dragX?: number; dragY?: number; width?: number; height?: number; dragging?: boolean }) => void;
+  onUserOfferDrag?: (update: { loanAmount: number; interestRate: number; dragX?: number; dragY?: number; width?: number; height?: number; dragging?: boolean; isNearEdge?: boolean }) => void;
   domain: { x: [number, number]; y: [number, number] };
 }
 
@@ -337,6 +337,13 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
             .attr('x', x)
             .attr('y', y);
           if (typeof onUserOfferDrag === 'function') {
+            // Check if we're near the edges and need to expand
+            const isNearEdge = 
+              x >= width * 0.95 || 
+              x <= width * 0.05 || 
+              y >= height * 0.95 || 
+              y <= height * 0.05;
+            
             onUserOfferDrag({
               loanAmount: xScale.invert(x),
               interestRate: yScale.invert(y),
@@ -344,7 +351,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
               dragY: y,
               width,
               height,
-              dragging: true
+              dragging: true,
+              isNearEdge // Add this flag to indicate we're near an edge
             });
           }
         })

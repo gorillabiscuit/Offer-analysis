@@ -6,6 +6,7 @@ import { useLoanOffers } from './hooks/useLoanOffers';
 import { useUserOffer, UserOfferState } from './hooks/useUserOffer';
 import { LoanOffer } from './types';
 import { roundETH, roundPercentage } from './utils/formatting';
+import { getMarketMedians } from './utils/median';
 
 // Move getInitialDomain outside the component to avoid dependency issues
 function getInitialDomain(offers: LoanOffer[], userOffer: UserOfferState) {
@@ -25,16 +26,18 @@ function getInitialDomain(offers: LoanOffer[], userOffer: UserOfferState) {
 
 function App() {
   const { loanOffers, collections, loading, error, selectedCurrency, setSelectedCurrency } = useLoanOffers();
-  const { userOffer, updateUserOffer, initializeWithMedianValues } = useUserOffer();
-
+  const { userOffer, updateUserOffer } = useUserOffer();
   const [domain, setDomain] = useState(() => getInitialDomain(loanOffers, userOffer));
 
-  // Initialize user offer with median values when loan offers are loaded
+  // Only initialize user offer once, after offers are loaded and stable
+  const hasInitializedUserOffer = React.useRef(false);
   useEffect(() => {
-    if (loanOffers.length > 0) {
-      initializeWithMedianValues(loanOffers);
+    if (!hasInitializedUserOffer.current && !loading && loanOffers.length > 0) {
+      const { medianLoanAmount, medianInterestRate } = getMarketMedians(loanOffers);
+      updateUserOffer({ loanAmount: medianLoanAmount, interestRate: medianInterestRate });
+      hasInitializedUserOffer.current = true;
     }
-  }, [loanOffers, initializeWithMedianValues]);
+  }, [loading, loanOffers, updateUserOffer]);
 
   // Add a constant for the expansion percentage
   const DOMAIN_EXPAND_PERCENT = 0.01; // 1%

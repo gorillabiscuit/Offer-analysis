@@ -3,6 +3,7 @@ import { Box, Paper, Typography, FormControlLabel, Switch } from '@mui/material'
 import * as d3 from 'd3';
 import { LoanOffer } from '../types';
 import { Currency } from '../hooks/useLoanOffers';
+import { getMarketMedians } from '../utils/median';
 
 interface ScatterPlotProps {
   data?: LoanOffer[];
@@ -207,11 +208,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     }
 
     // Calculate statistics
-    const sortedLoanAmounts = [...data.map(d => d.loanAmount)].sort((a, b) => a - b);
-    const sortedInterestRates = [...data.map(d => d.interestRate)].sort((a, b) => a - b);
-    
-    const medianLoanAmount = d3.median(sortedLoanAmounts) || 0;
-    const medianInterestRate = d3.median(sortedInterestRates) || 0;
+    const { medianLoanAmount, medianInterestRate } = getMarketMedians(data);
     
     // Update reference lines with transitions or immediate
     const updateReferenceLine = (className: string, x1: number, x2: number, y1: number, y2: number, color: string, dashArray: string) => {

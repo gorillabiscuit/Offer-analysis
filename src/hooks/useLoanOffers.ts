@@ -36,7 +36,8 @@ export const useLoanOffers = () => {
           lender: offer.lender,
           createdAt: offer.offerDate,
           currency: offer.currencySymbol, // Add currency information
-          maximumRepayment: offer.maximumRepaymentCanonicalAmount // Add maximum repayment amount
+          maximumRepayment: offer.maximumRepaymentCanonicalAmount, // Add maximum repayment amount
+          loanPrincipalUSD: offer.loanPrincipalUSD // Add USD value for conversion
         }));
 
         setLoanOffers(transformedOffers);
@@ -64,6 +65,7 @@ export const useLoanOffers = () => {
 
   return {
     loanOffers: filteredOffers,
+    allLoanOffers: loanOffers,
     collections,
     loading,
     error,

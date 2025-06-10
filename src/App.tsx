@@ -6,7 +6,7 @@ import { useLoanOffers } from './hooks/useLoanOffers';
 import { useUserOffer, UserOfferState } from './hooks/useUserOffer';
 import { LoanOffer } from './types';
 import { roundETH, roundPercentage } from './utils/formatting';
-import { getMarketMedians } from './utils/median';
+import { getMarketMedians, getMedianEthUsdcRate } from './utils/median';
 
 // Move getInitialDomain outside the component to avoid dependency issues
 function getInitialDomain(offers: LoanOffer[], userOffer: UserOfferState) {
@@ -25,19 +25,19 @@ function getInitialDomain(offers: LoanOffer[], userOffer: UserOfferState) {
 }
 
 function App() {
-  const { loanOffers, collections, loading, error, selectedCurrency, setSelectedCurrency } = useLoanOffers();
+  const { loanOffers: currencyOffers, collections, loading, error, selectedCurrency, setSelectedCurrency, allLoanOffers } = useLoanOffers();
   const { userOffer, updateUserOffer } = useUserOffer();
-  const [domain, setDomain] = useState(() => getInitialDomain(loanOffers, userOffer));
+  const [domain, setDomain] = useState(() => getInitialDomain(currencyOffers, userOffer));
 
   // Only initialize user offer once, after offers are loaded and stable
   const hasInitializedUserOffer = React.useRef(false);
   useEffect(() => {
-    if (!hasInitializedUserOffer.current && !loading && loanOffers.length > 0) {
-      const { medianLoanAmount, medianInterestRate } = getMarketMedians(loanOffers);
+    if (!hasInitializedUserOffer.current && !loading && currencyOffers.length > 0) {
+      const { medianLoanAmount, medianInterestRate } = getMarketMedians(currencyOffers);
       updateUserOffer({ loanAmount: medianLoanAmount, interestRate: medianInterestRate });
       hasInitializedUserOffer.current = true;
     }
-  }, [loading, loanOffers, updateUserOffer]);
+  }, [loading, currencyOffers, updateUserOffer]);
 
   // Add a constant for the expansion percentage
   const DOMAIN_EXPAND_PERCENT = 0.01; // 1%
@@ -128,13 +128,35 @@ function App() {
 
   // Reset domain if data changes significantly (optional, for robustness)
   React.useEffect(() => {
-    setDomain(getInitialDomain(loanOffers, userOffer));
-  }, [loanOffers, userOffer]);
+    setDomain(getInitialDomain(currencyOffers, userOffer));
+  }, [currencyOffers, userOffer]);
 
   // Filter offers by selected duration
   const filteredOffers = userOffer.duration
-    ? loanOffers.filter(offer => offer.duration === userOffer.duration)
-    : loanOffers;
+    ? currencyOffers.filter(offer => offer.duration === userOffer.duration)
+    : currencyOffers;
+
+  // Intercept currency change to convert user offer amount
+  const handleCurrencyChange = useCallback((newCurrency: 'WETH' | 'USDC') => {
+    if (selectedCurrency === newCurrency) return;
+    // Use allLoanOffers (unfiltered) for conversion
+    const rate = getMedianEthUsdcRate(allLoanOffers || []);
+    let newAmount = userOffer.loanAmount;
+    console.log('Currency toggle:', selectedCurrency, '->', newCurrency);
+    console.log('Calculated median ETH/USD rate:', rate);
+    if (rate) {
+      if (selectedCurrency === 'WETH' && newCurrency === 'USDC') {
+        // ETH to USDC: multiply by rate (USD per ETH)
+        newAmount = userOffer.loanAmount * rate;
+      } else if (selectedCurrency === 'USDC' && newCurrency === 'WETH') {
+        // USDC to ETH: divide by rate (USD per ETH)
+        newAmount = userOffer.loanAmount / rate;
+      }
+    }
+    console.log('Converted amount:', newAmount);
+    updateUserOffer({ loanAmount: newAmount });
+    setSelectedCurrency(newCurrency);
+  }, [selectedCurrency, allLoanOffers, userOffer.loanAmount, setSelectedCurrency, updateUserOffer]);
 
   return (
     <Container maxWidth="xl">
@@ -145,6 +167,7 @@ function App() {
               collections={collections}
               onUserOfferChange={updateUserOffer}
               userOffer={userOffer}
+              selectedCurrency={selectedCurrency}
             />
           </Grid>
           <Grid item xs={12} md={8}>
@@ -159,7 +182,7 @@ function App() {
                 data={filteredOffers}
                 userOffer={userOffer}
                 selectedCurrency={selectedCurrency}
-                onCurrencyChange={setSelectedCurrency}
+                onCurrencyChange={handleCurrencyChange}
                 onUserOfferDrag={handleUserOfferDrag}
                 domain={domain}
               />

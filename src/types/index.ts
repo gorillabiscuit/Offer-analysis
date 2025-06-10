@@ -9,6 +9,7 @@ export interface LoanOffer {
   createdAt?: string;
   currency?: string;
   maximumRepayment?: number;
+  loanPrincipalUSD?: number;
 }
 
 export interface Collection {

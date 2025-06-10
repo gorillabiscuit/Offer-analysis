@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Container, Grid, Box, CircularProgress } from '@mui/material';
 import InputControls from './components/InputControls';
 import ScatterPlot from './components/ScatterPlot';
@@ -7,6 +7,28 @@ import { useUserOffer, UserOfferState } from './hooks/useUserOffer';
 import { LoanOffer } from './types';
 import { roundETH, roundPercentage } from './utils/formatting';
 import { getMarketMedians, getMedianEthUsdcRate } from './utils/median';
+
+// === Domain Expansion Tuning Parameters ===
+/**
+ * Number of pixels (in chart space) to expand the domain by per step.
+ * Lower values = smoother, less aggressive expansion.
+ * Typical range: 5-20.
+ */
+const PIXEL_INCREMENT = 1;
+
+/**
+ * Fraction of chart width/height from the edge at which expansion triggers.
+ * Lower values = only expand when bubble is very close to the edge.
+ * Example: 0.02 = 2% from the edge.
+ */
+const EDGE_THRESHOLD = 0.01;
+
+/**
+ * Minimum time (ms) between domain expansions while dragging at the edge.
+ * Higher values = slower expansion, lower CPU usage.
+ */
+const EXPAND_THROTTLE_MS = 1;
+// === End Domain Expansion Tuning Parameters ===
 
 // Move getInitialDomain outside the component to avoid dependency issues
 function getInitialDomain(offers: LoanOffer[], userOffer: UserOfferState) {
@@ -29,6 +51,11 @@ function App() {
   const { userOffer, updateUserOffer } = useUserOffer();
   const [domain, setDomain] = useState(() => getInitialDomain(currencyOffers, userOffer));
 
+  // --- Continuous domain expansion state ---
+  const dragActiveRef = useRef(false);
+  const dragPosRef = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
+  const expandIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
   // Only initialize user offer once, after offers are loaded and stable
   const hasInitializedUserOffer = React.useRef(false);
   useEffect(() => {
@@ -42,53 +69,43 @@ function App() {
   // Add a constant for the expansion percentage
   const DOMAIN_EXPAND_PERCENT = 0.01; // 1%
 
-  // Expand domain if user offer is in buffer zone or at edge
-  const expandDomainIfNeeded = useCallback((loanAmount: number, interestRate: number, dragging = false, dragX?: number, dragY?: number, width?: number, height?: number) => {
+  // --- Helper: Edge detection and expansion ---
+  const checkAndExpandDomain = useCallback(() => {
+    if (!dragActiveRef.current || !dragPosRef.current) return;
+    const { x, y, width, height } = dragPosRef.current;
     setDomain(prev => {
       let [xMin, xMax] = prev.x;
       let [yMin, yMax] = prev.y;
       const xRange = xMax - xMin;
       const yRange = yMax - yMin;
       let changed = false;
-
-      // During drag, expand more aggressively to prevent edge cases
-      const expandPercent = dragging ? DOMAIN_EXPAND_PERCENT * 2 : DOMAIN_EXPAND_PERCENT;
-
+      // Calculate data increment for x and y axes
+      const xDataPerPixel = xRange / (width || 1);
+      const yDataPerPixel = yRange / (height || 1);
+      const xIncrement = xDataPerPixel * PIXEL_INCREMENT;
+      const yIncrement = yDataPerPixel * PIXEL_INCREMENT;
       // Expand right
-      if (dragging && width !== undefined && dragX !== undefined && dragX >= width * 0.95) {
-        xMax += xRange * expandPercent;
-        changed = true;
-      } else if (loanAmount > xMax - xRange * 0.1) {
-        xMax += xRange * expandPercent;
+      if (x >= width * (1 - EDGE_THRESHOLD)) {
+        xMax += xIncrement;
         changed = true;
       }
       // Expand left
-      if (dragging && dragX !== undefined && width !== undefined && dragX <= width * 0.05) {
-        xMin = Math.max(0, xMin - xRange * expandPercent);
-        changed = true;
-      } else if (loanAmount < xMin + xRange * 0.1) {
-        xMin = Math.max(0, xMin - xRange * expandPercent);
+      if (x <= width * EDGE_THRESHOLD) {
+        xMin = Math.max(0, xMin - xIncrement);
         changed = true;
       }
       // Expand top
-      if (dragging && height !== undefined && dragY !== undefined && dragY <= height * 0.05) {
-        yMax += yRange * expandPercent;
-        changed = true;
-      } else if (interestRate > yMax - yRange * 0.1) {
-        yMax += yRange * expandPercent;
+      if (y <= height * EDGE_THRESHOLD) {
+        yMax += yIncrement;
         changed = true;
       }
       // Expand bottom
-      if (dragging && height !== undefined && dragY !== undefined && dragY >= height * 0.95) {
-        yMin = Math.max(0, yMin - yRange * expandPercent);
-        changed = true;
-      } else if (interestRate < yMin + yRange * 0.1) {
-        yMin = Math.max(0, yMin - yRange * expandPercent);
+      if (y >= height * (1 - EDGE_THRESHOLD)) {
+        yMin = Math.max(0, yMin - yIncrement);
         changed = true;
       }
-
       if (changed) {
-        // Ensure we maintain a minimum range to prevent collapse
+        // Maintain minimum range
         const minXRange = xRange * 0.1;
         const minYRange = yRange * 0.1;
         if (xMax - xMin < minXRange) {
@@ -107,7 +124,20 @@ function App() {
     });
   }, []);
 
-  // Callback for dragging the user offer point
+  // --- Start/stop interval for continuous expansion ---
+  const startExpandInterval = useCallback(() => {
+    if (expandIntervalRef.current) return;
+    expandIntervalRef.current = setInterval(checkAndExpandDomain, 60); // 60ms interval
+  }, [checkAndExpandDomain]);
+
+  const stopExpandInterval = useCallback(() => {
+    if (expandIntervalRef.current) {
+      clearInterval(expandIntervalRef.current);
+      expandIntervalRef.current = null;
+    }
+  }, []);
+
+  // --- Modified drag handler ---
   const handleUserOfferDrag = (update: { loanAmount: number; interestRate: number, dragX?: number, dragY?: number, width?: number, height?: number, dragging?: boolean }) => {
     if (update.dragging && update.dragX !== undefined && update.dragY !== undefined && update.width !== undefined && update.height !== undefined) {
       // During drag: update user offer state with live, unrounded value for real-time feedback
@@ -115,14 +145,20 @@ function App() {
         loanAmount: Math.max(0, update.loanAmount),
         interestRate: Math.max(0, update.interestRate),
       });
-      expandDomainIfNeeded(update.loanAmount, update.interestRate, true, update.dragX, update.dragY, update.width, update.height);
+      // Store drag state for interval
+      dragActiveRef.current = true;
+      dragPosRef.current = { x: update.dragX, y: update.dragY, width: update.width, height: update.height };
+      startExpandInterval();
     } else {
       // On drag end: round values before updating state
       updateUserOffer({
         loanAmount: roundETH(Math.max(0, update.loanAmount)),
         interestRate: roundPercentage(Math.max(0, update.interestRate)),
       });
-      // Don't expand domain on drag end - let the ScatterPlot component handle it
+      // Clear drag state and stop interval
+      dragActiveRef.current = false;
+      dragPosRef.current = null;
+      stopExpandInterval();
     }
   };
 
@@ -157,6 +193,13 @@ function App() {
     updateUserOffer({ loanAmount: newAmount });
     setSelectedCurrency(newCurrency);
   }, [selectedCurrency, allLoanOffers, userOffer.loanAmount, setSelectedCurrency, updateUserOffer]);
+
+  // --- Cleanup interval on unmount ---
+  useEffect(() => {
+    return () => {
+      stopExpandInterval();
+    };
+  }, [stopExpandInterval]);
 
   return (
     <Container maxWidth="xl">

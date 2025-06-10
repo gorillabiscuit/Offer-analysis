@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { Box, Paper, Typography, FormControlLabel, Switch } from '@mui/material';
 import * as d3 from 'd3';
 import { LoanOffer } from '../types';
@@ -28,6 +28,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   domain
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [chartSize, setChartSize] = useState({ width: 0, height: 0 });
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const dragTooltipRef = useRef<HTMLDivElement | null>(null);
   const prevScalesRef = useRef<{ x: d3.ScaleLinear<number, number>; y: d3.ScaleLinear<number, number> } | null>(null);
@@ -134,13 +136,30 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     lastDomainRef.current = domain;
   }, [domain]);
 
+  // ResizeObserver to track container size
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        setChartSize({
+          width: containerRef.current.clientWidth,
+          height: containerRef.current.clientHeight,
+        });
+      }
+    };
+    handleResize();
+    const resizeObserver = new window.ResizeObserver(handleResize);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+    return () => resizeObserver.disconnect();
+  }, []);
+
   useEffect(() => {
     if (!svgRef.current || data.length === 0 || !tooltipRef.current) return;
-
-    // Set up dimensions
     const margin = { top: 20, right: 20, bottom: 60, left: 60 };
-    const width = svgRef.current.clientWidth - margin.left - margin.right;
-    const height = svgRef.current.clientHeight - margin.top - margin.bottom;
+    const width = chartSize.width - margin.left - margin.right;
+    const height = chartSize.height - margin.top - margin.bottom;
+    if (width <= 0 || height <= 0) return;
 
     // Create or get SVG
     const svg = d3.select(svgRef.current);
@@ -593,7 +612,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       // Remove user point and label if no user offer
       g.selectAll('.user-point, .user-label').remove();
     }
-  }, [data, userOffer, selectedCurrency, onUserOfferDrag, domain, throttledExpand]);
+  }, [data, userOffer, selectedCurrency, onUserOfferDrag, domain, throttledExpand, chartSize]);
 
   return (
     <Paper elevation={3} sx={{ p: 2, height: '100%', background: 'none', boxShadow: 'none' }}>
@@ -646,8 +665,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           </ToggleButton>
         </ToggleButtonGroup>
       </Box>
-      <Box sx={{ width: '100%', height: 'calc(100% - 48px)' }}>
-        <svg ref={svgRef} style={{ width: '100%', height: '100%' }} />
+      <Box ref={containerRef} sx={{ width: '100%', height: 'calc(100% - 48px)' }}>
+        <svg ref={svgRef} width={chartSize.width} height={chartSize.height} style={{ width: '100%', height: '100%' }} />
       </Box>
     </Paper>
   );

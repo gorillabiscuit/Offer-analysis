@@ -5,7 +5,7 @@ import { LoanOffer } from '../types';
 import { Currency } from '../hooks/useLoanOffers';
 import { getMarketMedians } from '../utils/median';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
-import styles from './ScatterPlot.module.css';
+import styles from './ChartLayout.module.css';
 
 interface ScatterPlotProps {
   data?: LoanOffer[];
@@ -201,6 +201,17 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .call(yAxis as any);
     }
 
+    // === Axis styling for design ===
+    // Axis lines: white at 30% opacity
+    g.selectAll('.x-axis path, .x-axis line, .y-axis path, .y-axis line')
+      .attr('stroke', 'rgba(255,255,255,0.3)');
+    // Axis text: pure white
+    g.selectAll('.x-axis text, .y-axis text')
+      .attr('fill', '#FFF');
+    // Axis labels: #fff at 50% opacity
+    g.selectAll('.x-label, .y-label')
+      .attr('fill', 'rgba(255,255,255,0.5)');
+
     // Update axis labels
     const xLabel = g.select<SVGTextElement>('.x-label');
     const yLabel = g.select<SVGTextElement>('.y-label');
@@ -305,7 +316,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     // Add new dots
     const dotsEnter = dots.enter()
       .append('circle')
-      .attr('class', 'data-point ' + styles.bubble)
+      .attr('class', 'data-point')
       .attr('r', 5)
       // Color by age
       .attr('fill', d => timeScale(d.timestamp ?? 0))
@@ -351,7 +362,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
       const userPointEnter = userPoint.enter()
         .append('circle')
-        .attr('class', 'user-point ' + styles.userBubble)
+        .attr('class', 'user-point')
         .attr('r', 7)
         .attr('fill', '#f50057')
         .attr('stroke', '#fff')
@@ -376,7 +387,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
         // Draw vertical crosshair (loan amount)
         g.append('line')
-          .attr('class', 'user-crosshair-x ' + styles.crosshair)
+          .attr('class', 'user-crosshair-x')
           .attr('x1', userX)
           .attr('x2', userX)
           .attr('y1', 0)
@@ -386,7 +397,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .attr('stroke-dasharray', '4,2');
         // Draw horizontal crosshair (interest rate)
         g.append('line')
-          .attr('class', 'user-crosshair-y ' + styles.crosshair)
+          .attr('class', 'user-crosshair-y')
           .attr('x1', 0)
           .attr('x2', width)
           .attr('y1', userY)
@@ -414,7 +425,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
         // Place loan label
         g.append('text')
-          .attr('class', 'user-crosshair-x-label ' + styles.tickLabel)
+          .attr('class', 'user-crosshair-x-label')
           .attr('x', loanLabelX)
           .attr('y', loanLabelY - 6)
           .attr('fill', '#f50057')
@@ -424,7 +435,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .text(loanLabel);
         // Place rate label
         g.append('text')
-          .attr('class', 'user-crosshair-y-label ' + styles.tickLabel)
+          .attr('class', 'user-crosshair-y-label')
           .attr('x', rateLabelX)
           .attr('y', rateLabelY)
           .attr('fill', '#f50057')
@@ -453,7 +464,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           lastDataPosRef.current = { dataX: xScale.invert(event.x), dataY: yScale.invert(event.y) };
           // Show drag tooltip
           if (dragTooltipRef.current) {
-            dragTooltipRef.current.className = styles.dragTooltip;
+            dragTooltipRef.current.className = '';
             dragTooltipRef.current.style.visibility = 'visible';
           }
         })
@@ -568,7 +579,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
         const userLabelEnter = userLabel.enter()
           .append('text')
-          .attr('class', 'user-label ' + styles.userLabel)
+          .attr('class', 'user-label')
           .attr('dy', -10)
           .style('font-size', '12px')
           .style('fill', '#f50057')
@@ -585,24 +596,58 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   }, [data, userOffer, selectedCurrency, onUserOfferDrag, domain, throttledExpand]);
 
   return (
-    <Paper elevation={3} className={styles.chartContainer} sx={{ p: 2, height: '100%', background: 'none', boxShadow: 'none' }}>
+    <Paper elevation={3} sx={{ p: 2, height: '100%', background: 'none', boxShadow: 'none' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h6">Market Offers</Typography>
+        <Typography variant="h6" sx={{ color: '#fff' }}>Market Offers</Typography>
         <ToggleButtonGroup
+          className={styles.toggleButtonGroup}
           value={selectedCurrency}
           exclusive
           onChange={(_, value) => {
             if (value) onCurrencyChange(value);
           }}
           size="small"
-          sx={{ ml: 2 }}
         >
-          <ToggleButton value="WETH">WETH</ToggleButton>
-          <ToggleButton value="USDC">USDC</ToggleButton>
+          <ToggleButton
+            className={styles.toggleButton}
+            value="WETH"
+            sx={{
+              color: 'rgba(255,255,255,0.8)',
+              background: 'transparent',
+              px: '30px',
+              '&.Mui-selected': {
+                color: '#fff',
+                background: '#221E37',
+              },
+              '&:hover': {
+                background: 'rgba(34,30,55,0.7)',
+              },
+            }}
+          >
+            WETH
+          </ToggleButton>
+          <ToggleButton
+            className={styles.toggleButton}
+            value="USDC"
+            sx={{
+              color: 'rgba(255,255,255,0.8)',
+              background: 'transparent',
+              px: '30px',
+              '&.Mui-selected': {
+                color: '#fff',
+                background: '#221E37',
+              },
+              '&:hover': {
+                background: 'rgba(34,30,55,0.7)',
+              },
+            }}
+          >
+            USDC
+          </ToggleButton>
         </ToggleButtonGroup>
       </Box>
       <Box sx={{ width: '100%', height: 'calc(100% - 48px)' }}>
-        <svg ref={svgRef} className={styles.chartSvg} style={{ width: '100%', height: '100%' }} />
+        <svg ref={svgRef} style={{ width: '100%', height: '100%' }} />
       </Box>
     </Paper>
   );

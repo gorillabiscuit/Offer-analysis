@@ -7,6 +7,7 @@ import { useUserOffer, UserOfferState } from './hooks/useUserOffer';
 import { LoanOffer } from './types';
 import { roundETH, roundPercentage } from './utils/formatting';
 import { getMarketMedians, getMedianEthUsdcRate } from './utils/median';
+import styles from './components/ChartLayout.module.css';
 
 // === Domain Expansion Tuning Parameters ===
 /**
@@ -202,38 +203,34 @@ function App() {
   }, [stopExpandInterval]);
 
   return (
-    <Container maxWidth="xl">
-      <Box sx={{ py: 4 }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            <InputControls
-              collections={collections}
-              onUserOfferChange={updateUserOffer}
-              userOffer={userOffer}
-              selectedCurrency={selectedCurrency}
-            />
-          </Grid>
-          <Grid item xs={12} md={8}>
-            {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                <CircularProgress />
-              </Box>
-            ) : error ? (
-              <Box sx={{ color: 'error.main', p: 2 }}>{error}</Box>
-            ) : (
-              <ScatterPlot
-                data={filteredOffers}
-                userOffer={userOffer}
-                selectedCurrency={selectedCurrency}
-                onCurrencyChange={handleCurrencyChange}
-                onUserOfferDrag={handleUserOfferDrag}
-                domain={domain}
-              />
-            )}
-          </Grid>
-        </Grid>
-      </Box>
-    </Container>
+    <div className={styles.menuDesktop}>
+      <div className={styles.leftPanel}>
+        <InputControls
+          collections={collections}
+          onUserOfferChange={updateUserOffer}
+          userOffer={userOffer}
+          selectedCurrency={selectedCurrency}
+        />
+      </div>
+      <div className={styles.chartArea}>
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Box sx={{ color: 'error.main', p: 2 }}>{error}</Box>
+        ) : (
+          <ScatterPlot
+            data={filteredOffers}
+            userOffer={userOffer}
+            selectedCurrency={selectedCurrency}
+            onCurrencyChange={handleCurrencyChange}
+            onUserOfferDrag={handleUserOfferDrag}
+            domain={domain}
+          />
+        )}
+      </div>
+    </div>
   );
 }
 

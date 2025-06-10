@@ -1,9 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { Box, Paper, Typography, FormControlLabel, Switch } from '@mui/material';
 import * as d3 from 'd3';
 import { LoanOffer } from '../types';
 import { Currency } from '../hooks/useLoanOffers';
 import { getMarketMedians } from '../utils/median';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
+import styles from './ScatterPlot.module.css';
 
 interface ScatterPlotProps {
   data?: LoanOffer[];
@@ -32,6 +34,10 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   const isDraggingRef = useRef(false);
   const lastDragPosRef = useRef<{ x: number; y: number } | null>(null);
   const pendingDragEndRef = useRef<{ x: number; y: number } | null>(null);
+  const dragAnchorRef = useRef<{ svgX: number; svgY: number; dataX: number; dataY: number } | null>(null);
+  const lastDataPosRef = useRef<{ dataX: number; dataY: number } | null>(null);
+  const lastDomainRef = useRef(domain);
+  const throttleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Create tooltips once when component mounts
   useEffect(() => {
@@ -114,6 +120,19 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`;
     }
   }
+
+  // Helper to throttle domain expansion
+  const throttledExpand = useCallback((fn: () => void) => {
+    if (throttleTimeoutRef.current) return;
+    throttleTimeoutRef.current = setTimeout(() => {
+      fn();
+      throttleTimeoutRef.current = null;
+    }, 100); // 100ms throttle
+  }, []);
+
+  useEffect(() => {
+    lastDomainRef.current = domain;
+  }, [domain]);
 
   useEffect(() => {
     if (!svgRef.current || data.length === 0 || !tooltipRef.current) return;
@@ -286,7 +305,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     // Add new dots
     const dotsEnter = dots.enter()
       .append('circle')
-      .attr('class', 'data-point')
+      .attr('class', 'data-point ' + styles.bubble)
       .attr('r', 5)
       // Color by age
       .attr('fill', d => timeScale(d.timestamp ?? 0))
@@ -332,14 +351,91 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
       const userPointEnter = userPoint.enter()
         .append('circle')
-        .attr('class', 'user-point')
+        .attr('class', 'user-point ' + styles.userBubble)
         .attr('r', 7)
         .attr('fill', '#f50057')
         .attr('stroke', '#fff')
         .attr('stroke-width', 2)
         .style('cursor', 'move');
 
-      // Add D3 drag behavior
+      // --- Crosshairs ---
+      g.selectAll('.user-crosshair-x, .user-crosshair-y, .user-crosshair-x-label, .user-crosshair-y-label').remove();
+
+      // Only show crosshairs and labels while dragging
+      if (isDraggingRef.current && lastDataPosRef.current) {
+        const [xMin, xMax] = lastDomainRef.current.x;
+        const [yMin, yMax] = lastDomainRef.current.y;
+        const width = svgRef.current!.clientWidth - margin.left - margin.right;
+        const height = svgRef.current!.clientHeight - margin.top - margin.bottom;
+        const xScaleCurrent = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
+        const yScaleCurrent = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
+        const userLoan = lastDataPosRef.current.dataX;
+        const userRate = lastDataPosRef.current.dataY;
+        const userX = xScaleCurrent(userLoan);
+        const userY = yScaleCurrent(userRate);
+
+        // Draw vertical crosshair (loan amount)
+        g.append('line')
+          .attr('class', 'user-crosshair-x ' + styles.crosshair)
+          .attr('x1', userX)
+          .attr('x2', userX)
+          .attr('y1', 0)
+          .attr('y2', height)
+          .attr('stroke', '#f50057')
+          .attr('stroke-width', 1.5)
+          .attr('stroke-dasharray', '4,2');
+        // Draw horizontal crosshair (interest rate)
+        g.append('line')
+          .attr('class', 'user-crosshair-y ' + styles.crosshair)
+          .attr('x1', 0)
+          .attr('x2', width)
+          .attr('y1', userY)
+          .attr('y2', userY)
+          .attr('stroke', '#f50057')
+          .attr('stroke-width', 1.5)
+          .attr('stroke-dasharray', '4,2');
+
+        // --- Crosshair Labels ---
+        // Calculate differences from median
+        const loanDiff = userLoan - medianLoanAmount;
+        const rateDiff = userRate - medianInterestRate;
+        const loanDiffAbs = Math.abs(loanDiff).toFixed(2);
+        const rateDiffAbs = Math.abs(rateDiff).toFixed(2);
+        const loanLabel = `${loanDiff >= 0 ? '+' : '-'}${loanDiffAbs} ${selectedCurrency} ${loanDiff >= 0 ? 'above' : 'below'} median`;
+        const rateLabel = `${rateDiff >= 0 ? '+' : '-'}${rateDiffAbs}% ${rateDiff >= 0 ? 'above' : 'below'} median`;
+
+        // For vertical (loan) label: if in right half, place at left; if in left half, place at right
+        const loanLabelX = userX > width / 2 ? 20 : width - 20;
+        const loanLabelY = userY;
+        // For horizontal (APR) label: if in bottom half, place at top+20; if in top half, place at bottom-20
+        // Also, move horizontally 20px away from the crosshair: right if left half, left if right half
+        const rateLabelY = userY > height / 2 ? 40 : height - 40;
+        const rateLabelX = userX < width / 2 ? userX + 20 : userX - 20;
+
+        // Place loan label
+        g.append('text')
+          .attr('class', 'user-crosshair-x-label ' + styles.tickLabel)
+          .attr('x', loanLabelX)
+          .attr('y', loanLabelY - 6)
+          .attr('fill', '#f50057')
+          .attr('font-size', 12)
+          .attr('font-weight', 'bold')
+          .attr('text-anchor', loanLabelX < width / 2 ? 'start' : 'end')
+          .text(loanLabel);
+        // Place rate label
+        g.append('text')
+          .attr('class', 'user-crosshair-y-label ' + styles.tickLabel)
+          .attr('x', rateLabelX)
+          .attr('y', rateLabelY)
+          .attr('fill', '#f50057')
+          .attr('font-size', 12)
+          .attr('font-weight', 'bold')
+          .attr('text-anchor', rateLabelX < width / 2 ? 'start' : 'end')
+          .text(rateLabel);
+        // --- End Crosshairs ---
+      }
+
+      // Anchor-based drag logic
       const drag = d3.drag<SVGCircleElement, LoanOffer>()
         .on('start', function (event, d) {
           event.sourceEvent.stopPropagation();
@@ -347,92 +443,119 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           pendingDragEndRef.current = null;
           d3.select(this).interrupt();
           d3.select(this).raise().attr('stroke', '#000');
+          // Record anchor
+          dragAnchorRef.current = {
+            svgX: event.x,
+            svgY: event.y,
+            dataX: xScale.invert(event.x),
+            dataY: yScale.invert(event.y)
+          };
+          lastDataPosRef.current = { dataX: xScale.invert(event.x), dataY: yScale.invert(event.y) };
           // Show drag tooltip
           if (dragTooltipRef.current) {
+            dragTooltipRef.current.className = styles.dragTooltip;
             dragTooltipRef.current.style.visibility = 'visible';
           }
         })
         .on('drag', function (event, d) {
-          const x = Math.max(0, Math.min(width, event.x));
-          const y = Math.max(0, Math.min(height, event.y));
-          lastDragPosRef.current = { x, y };
+          // Calculate delta from anchor
+          const anchor = dragAnchorRef.current;
+          if (!anchor) return;
+          // If domain changed, update anchor SVG position to keep bubble under cursor
+          const [xMin, xMax] = lastDomainRef.current.x;
+          const [yMin, yMax] = lastDomainRef.current.y;
+          const width = svgRef.current!.clientWidth - margin.left - margin.right;
+          const height = svgRef.current!.clientHeight - margin.top - margin.bottom;
+          const xScaleCurrent = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
+          const yScaleCurrent = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
+
+          // Calculate new data value using delta from anchor
+          const dx = event.x - anchor.svgX;
+          const dy = event.y - anchor.svgY;
+          const newDataX = anchor.dataX + xScaleCurrent.invert(dx) - xScaleCurrent.invert(0);
+          const newDataY = anchor.dataY + yScaleCurrent.invert(dy) - yScaleCurrent.invert(0);
+          lastDataPosRef.current = { dataX: newDataX, dataY: newDataY };
+
+          // Clamp to chart area
+          const clampedX = Math.max(0, Math.min(width, xScaleCurrent(newDataX)));
+          const clampedY = Math.max(0, Math.min(height, yScaleCurrent(newDataY)));
+
           d3.select(this)
-            .attr('cx', x)
-            .attr('cy', y);
+            .attr('cx', clampedX)
+            .attr('cy', clampedY);
           // Move label instantly as well
           g.selectAll('.user-label')
-            .attr('x', x)
-            .attr('y', y);
+            .attr('x', clampedX)
+            .attr('y', clampedY);
           // Update drag tooltip
           if (dragTooltipRef.current && svgRef.current) {
-            const loanAmount = xScale.invert(x);
-            const interestRate = yScale.invert(y);
             // Convert SVG coordinates to page coordinates
             const svgRect = svgRef.current.getBoundingClientRect();
-            const tooltipX = svgRect.left + margin.left + x;
-            const tooltipY = svgRect.top + margin.top + y;
-            dragTooltipRef.current.style.left = (tooltipX + 15) + 'px';
-            dragTooltipRef.current.style.top = (tooltipY - 10) + 'px';
-            dragTooltipRef.current.innerHTML = `${loanAmount.toFixed(2)} ${selectedCurrency}<br/>${interestRate.toFixed(2)}% APR`;
+            // Offset tooltip to top-right of bubble, with extra padding
+            const tooltipX = svgRect.left + margin.left + clampedX + 28; // 24px bubble + 4px gap
+            const tooltipY = svgRect.top + margin.top + clampedY - 10;
+            dragTooltipRef.current.style.left = tooltipX + 'px';
+            dragTooltipRef.current.style.top = tooltipY + 'px';
+            dragTooltipRef.current.style.background = 'rgba(200,30,30,0.8)';
+            dragTooltipRef.current.style.borderRadius = '6px';
+            dragTooltipRef.current.style.padding = '6px 9px';
+            dragTooltipRef.current.style.color = '#fff';
+            dragTooltipRef.current.style.fontSize = '13px';
+            dragTooltipRef.current.style.fontFamily = 'Public Sans, sans-serif';
+            dragTooltipRef.current.style.fontWeight = '500';
+            dragTooltipRef.current.style.boxShadow = '0px 4px 16px rgba(0,0,0,0.24)';
+            dragTooltipRef.current.innerHTML = `<div style='margin-bottom:4px;'>Your Offer</div><div>${newDataX.toLocaleString(undefined, {maximumFractionDigits: 2})} ${selectedCurrency}</div><div>${newDataY.toFixed(2)}% APR</div>`;
           }
+          // Throttle domain expansion
           if (typeof onUserOfferDrag === 'function') {
-            onUserOfferDrag({
-              loanAmount: xScale.invert(x),
-              interestRate: yScale.invert(y),
-              dragX: x,
-              dragY: y,
-              width,
-              height,
-              dragging: true
+            throttledExpand(() => {
+              onUserOfferDrag({
+                loanAmount: newDataX,
+                interestRate: newDataY,
+                dragX: clampedX,
+                dragY: clampedY,
+                width,
+                height,
+                dragging: true
+              });
             });
           }
         })
         .on('end', function (event, d) {
           isDraggingRef.current = false;
           d3.select(this).attr('stroke', '#fff');
-          const x = Math.max(0, Math.min(width, event.x));
-          const y = Math.max(0, Math.min(height, event.y));
-          // Store the final position for after domain update
-          pendingDragEndRef.current = { x, y };
-          lastDragPosRef.current = null;
+          // Use last data position for final update
+          const { dataX, dataY } = lastDataPosRef.current || { dataX: userOffer.loanAmount, dataY: userOffer.interestRate };
+          if (typeof onUserOfferDrag === 'function') {
+            onUserOfferDrag({ loanAmount: dataX, interestRate: dataY });
+          }
+          dragAnchorRef.current = null;
+          lastDataPosRef.current = null;
           // Hide drag tooltip
           if (dragTooltipRef.current) {
+            dragTooltipRef.current.className = '';
             dragTooltipRef.current.style.visibility = 'hidden';
           }
         });
 
       // Update user offer point position
       const merged = userPoint.merge(userPointEnter);
-      if (isDraggingRef.current && lastDragPosRef.current) {
+      // If dragging, use lastDataPosRef for position
+      if (isDraggingRef.current && lastDataPosRef.current) {
+        const [xMin, xMax] = lastDomainRef.current.x;
+        const [yMin, yMax] = lastDomainRef.current.y;
+        const width = svgRef.current!.clientWidth - margin.left - margin.right;
+        const height = svgRef.current!.clientHeight - margin.top - margin.bottom;
+        const xScaleCurrent = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
+        const yScaleCurrent = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
+        const { dataX, dataY } = lastDataPosRef.current;
         merged
-          .attr('cx', lastDragPosRef.current.x)
-          .attr('cy', lastDragPosRef.current.y)
+          .attr('cx', xScaleCurrent(dataX))
+          .attr('cy', yScaleCurrent(dataY))
           .call(drag);
-        // Move label instantly as well
-        g.selectAll('.user-label')
-          .attr('x', lastDragPosRef.current.x)
-          .attr('y', lastDragPosRef.current.y);
-      } else if (pendingDragEndRef.current) {
-        // If we have a pending drag end, use the stored position
-        const { x, y } = pendingDragEndRef.current;
-        merged
-          .attr('cx', x)
-          .attr('cy', y)
-          .call(drag);
-        // Move label instantly as well
-        g.selectAll('.user-label')
-          .attr('x', x)
-          .attr('y', y);
-        // Convert to data space using the new scale
-        const newLoanAmount = xScale.invert(x);
-        const newInterestRate = yScale.invert(y);
-        if (typeof onUserOfferDrag === 'function') {
-          onUserOfferDrag({ loanAmount: newLoanAmount, interestRate: newInterestRate });
-        }
-        // Clear the pending drag end
-        pendingDragEndRef.current = null;
+        g.selectAll('.user-label').remove(); // Hide label while dragging
       } else {
-        // If not dragging, update position immediately (no transition) to avoid jump after domain expansion
+        // If not dragging, update position immediately (no transition)
         merged
           .attr('cx', d => xScale(d.loanAmount))
           .attr('cy', d => yScale(d.interestRate))
@@ -445,7 +568,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
         const userLabelEnter = userLabel.enter()
           .append('text')
-          .attr('class', 'user-label')
+          .attr('class', 'user-label ' + styles.userLabel)
           .attr('dy', -10)
           .style('font-size', '12px')
           .style('fill', '#f50057')
@@ -459,24 +582,27 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       // Remove user point and label if no user offer
       g.selectAll('.user-point, .user-label').remove();
     }
-  }, [data, userOffer, selectedCurrency, onUserOfferDrag, domain]);
+  }, [data, userOffer, selectedCurrency, onUserOfferDrag, domain, throttledExpand]);
 
   return (
-    <Paper elevation={3} sx={{ p: 2, height: '100%' }}>
+    <Paper elevation={3} className={styles.chartContainer} sx={{ p: 2, height: '100%', background: 'none', boxShadow: 'none' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h6">Market Offers</Typography>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={selectedCurrency === 'USDC'}
-              onChange={(e) => onCurrencyChange(e.target.checked ? 'USDC' : 'WETH')}
-            />
-          }
-          label={`Show ${selectedCurrency} offers`}
-        />
+        <ToggleButtonGroup
+          value={selectedCurrency}
+          exclusive
+          onChange={(_, value) => {
+            if (value) onCurrencyChange(value);
+          }}
+          size="small"
+          sx={{ ml: 2 }}
+        >
+          <ToggleButton value="WETH">WETH</ToggleButton>
+          <ToggleButton value="USDC">USDC</ToggleButton>
+        </ToggleButtonGroup>
       </Box>
       <Box sx={{ width: '100%', height: 'calc(100% - 48px)' }}>
-        <svg ref={svgRef} style={{ width: '100%', height: '100%' }} />
+        <svg ref={svgRef} className={styles.chartSvg} style={{ width: '100%', height: '100%' }} />
       </Box>
     </Paper>
   );

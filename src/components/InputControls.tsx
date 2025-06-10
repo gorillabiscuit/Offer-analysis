@@ -17,12 +17,14 @@ interface InputControlsProps {
   collections: string[];
   onUserOfferChange: (userOffer: Partial<LoanOffer>) => void;
   userOffer: Partial<LoanOffer>;
+  selectedCurrency: 'WETH' | 'USDC';
 }
 
 const InputControls: React.FC<InputControlsProps> = ({ 
   collections, 
   onUserOfferChange,
-  userOffer
+  userOffer,
+  selectedCurrency
 }) => {
   // Handlers for controlled fields
   const handleCollectionChange = (event: SelectChangeEvent) => {
@@ -120,7 +122,7 @@ const InputControls: React.FC<InputControlsProps> = ({
           onChange={(e) => handleLoanAmountChange(e.target.value)}
           onBlur={handleLoanAmountBlur}
           InputProps={{
-            endAdornment: <Typography variant="body2">ETH</Typography>
+            endAdornment: <Typography variant="body2">{selectedCurrency}</Typography>
           }}
         />
 
@@ -164,7 +166,7 @@ const InputControls: React.FC<InputControlsProps> = ({
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           <Typography variant="body2">
-            Loan Amount: {userOffer.loanAmount !== undefined ? formatETH(Number(userOffer.loanAmount)) : '-'}
+            Loan Amount: {userOffer.loanAmount !== undefined ? `${Number(userOffer.loanAmount).toLocaleString(undefined, { maximumFractionDigits: 3 })} ${selectedCurrency}` : '-'}
           </Typography>
           <Typography variant="body2">
             Duration: {userOffer.duration !== undefined ? formatDuration(Number(userOffer.duration)) : '-'}

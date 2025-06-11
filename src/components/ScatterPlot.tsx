@@ -253,7 +253,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .attr('y', -margin.left + 15)
         .attr('x', -(height / 2))
         .style('text-anchor', 'middle')
-        .text('Interest Rate (%)');
+        .text('APR (%)');
     }
 
     // Calculate statistics
@@ -384,8 +384,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .attr('class', 'user-point')
         .attr('r', 7)
         .attr('fill', '#f50057')
-        .attr('stroke', '#fff')
-        .attr('stroke-width', 2)
         .style('cursor', 'move');
 
       // --- Crosshairs ---
@@ -472,7 +470,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           isDraggingRef.current = true;
           pendingDragEndRef.current = null;
           d3.select(this).interrupt();
-          d3.select(this).raise().attr('stroke', '#000');
+          d3.select(this).raise();
           // Record anchor
           dragAnchorRef.current = {
             svgX: event.x,
@@ -553,7 +551,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         })
         .on('end', function (event, d) {
           isDraggingRef.current = false;
-          d3.select(this).attr('stroke', '#fff');
           // Use last data position for final update
           const { dataX, dataY } = lastDataPosRef.current || { dataX: userOffer.loanAmount, dataY: userOffer.interestRate };
           if (typeof onUserOfferDrag === 'function') {
@@ -620,7 +617,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   return (
     <Paper elevation={3} sx={{ p: 2, height: '100%', background: 'none', boxShadow: 'none' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h6" sx={{ color: '#fff' }}>Market Offers</Typography>
+        <Typography variant="h6">Market Offers</Typography>
         <ToggleButtonGroup
           className={styles.toggleButtonGroup}
           value={selectedCurrency}
@@ -633,36 +630,12 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           <ToggleButton
             className={styles.toggleButton}
             value="WETH"
-            sx={{
-              color: 'rgba(255,255,255,0.8)',
-              background: 'transparent',
-              px: '30px',
-              '&.Mui-selected': {
-                color: '#fff',
-                background: '#221E37',
-              },
-              '&:hover': {
-                background: 'rgba(34,30,55,0.7)',
-              },
-            }}
           >
             WETH
           </ToggleButton>
           <ToggleButton
             className={styles.toggleButton}
             value="USDC"
-            sx={{
-              color: 'rgba(255,255,255,0.8)',
-              background: 'transparent',
-              px: '30px',
-              '&.Mui-selected': {
-                color: '#fff',
-                background: '#221E37',
-              },
-              '&:hover': {
-                background: 'rgba(34,30,55,0.7)',
-              },
-            }}
           >
             USDC
           </ToggleButton>

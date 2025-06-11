@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Container, Grid, Box, CircularProgress } from '@mui/material';
+import { Container, Grid, Box, CircularProgress, ThemeProvider } from '@mui/material';
 import InputControls from './components/InputControls';
 import ScatterPlot from './components/ScatterPlot';
 import { useLoanOffers } from './hooks/useLoanOffers';
@@ -8,6 +8,7 @@ import { LoanOffer } from './types';
 import { roundETH, roundPercentage } from './utils/formatting';
 import { getMarketMedians, getMedianEthUsdcRate } from './utils/median';
 import styles from './components/ChartLayout.module.css';
+import darkTheme from './styles/theme';
 
 // === Domain Expansion Tuning Parameters ===
 /**
@@ -169,9 +170,10 @@ function App() {
   }, [currencyOffers, userOffer]);
 
   // Filter offers by selected duration
-  const filteredOffers = userOffer.duration
-    ? currencyOffers.filter(offer => offer.duration === userOffer.duration)
-    : currencyOffers;
+  const filteredOffers =
+    userOffer.duration === undefined
+      ? currencyOffers
+      : currencyOffers.filter(offer => Number(offer.duration) === Number(userOffer.duration));
 
   // Intercept currency change to convert user offer amount
   const handleCurrencyChange = useCallback((newCurrency: 'WETH' | 'USDC') => {
@@ -203,36 +205,38 @@ function App() {
   }, [stopExpandInterval]);
 
   return (
-    <div className={styles.mainContainer}>
-      <div className={styles.menuDesktop}>
-        <div className={styles.leftPanel}>
-          <InputControls
-            collections={collections}
-            onUserOfferChange={updateUserOffer}
-            userOffer={userOffer}
-            selectedCurrency={selectedCurrency}
-          />
-        </div>
-        <div className={styles.chartArea}>
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-              <CircularProgress />
-            </Box>
-          ) : error ? (
-            <Box sx={{ color: 'error.main', p: 2 }}>{error}</Box>
-          ) : (
-            <ScatterPlot
-              data={filteredOffers}
+    <ThemeProvider theme={darkTheme}>
+      <div className={styles.mainContainer}>
+        <div className={styles.menuDesktop}>
+          <div className={styles.leftPanel}>
+            <InputControls
+              collections={collections}
+              onUserOfferChange={updateUserOffer}
               userOffer={userOffer}
               selectedCurrency={selectedCurrency}
-              onCurrencyChange={handleCurrencyChange}
-              onUserOfferDrag={handleUserOfferDrag}
-              domain={domain}
             />
-          )}
+          </div>
+          <div className={styles.chartArea}>
+            {loading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <CircularProgress />
+              </Box>
+            ) : error ? (
+              <Box sx={{ color: 'error.main', p: 2 }}>{error}</Box>
+            ) : (
+              <ScatterPlot
+                data={filteredOffers}
+                userOffer={userOffer}
+                selectedCurrency={selectedCurrency}
+                onCurrencyChange={handleCurrencyChange}
+                onUserOfferDrag={handleUserOfferDrag}
+                domain={domain}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 }
 

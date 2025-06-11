@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { Box, Paper, Typography, FormControlLabel, Switch } from '@mui/material';
 import * as d3 from 'd3';
-import { LoanOffer } from '../types';
+import { LoanOffer, HeatmapCell } from '../types';
 import { Currency } from '../hooks/useLoanOffers';
 import { getMarketMedians } from '../utils/median';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
@@ -18,6 +18,57 @@ interface ScatterPlotProps {
 
 const PADDING_PERCENTAGE = 0.1; // 10% padding
 const TRANSITION_DURATION = 750; // Duration of transitions in milliseconds
+
+// Add depth as an optional property for charting
+interface LoanOfferWithDepth extends LoanOffer {
+  depth?: number;
+}
+
+// === Contour Density Visualization Parameters ===
+/**
+ * Controls how "smooth" the contours are. Lower values create more focused, 
+ * detailed contours, while higher values create smoother, more generalized contours.
+ * Range: 5-30, where:
+ * - 5: Very focused, shows small clusters
+ * - 15: Balanced, shows medium-sized clusters
+ * - 30: Very smooth, shows large trends
+ */
+const CONTOUR_BANDWIDTH = 30;
+
+/**
+ * Number of contour levels to generate. Higher values create more detailed
+ * visualization with more color steps, while lower values create broader
+ * categories of density.
+ * Range: 10-50, where:
+ * - 10: Broad categories, clear distinction between high/low density
+ * - 30: Detailed visualization, smooth transitions
+ * - 50: Very detailed, might be too granular
+ */
+const CONTOUR_THRESHOLDS = 10;
+
+/**
+ * Exponent for the power scale used in color mapping. Controls how the density
+ * values are mapped to colors. Lower values emphasize differences in low-density
+ * areas, while higher values emphasize differences in high-density areas.
+ * Range: 0.1-2, where:
+ * - 0.1: Very sensitive to small differences
+ * - 0.5: Square root, balanced emphasis
+ * - 2: Square, emphasizes high-density areas
+ */
+const CONTOUR_SCALE_EXPONENT = 3;
+
+/**
+ * Color and opacity range for the contours. First color is for low density,
+ * second color is for high density. Opacity values control how visible the
+ * contours are against the background.
+ * Format: ['rgba(r,g,b,opacity)', 'rgba(r,g,b,opacity)']
+ * - First opacity: 0.05-0.2 for subtle low-density areas
+ * - Second opacity: 0.3-0.6 for visible high-density areas
+ */
+const CONTOUR_COLORS = [
+  'rgba(77, 150, 255, 0.05)',  // Light blue, very transparent
+  'rgba(255, 107, 107, 0.4)'   // Light red, more opaque
+];
 
 const ScatterPlot: React.FC<ScatterPlotProps> = ({ 
   data = [], 
@@ -372,6 +423,21 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .attr('fill', (d: LoanOffer) => timeScale(d.timestamp ?? 0))
       );
 
+    // Render loan depth numbers (must be after xScale/yScale are defined)
+    g.selectAll('.loan-depth-label').remove();
+    g.selectAll('.loan-depth-label')
+      .data(data as LoanOfferWithDepth[])
+      .enter()
+      .append('text')
+      .attr('class', 'loan-depth-label')
+      .attr('x', (d: LoanOfferWithDepth) => xScale(d.loanAmount) + 8)
+      .attr('y', (d: LoanOfferWithDepth) => yScale(d.interestRate) - 8)
+      .attr('font-size', 10)
+      .attr('fill', '#fff')
+      .attr('text-anchor', 'start')
+      .attr('opacity', 0.8)
+      .text((d: LoanOfferWithDepth) => d.depth && d.depth > 1 ? d.depth : '');
+
     // Update user offer point if it exists
     if (userOffer) {
       const userPoint = g.selectAll<SVGCircleElement, LoanOffer>('.user-point')
@@ -612,6 +678,39 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       // Remove user point and label if no user offer
       g.selectAll('.user-point, .user-label').remove();
     }
+
+    // After removing old heatmap code, add contour density visualization
+    // Remove any existing contours
+    g.selectAll('.contour').remove();
+
+    // Create density estimator with parameters from constants
+    const density = d3.contourDensity<LoanOffer>()
+      .x(d => xScale(d.loanAmount))
+      .y(d => yScale(d.interestRate))
+      .size([width, height])
+      .bandwidth(CONTOUR_BANDWIDTH)
+      .thresholds(CONTOUR_THRESHOLDS);
+
+    // Generate contours
+    const contours = density(data);
+
+    // Create non-linear color scale using constants
+    const maxDensity = d3.max(contours, d => d.value) || 1;
+    const contourColorScale = d3.scalePow<string>()
+      .exponent(CONTOUR_SCALE_EXPONENT)
+      .domain([0, maxDensity])
+      .range(CONTOUR_COLORS);
+
+    // Draw contours
+    g.selectAll('.contour')
+      .data(contours)
+      .enter()
+      .append('path')
+      .attr('class', 'contour')
+      .attr('d', d3.geoPath())
+      .attr('fill', d => contourColorScale(d.value))
+      .attr('stroke', 'none')
+      .lower(); // Ensure contours are behind points
   }, [data, userOffer, selectedCurrency, onUserOfferDrag, domain, throttledExpand, chartSize]);
 
   return (

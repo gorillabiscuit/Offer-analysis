@@ -411,7 +411,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .attr('x2', userX)
           .attr('y1', 0)
           .attr('y2', height)
-          .attr('stroke', '#f50057')
+          .attr('stroke', 'rgba(245,0,87,0.7)')
           .attr('stroke-width', 1.5)
           .attr('stroke-dasharray', '4,2');
         // Draw horizontal crosshair (interest rate)
@@ -421,7 +421,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .attr('x2', width)
           .attr('y1', userY)
           .attr('y2', userY)
-          .attr('stroke', '#f50057')
+          .attr('stroke', 'rgba(245,0,87,0.7)')
           .attr('stroke-width', 1.5)
           .attr('stroke-dasharray', '4,2');
 
@@ -447,7 +447,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .attr('class', 'user-crosshair-x-label')
           .attr('x', loanLabelX)
           .attr('y', loanLabelY - 6)
-          .attr('fill', '#f50057')
+          .attr('fill', 'rgba(245,0,87,0.7)')
           .attr('font-size', 12)
           .attr('font-weight', 'bold')
           .attr('text-anchor', loanLabelX < width / 2 ? 'start' : 'end')
@@ -457,7 +457,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .attr('class', 'user-crosshair-y-label')
           .attr('x', rateLabelX)
           .attr('y', rateLabelY)
-          .attr('fill', '#f50057')
+          .attr('fill', 'rgba(245,0,87,0.7)')
           .attr('font-size', 12)
           .attr('font-weight', 'bold')
           .attr('text-anchor', rateLabelX < width / 2 ? 'start' : 'end')
@@ -582,14 +582,16 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         merged
           .attr('cx', xScaleCurrent(dataX))
           .attr('cy', yScaleCurrent(dataY))
-          .call(drag);
+          .call(drag)
+          .raise();
         g.selectAll('.user-label').remove(); // Hide label while dragging
       } else {
         // If not dragging, update position immediately (no transition)
         merged
           .attr('cx', d => xScale(d.loanAmount))
           .attr('cy', d => yScale(d.interestRate))
-          .call(drag);
+          .call(drag)
+          .raise();
         // Update label instantly as well
         const userLabel = g.selectAll<SVGTextElement, LoanOffer>('.user-label')
           .data([userOffer]);
@@ -606,7 +608,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
         userLabel.merge(userLabelEnter)
           .attr('x', d => xScale(d.loanAmount))
-          .attr('y', d => yScale(d.interestRate));
+          .attr('y', d => yScale(d.interestRate))
+          .raise();
       }
     } else {
       // Remove user point and label if no user offer

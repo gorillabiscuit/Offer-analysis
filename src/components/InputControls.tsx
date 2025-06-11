@@ -87,26 +87,45 @@ const InputControls: React.FC<InputControlsProps> = ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        gap: 3
+        gap: 3,
+        background: '#221E37',
+        boxShadow: '0px 0px 2px rgba(0,0,0,0.24), 0px 12px 24px -4px rgba(0,0,0,0.24)',
+        borderRadius: '16px',
       }}
     >
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" gutterBottom sx={{ color: '#fff', fontFamily: 'Public Sans', fontWeight: 700, fontSize: 18, lineHeight: '28px' }}>
         Your Offer
       </Typography>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         {/* Collection Selection */}
-        <FormControl fullWidth>
-          <InputLabel id="collection-select-label">Collection</InputLabel>
+        <FormControl fullWidth sx={{
+          background: '#221E37',
+          borderRadius: '8px',
+        }}>
+          <InputLabel id="collection-select-label" sx={{ color: '#919EAB', fontWeight: 600, fontSize: 12, fontFamily: 'Public Sans' }}>Collection</InputLabel>
           <Select
             labelId="collection-select-label"
             id="collection-select"
             value={userOffer.collection || ''}
             label="Collection"
             onChange={handleCollectionChange}
+            sx={{
+              background: '#221E37',
+              color: '#fff',
+              borderRadius: '8px',
+              fontFamily: 'Public Sans',
+              fontWeight: 266,
+              fontSize: 14,
+              lineHeight: '22px',
+              '& .MuiSelect-icon': { color: '#919EAB' },
+              '& fieldset': { borderColor: 'rgba(145,158,171,0.2)' },
+              '&:hover fieldset': { borderColor: '#fff' },
+              '&.Mui-focused fieldset': { borderColor: '#fff' },
+            }}
           >
             {collections.map((coll) => (
-              <MenuItem key={coll} value={coll}>
+              <MenuItem key={coll} value={coll} sx={{ background: '#221E37', color: '#fff', fontFamily: 'Public Sans' }}>
                 {coll.charAt(0).toUpperCase() + coll.slice(1)}
               </MenuItem>
             ))}
@@ -122,26 +141,65 @@ const InputControls: React.FC<InputControlsProps> = ({
           onChange={(e) => handleLoanAmountChange(e.target.value)}
           onBlur={handleLoanAmountBlur}
           InputProps={{
-            endAdornment: <Typography variant="body2">{selectedCurrency}</Typography>
+            endAdornment: <Typography variant="body2" sx={{ color: '#919EAB', fontFamily: 'Public Sans' }}>{selectedCurrency}</Typography>,
+          }}
+          sx={{
+            background: '#221E37',
+            color: '#fff',
+            borderRadius: '8px',
+            fontFamily: 'Public Sans',
+            fontWeight: 266,
+            fontSize: 14,
+            lineHeight: '22px',
+            '& .MuiOutlinedInput-root': {
+              background: '#221E37',
+              color: '#fff',
+              borderRadius: '8px',
+              '& fieldset': { borderColor: 'rgba(145,158,171,0.2)' },
+              '&:hover fieldset': { borderColor: '#fff' },
+              '&.Mui-focused fieldset': { borderColor: '#fff' },
+            },
+            '& .MuiInputLabel-root': {
+              color: '#919EAB',
+              fontWeight: 600,
+              fontSize: 12,
+              fontFamily: 'Public Sans',
+            },
           }}
         />
 
         {/* Duration Dropdown */}
-        <FormControl fullWidth>
-          <InputLabel id="duration-select-label">Duration</InputLabel>
+        <FormControl fullWidth sx={{
+          background: '#221E37',
+          borderRadius: '8px',
+        }}>
+          <InputLabel id="duration-select-label" sx={{ color: '#919EAB', fontWeight: 600, fontSize: 12, fontFamily: 'Public Sans' }}>Duration</InputLabel>
           <Select
             labelId="duration-select-label"
             id="duration-select"
             value={userOffer.duration === undefined ? 'all' : String(userOffer.duration)}
             label="Duration"
             onChange={handleDurationDropdownChange}
+            sx={{
+              background: '#221E37',
+              color: '#fff',
+              borderRadius: '8px',
+              fontFamily: 'Public Sans',
+              fontWeight: 266,
+              fontSize: 14,
+              lineHeight: '22px',
+              '& .MuiSelect-icon': { color: '#919EAB' },
+              '& fieldset': { borderColor: 'rgba(145,158,171,0.2)' },
+              '&:hover fieldset': { borderColor: '#fff' },
+              '&.Mui-focused fieldset': { borderColor: '#fff' },
+            }}
           >
-            <MenuItem value="all">All durations</MenuItem>
-            <MenuItem value="7">7 days</MenuItem>
-            <MenuItem value="14">14 days</MenuItem>
-            <MenuItem value="30">30 days</MenuItem>
-            <MenuItem value="60">60 days</MenuItem>
-            <MenuItem value="180">180 days</MenuItem>
+            <MenuItem value="all" sx={{ background: '#221E37', color: '#fff', fontFamily: 'Public Sans' }}>All durations</MenuItem>
+            <MenuItem value="7" sx={{ background: '#221E37', color: '#fff', fontFamily: 'Public Sans' }}>7 days</MenuItem>
+            <MenuItem value="14" sx={{ background: '#221E37', color: '#fff', fontFamily: 'Public Sans' }}>14 days</MenuItem>
+            <MenuItem value="30" sx={{ background: '#221E37', color: '#fff', fontFamily: 'Public Sans' }}>30 days</MenuItem>
+            <MenuItem value="60" sx={{ background: '#221E37', color: '#fff', fontFamily: 'Public Sans' }}>60 days</MenuItem>
+            <MenuItem value="180" sx={{ background: '#221E37', color: '#fff', fontFamily: 'Public Sans' }}>180 days</MenuItem>
           </Select>
         </FormControl>
 
@@ -154,24 +212,47 @@ const InputControls: React.FC<InputControlsProps> = ({
           onChange={(e) => handleInterestRateChange(e.target.value)}
           onBlur={handleInterestRateBlur}
           InputProps={{
-            endAdornment: <Typography variant="body2">%</Typography>
+            endAdornment: <Typography variant="body2" sx={{ color: '#919EAB', fontFamily: 'Public Sans' }}>%</Typography>,
+          }}
+          sx={{
+            background: '#221E37',
+            color: '#fff',
+            borderRadius: '8px',
+            fontFamily: 'Public Sans',
+            fontWeight: 266,
+            fontSize: 14,
+            lineHeight: '22px',
+            '& .MuiOutlinedInput-root': {
+              background: '#221E37',
+              color: '#fff',
+              borderRadius: '8px',
+              '& fieldset': { borderColor: 'rgba(145,158,171,0.2)' },
+              '&:hover fieldset': { borderColor: '#fff' },
+              '&.Mui-focused fieldset': { borderColor: '#fff' },
+            },
+            '& .MuiInputLabel-root': {
+              color: '#919EAB',
+              fontWeight: 600,
+              fontSize: 12,
+              fontFamily: 'Public Sans',
+            },
           }}
         />
       </Box>
 
       {/* Summary Section */}
-      <Box sx={{ mt: 'auto', pt: 2, borderTop: 1, borderColor: 'divider' }}>
-        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+      <Box sx={{ mt: 'auto', pt: 2, borderTop: 1, borderColor: 'rgba(145,158,171,0.2)' }}>
+        <Typography variant="subtitle2" sx={{ color: '#919EAB', fontWeight: 600, fontFamily: 'Public Sans' }} gutterBottom>
           Your Offer Summary
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <Typography variant="body2">
+          <Typography variant="body2" sx={{ color: '#fff', fontFamily: 'Public Sans' }}>
             Loan Amount: {userOffer.loanAmount !== undefined ? `${Number(userOffer.loanAmount).toLocaleString(undefined, { maximumFractionDigits: 3 })} ${selectedCurrency}` : '-'}
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="body2" sx={{ color: '#fff', fontFamily: 'Public Sans' }}>
             Duration: {userOffer.duration !== undefined ? formatDuration(Number(userOffer.duration)) : '-'}
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="body2" sx={{ color: '#fff', fontFamily: 'Public Sans' }}>
             Interest Rate: {userOffer.interestRate !== undefined ? formatPercentage(Number(userOffer.interestRate)) : '-'}
           </Typography>
         </Box>

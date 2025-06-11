@@ -203,32 +203,34 @@ function App() {
   }, [stopExpandInterval]);
 
   return (
-    <div className={styles.menuDesktop}>
-      <div className={styles.leftPanel}>
-        <InputControls
-          collections={collections}
-          onUserOfferChange={updateUserOffer}
-          userOffer={userOffer}
-          selectedCurrency={selectedCurrency}
-        />
-      </div>
-      <div className={styles.chartArea}>
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <CircularProgress />
-          </Box>
-        ) : error ? (
-          <Box sx={{ color: 'error.main', p: 2 }}>{error}</Box>
-        ) : (
-          <ScatterPlot
-            data={filteredOffers}
+    <div className={styles.mainContainer}>
+      <div className={styles.menuDesktop}>
+        <div className={styles.leftPanel}>
+          <InputControls
+            collections={collections}
+            onUserOfferChange={updateUserOffer}
             userOffer={userOffer}
             selectedCurrency={selectedCurrency}
-            onCurrencyChange={handleCurrencyChange}
-            onUserOfferDrag={handleUserOfferDrag}
-            domain={domain}
           />
-        )}
+        </div>
+        <div className={styles.chartArea}>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Box sx={{ color: 'error.main', p: 2 }}>{error}</Box>
+          ) : (
+            <ScatterPlot
+              data={filteredOffers}
+              userOffer={userOffer}
+              selectedCurrency={selectedCurrency}
+              onCurrencyChange={handleCurrencyChange}
+              onUserOfferDrag={handleUserOfferDrag}
+              domain={domain}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

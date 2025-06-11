@@ -1,5 +1,14 @@
 /* ChartLayout.module.css */
 
+.mainContainer {
+  box-sizing: border-box;
+  padding: clamp(16px, 3vw, 32px);
+  width: 100vw;
+  height: 100vh;
+  background: #16152D;
+  overflow: hidden;
+}
+
 .menuDesktop {
   display: flex;
   flex-direction: row;
@@ -7,13 +16,13 @@
   padding: 0;
   isolation: isolate;
   position: relative;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   min-width: 900px;
   min-height: 600px;
   max-width: 100vw;
   max-height: 100vh;
-  background: #16152D;
+  background: none;
 }
 
 .leftPanel {
@@ -29,7 +38,6 @@
   background: #221E37;
   box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.24), 0px 12px 24px -4px rgba(0, 0, 0, 0.24);
   border-radius: 16px;
-  margin-right: 24px;
   flex-grow: 0;
   z-index: 1;
 }
@@ -100,7 +108,6 @@
   display: flex;
   flex-direction: column;
   padding: 24px;
-  margin: 24px;
 }
 
 /* ToggleButtonGroup */
@@ -149,4 +156,39 @@
   color: #fff !important;
   background: #221E37 !important;
   border: none !important;
+}
+
+@media (max-width: 1200px) {
+  .mainContainer {
+    padding: 16px;
+  }
+  .leftPanel {
+    min-width: 200px;
+    max-width: 300px;
+  }
+  .chartArea {
+    min-width: 250px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 900px) {
+  .mainContainer {
+    padding: 8px;
+  }
+  .menuDesktop {
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+  }
+  .leftPanel, .chartArea {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    height: auto;
+    margin: 0 0 12px 0;
+  }
+  .chartArea {
+    padding: 8px;
+  }
 } 

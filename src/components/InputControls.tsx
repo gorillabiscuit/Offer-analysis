@@ -8,9 +8,11 @@ import {
   MenuItem, 
   FormControl, 
   InputLabel,
-  SelectChangeEvent
+  SelectChangeEvent,
+  FormControlLabel,
+  Switch
 } from '@mui/material';
-import { formatETH, formatPercentage, formatDuration, formatCurrency } from '../utils/formatting';
+import { formatETH, formatPercentage, formatDuration, formatCurrency, formatPercentageAxis } from '../utils/formatting';
 import { LoanOffer } from '../types';
 
 interface InputControlsProps {
@@ -18,16 +20,21 @@ interface InputControlsProps {
   onUserOfferChange: (userOffer: Partial<LoanOffer>) => void;
   userOffer: Partial<LoanOffer>;
   selectedCurrency: 'WETH' | 'USDC';
+  showContours?: boolean;
+  onShowContoursChange?: (show: boolean) => void;
 }
 
 const InputControls: React.FC<InputControlsProps> = ({ 
   collections, 
   onUserOfferChange,
   userOffer,
-  selectedCurrency
+  selectedCurrency,
+  showContours = true,
+  onShowContoursChange
 }) => {
   // Add local state for input display
   const [loanAmountInput, setLoanAmountInput] = React.useState<string>('');
+  const [interestRateInput, setInterestRateInput] = React.useState<string>('');
   React.useEffect(() => {
     // Sync input when userOffer.loanAmount changes externally
     if (userOffer.loanAmount !== undefined && !isNaN(userOffer.loanAmount)) {
@@ -35,7 +42,13 @@ const InputControls: React.FC<InputControlsProps> = ({
     } else {
       setLoanAmountInput('');
     }
-  }, [userOffer.loanAmount, selectedCurrency]);
+    // Sync interest rate input
+    if (userOffer.interestRate !== undefined && !isNaN(userOffer.interestRate)) {
+      setInterestRateInput(formatPercentageAxis(userOffer.interestRate));
+    } else {
+      setInterestRateInput('');
+    }
+  }, [userOffer.loanAmount, userOffer.interestRate, selectedCurrency]);
 
   // Handlers for controlled fields
   const handleCollectionChange = (event: SelectChangeEvent) => {
@@ -63,7 +76,9 @@ const InputControls: React.FC<InputControlsProps> = ({
   };
 
   const handleInterestRateChange = (value: string) => {
-    const numValue = Number(value);
+    setInterestRateInput(value);
+    // Remove all non-numeric and non-dot/decimal chars
+    const numValue = Number(value.replace(/[^0-9.]/g, ''));
     if (!isNaN(numValue)) {
       onUserOfferChange({ interestRate: numValue });
     } else {
@@ -84,13 +99,16 @@ const InputControls: React.FC<InputControlsProps> = ({
     }
   };
 
-  // Add rounding on blur for interest rate
+  // Add rounding and formatting on blur for interest rate
   const handleInterestRateBlur = () => {
     if (userOffer.interestRate !== undefined && !isNaN(userOffer.interestRate)) {
       const rounded = Math.round(userOffer.interestRate * 100) / 100;
       if (rounded !== userOffer.interestRate) {
         onUserOfferChange({ interestRate: rounded });
       }
+      setInterestRateInput(formatPercentageAxis(rounded));
+    } else {
+      setInterestRateInput('');
     }
   };
 
@@ -166,14 +184,28 @@ const InputControls: React.FC<InputControlsProps> = ({
         <TextField
           fullWidth
           label="Interest Rate"
-          type="number"
-          value={userOffer.interestRate ?? ''}
+          type="text"
+          value={interestRateInput}
           onChange={(e) => handleInterestRateChange(e.target.value)}
           onBlur={handleInterestRateBlur}
           InputProps={{
             endAdornment: <Typography variant="body2">%</Typography>,
           }}
         />
+
+        {/* Toggle for loan density contours */}
+        <Box sx={{ mt: 2 }}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={showContours}
+                onChange={(_, checked) => onShowContoursChange && onShowContoursChange(checked)}
+                color="primary"
+              />
+            }
+            label={<span style={{ color: '#fff' }}>Show Loan Density Contours</span>}
+          />
+        </Box>
       </Box>
 
       {/* Summary Section */}

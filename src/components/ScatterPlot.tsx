@@ -15,6 +15,7 @@ interface ScatterPlotProps {
   onCurrencyChange: (currency: Currency) => void;
   onUserOfferDrag?: (update: { loanAmount: number; interestRate: number; dragX?: number; dragY?: number; width?: number; height?: number; dragging?: boolean }) => void;
   domain: { x: [number, number]; y: [number, number] };
+  showContours?: boolean;
 }
 
 const PADDING_PERCENTAGE = 0.1; // 10% padding
@@ -77,7 +78,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   selectedCurrency,
   onCurrencyChange,
   onUserOfferDrag,
-  domain
+  domain,
+  showContours = true
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -372,7 +374,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     const dotsEnter = dots.enter()
       .append('circle')
       .attr('class', 'data-point')
-      .attr('r', 5)
+      .attr('r', 10)
       // Color by age
       .attr('fill', d => timeScale(d.timestamp ?? 0))
       .attr('opacity', 0.7)
@@ -382,12 +384,18 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         tooltip.style.visibility = 'visible';
         tooltip.style.left = (event.pageX + 10) + 'px';
         tooltip.style.top = (event.pageY - 10) + 'px';
-        tooltip.innerHTML = `
-          <strong>Loan Amount:</strong> ${d.loanAmount} ${selectedCurrency}<br/>
-          <strong>Interest Rate:</strong> ${d.interestRate}%<br/>
-          <strong>Duration:</strong> ${d.duration} days<br/>
-          <strong>Loan created:</strong> ${formatAge(d.timestamp)}
-        `;
+        if (d) {
+          const dd = d as LoanOfferWithDepth;
+          tooltip.innerHTML = `
+            <strong>Loan Amount:</strong> ${dd.loanAmount} ${selectedCurrency}<br/>
+            <strong>Interest Rate:</strong> ${dd.interestRate}%<br/>
+            <strong>Duration:</strong> ${dd.duration} days<br/>
+            <strong>Loan created:</strong> ${formatAge(dd.timestamp)}<br/>
+            <strong>Loans Available:</strong> ${dd.depth && dd.depth > 1 ? dd.depth : 1}
+          `;
+        } else {
+          tooltip.innerHTML = '';
+        }
       })
       .on('mousemove', function(event) {
         if (!tooltipRef.current) return;
@@ -408,21 +416,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .attr('fill', (d: LoanOffer) => timeScale(d.timestamp ?? 0))
       );
 
-    // Render loan depth numbers (must be after xScale/yScale are defined)
-    g.selectAll('.loan-depth-label').remove();
-    g.selectAll('.loan-depth-label')
-      .data(data as LoanOfferWithDepth[])
-      .enter()
-      .append('text')
-      .attr('class', 'loan-depth-label')
-      .attr('x', (d: LoanOfferWithDepth) => xScale(d.loanAmount) + 8)
-      .attr('y', (d: LoanOfferWithDepth) => yScale(d.interestRate) - 8)
-      .attr('font-size', 10)
-      .attr('fill', '#fff')
-      .attr('text-anchor', 'start')
-      .attr('opacity', 0.8)
-      .text((d: LoanOfferWithDepth) => d.depth && d.depth > 1 ? d.depth : '');
-
     // Update user offer point if it exists
     if (userOffer) {
       const userPoint = g.selectAll<SVGCircleElement, LoanOffer>('.user-point')
@@ -433,7 +426,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       const userPointEnter = userPoint.enter()
         .append('circle')
         .attr('class', 'user-point')
-        .attr('r', 7)
+        .attr('r', 12)
         .attr('fill', '#f50057')
         .style('cursor', 'move');
 
@@ -518,22 +511,45 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           loanTextHeight = bbox.height;
         }
         // Now position text and rect at the edge, fully visible
+        let finalLoanLabelY;
+        if (userY < height / 2) {
+          // Crosshair in top half: label below the line
+          finalLoanLabelY = userY + LABEL_MARGIN;
+          // Clamp so label doesn't go off bottom edge
+          if (finalLoanLabelY + loanFontSize + 2 * loanPaddingY > height) {
+            finalLoanLabelY = height - loanFontSize - 2 * loanPaddingY;
+          }
+        } else {
+          // Crosshair in bottom half: label above the line
+          finalLoanLabelY = userY - LABEL_MARGIN - loanFontSize - 2 * loanPaddingY;
+          // Clamp so label doesn't go off top edge
+          if (finalLoanLabelY < 0) {
+            finalLoanLabelY = 0;
+          }
+        }
+
+        // Horizontal position: left or right edge as before
         if (userX > width / 2) {
           // Left edge
           loanLabelX = LABEL_MARGIN;
-          loanTextElem.attr('x', loanLabelX + loanPaddingX);
         } else {
           // Right edge
           loanLabelX = width - LABEL_MARGIN - loanTextWidth - 2 * loanPaddingX;
-          loanTextElem.attr('x', loanLabelX + loanPaddingX);
         }
-        loanTextElem.attr('y', loanLabelY - 6);
-        // Draw rect behind text
+
+        // Position text inside the box (vertically centered)
+        const loanBoxY = finalLoanLabelY;
+        const loanBoxHeight = loanFontSize + 2 * loanPaddingY;
+        loanTextElem
+          .attr('x', loanLabelX + loanPaddingX)
+          .attr('y', loanBoxY + loanBoxHeight / 2 + loanFontSize / 2.8);
+        
+        // Position the box itself
         loanLabelGroup.insert('rect', 'text')
           .attr('x', loanLabelX)
-          .attr('y', loanLabelY - 6 - loanFontSize + 4 - loanPaddingY)
+          .attr('y', loanBoxY)
           .attr('width', loanTextWidth + 2 * loanPaddingX)
-          .attr('height', loanFontSize + 2 * loanPaddingY)
+          .attr('height', loanBoxHeight)
           .attr('rx', 8)
           .attr('fill', 'rgba(200,30,30,0.8)')
           .attr('filter', 'url(#crosshair-label-shadow)');
@@ -587,16 +603,18 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           // Bottom edge
           rateLabelY = height - LABEL_MARGIN;
         }
-        // Position text inside the box
+        // Position text inside the box (vertically centered)
+        const rateBoxY = rateLabelY - rateFontSize - 2 * ratePaddingY;
+        const rateBoxHeight = rateFontSize + 2 * ratePaddingY;
         rateTextElem
           .attr('x', finalRateLabelX + ratePaddingX)
-          .attr('y', rateLabelY);
+          .attr('y', rateBoxY + rateBoxHeight / 2 + rateFontSize / 2.8);
         // Position the box itself
         rateLabelGroup.insert('rect', 'text')
           .attr('x', finalRateLabelX)
-          .attr('y', rateLabelY - rateFontSize + 4 - ratePaddingY)
+          .attr('y', rateBoxY)
           .attr('width', rateTextWidth + 2 * ratePaddingX)
-          .attr('height', rateFontSize + 2 * ratePaddingY)
+          .attr('height', rateBoxHeight)
           .attr('rx', 8)
           .attr('fill', 'rgba(200,30,30,0.8)')
           .attr('filter', 'url(#crosshair-label-shadow)');
@@ -749,8 +767,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         const userLabelEnter = userLabel.enter()
           .append('text')
           .attr('class', 'user-label')
-          .attr('dy', -10)
-          .style('font-size', '12px')
+          .attr('dy', -20)
+          .style('font-size', '14px')
           .style('fill', '#f50057')
           .text('Your Offer');
 
@@ -768,35 +786,37 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     // Remove any existing contours
     g.selectAll('.contour').remove();
 
-    // Create density estimator with parameters from constants
-    const density = d3.contourDensity<LoanOffer>()
-      .x(d => xScale(d.loanAmount))
-      .y(d => yScale(d.interestRate))
-      .size([width, height])
-      .bandwidth(CONTOUR_BANDWIDTH)
-      .thresholds(CONTOUR_THRESHOLDS);
+    if (showContours) {
+      // Create density estimator with parameters from constants
+      const density = d3.contourDensity<LoanOffer>()
+        .x(d => xScale(d.loanAmount))
+        .y(d => yScale(d.interestRate))
+        .size([width, height])
+        .bandwidth(CONTOUR_BANDWIDTH)
+        .thresholds(CONTOUR_THRESHOLDS);
 
-    // Generate contours
-    const contours = density(data);
+      // Generate contours
+      const contours = density(data);
 
-    // Create non-linear color scale using constants
-    const maxDensity = d3.max(contours, d => d.value) || 1;
-    const contourColorScale = d3.scalePow<string>()
-      .exponent(CONTOUR_SCALE_EXPONENT)
-      .domain([0, maxDensity])
-      .range(CONTOUR_COLORS);
+      // Create non-linear color scale using constants
+      const maxDensity = d3.max(contours, d => d.value) || 1;
+      const contourColorScale = d3.scalePow<string>()
+        .exponent(CONTOUR_SCALE_EXPONENT)
+        .domain([0, maxDensity])
+        .range(CONTOUR_COLORS);
 
-    // Draw contours
-    g.selectAll('.contour')
-      .data(contours)
-      .enter()
-      .append('path')
-      .attr('class', 'contour')
-      .attr('d', d3.geoPath())
-      .attr('fill', d => contourColorScale(d.value))
-      .attr('stroke', 'none')
-      .lower(); // Ensure contours are behind points
-  }, [data, userOffer, selectedCurrency, onUserOfferDrag, domain, throttledExpand, chartSize]);
+      // Draw contours
+      g.selectAll('.contour')
+        .data(contours)
+        .enter()
+        .append('path')
+        .attr('class', 'contour')
+        .attr('d', d3.geoPath())
+        .attr('fill', d => contourColorScale(d.value))
+        .attr('stroke', 'none')
+        .lower(); // Ensure contours are behind points
+    }
+  }, [data, userOffer, selectedCurrency, onUserOfferDrag, domain, throttledExpand, chartSize, showContours]);
 
   return (
     <Paper elevation={3} sx={{ p: 2, height: '100%', background: 'none', boxShadow: 'none' }}>

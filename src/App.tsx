@@ -53,6 +53,7 @@ function App() {
   const { userOffer, updateUserOffer } = useUserOffer();
   const [domain, setDomain] = useState(() => getInitialDomain(currencyOffers, userOffer));
   const [showHeatmap, setShowHeatmap] = useState(true);
+  const [showContours, setShowContours] = useState(true);
 
   // --- Continuous domain expansion state ---
   const dragActiveRef = useRef(false);
@@ -229,6 +230,8 @@ function App() {
               onUserOfferChange={updateUserOffer}
               userOffer={userOffer}
               selectedCurrency={selectedCurrency}
+              showContours={showContours}
+              onShowContoursChange={setShowContours}
             />
           </div>
           <div className={styles.chartArea}>
@@ -246,6 +249,7 @@ function App() {
                 onCurrencyChange={handleCurrencyChange}
                 onUserOfferDrag={handleUserOfferDrag}
                 domain={domain}
+                showContours={showContours}
               />
             )}
           </div>

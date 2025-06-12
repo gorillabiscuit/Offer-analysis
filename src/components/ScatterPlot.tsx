@@ -342,8 +342,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     };
 
     // Update median annotations
-    updateAnnotation('median-x-annotation', xScale(medianLoanAmount) + 5, 15, `Median: ${formatCurrency(medianLoanAmount, selectedCurrency)} ${selectedCurrency}`);
-    updateAnnotation('median-y-annotation', width - 5, yScale(medianInterestRate) - 5, `Median: ${formatPercentageAxis(medianInterestRate)}`, 'end');
+    updateAnnotation('median-x-annotation', xScale(medianLoanAmount) + 20, 15, `Median: ${formatCurrency(medianLoanAmount, selectedCurrency)} ${selectedCurrency === 'WETH' ? 'wETH' : selectedCurrency}`);
+    updateAnnotation('median-y-annotation', width - 5, yScale(medianInterestRate) - 20, `Median: ${formatPercentageAxis(medianInterestRate)}`, 'end');
 
     // Log the keys for debugging
     const keys = data.map(d => d.id || `${d.collection}-${d.loanAmount}-${d.interestRate}-${d.duration}`);
@@ -485,13 +485,13 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         const loanLabel = `${loanDiff >= 0 ? '+' : '-'}${loanDiffAbs} ${selectedCurrency} ${loanDiff >= 0 ? 'above' : 'below'} median`;
         const rateLabel = `${rateDiff >= 0 ? '+' : '-'}${rateDiffAbs}% ${rateDiff >= 0 ? 'above' : 'below'} median`;
 
-        // For vertical (loan) label: if in right half, place at left; if in left half, place at right
-        const loanLabelX = userX > width / 2 ? 20 : width - 20;
+        const LABEL_MARGIN = 20;
+        // For vertical (loan) label: always at left or right edge
         const loanLabelY = userY;
-        // For horizontal (APR) label: if in bottom half, place at top+20; if in top half, place at bottom-20
-        // Also, move horizontally 20px away from the crosshair: right if left half, left if right half
-        const rateLabelY = userY > height / 2 ? 40 : height - 40;
-        const rateLabelX = userX < width / 2 ? userX + 20 : userX - 20;
+        let loanLabelX = userX > width / 2 ? LABEL_MARGIN : width - LABEL_MARGIN;
+        // For horizontal (APR) label: always at top or bottom edge
+        const rateLabelX = userX;
+        let rateLabelY = userY > height / 2 ? LABEL_MARGIN : height - LABEL_MARGIN;
 
         // Draw a group with a red rounded rect and white text for the loan label
         const loanLabelGroup = g.append('g').attr('class', 'user-crosshair-x-label-group');
@@ -499,31 +499,38 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         const loanPaddingX = 9;
         const loanPaddingY = 6;
         const loanText = loanLabel;
+        // Render text at (0,0) to measure
         const loanTextElem = loanLabelGroup.append('text')
-          .attr('x', loanLabelX)
-          .attr('y', loanLabelY - 6)
+          .attr('x', 0)
+          .attr('y', 0)
           .attr('font-size', loanFontSize)
           .attr('font-family', 'Public Sans, sans-serif')
           .attr('font-weight', 500)
           .attr('fill', '#fff')
-          .attr('text-anchor', 'middle')
+          .attr('text-anchor', 'start')
           .text(loanText);
-        // Get text width for rect
         const loanTextNode = loanTextElem.node();
         let loanTextWidth = 0;
+        let loanTextHeight = 0;
         if (loanTextNode) {
-          loanTextWidth = loanTextNode.getBBox().width;
+          const bbox = loanTextNode.getBBox();
+          loanTextWidth = bbox.width;
+          loanTextHeight = bbox.height;
         }
-        // Clamp x so box edge is at least 20px from chart edge
-        const minLoanX = 20 + (loanTextWidth / 2) + loanPaddingX;
-        const maxLoanX = width - 20 - (loanTextWidth / 2) - loanPaddingX;
-        let clampedLoanX = loanLabelX;
-        if (clampedLoanX < minLoanX) clampedLoanX = minLoanX;
-        if (clampedLoanX > maxLoanX) clampedLoanX = maxLoanX;
-        loanTextElem.attr('x', clampedLoanX);
+        // Now position text and rect at the edge, fully visible
+        if (userX > width / 2) {
+          // Left edge
+          loanLabelX = LABEL_MARGIN;
+          loanTextElem.attr('x', loanLabelX + loanPaddingX);
+        } else {
+          // Right edge
+          loanLabelX = width - LABEL_MARGIN - loanTextWidth - 2 * loanPaddingX;
+          loanTextElem.attr('x', loanLabelX + loanPaddingX);
+        }
+        loanTextElem.attr('y', loanLabelY - 6);
         // Draw rect behind text
         loanLabelGroup.insert('rect', 'text')
-          .attr('x', clampedLoanX - (loanTextWidth / 2) - loanPaddingX)
+          .attr('x', loanLabelX)
           .attr('y', loanLabelY - 6 - loanFontSize + 4 - loanPaddingY)
           .attr('width', loanTextWidth + 2 * loanPaddingX)
           .attr('height', loanFontSize + 2 * loanPaddingY)
@@ -531,38 +538,62 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .attr('fill', 'rgba(200,30,30,0.8)')
           .attr('filter', 'url(#crosshair-label-shadow)');
 
-        // Place rate label
-        // Draw a group with a red rounded rect and white text for the rate label
+        // Place rate label at top or bottom edge
         const rateLabelGroup = g.append('g').attr('class', 'user-crosshair-y-label-group');
         const rateFontSize = 13;
         const ratePaddingX = 9;
         const ratePaddingY = 6;
         const rateText = rateLabel;
+        // Render text at (0,0) to measure
         const rateTextElem = rateLabelGroup.append('text')
-          .attr('x', rateLabelX)
-          .attr('y', rateLabelY)
+          .attr('x', 0)
+          .attr('y', 0)
           .attr('font-size', rateFontSize)
           .attr('font-family', 'Public Sans, sans-serif')
           .attr('font-weight', 500)
           .attr('fill', '#fff')
-          .attr('text-anchor', 'middle')
+          .attr('text-anchor', 'start')
           .text(rateText);
-        // Get text width for rect
         const rateTextNode = rateTextElem.node();
         let rateTextWidth = 0;
+        let rateTextHeight = 0;
         if (rateTextNode) {
-          rateTextWidth = rateTextNode.getBBox().width;
+          const bbox = rateTextNode.getBBox();
+          rateTextWidth = bbox.width;
+          rateTextHeight = bbox.height;
         }
-        // Clamp x so box edge is at least 20px from chart edge
-        const minRateX = 20 + (rateTextWidth / 2) + ratePaddingX;
-        const maxRateX = width - 20 - (rateTextWidth / 2) - ratePaddingX;
-        let clampedRateX = rateLabelX;
-        if (clampedRateX < minRateX) clampedRateX = minRateX;
-        if (clampedRateX > maxRateX) clampedRateX = maxRateX;
-        rateTextElem.attr('x', clampedRateX);
-        // Draw rect behind text
+        // --- NEW LOGIC: Offset label box to left or right of crosshair line ---
+        let finalRateLabelX;
+        if (rateLabelX < width / 2) {
+          // Crosshair in left half: label to the right of the line
+          finalRateLabelX = rateLabelX + LABEL_MARGIN;
+          // Clamp so label doesn't go off right edge
+          if (finalRateLabelX + rateTextWidth + 2 * ratePaddingX > width) {
+            finalRateLabelX = width - rateTextWidth - 2 * ratePaddingX;
+          }
+        } else {
+          // Crosshair in right half: label to the left of the line
+          finalRateLabelX = rateLabelX - LABEL_MARGIN - rateTextWidth - 2 * ratePaddingX;
+          // Clamp so label doesn't go off left edge
+          if (finalRateLabelX < 0) {
+            finalRateLabelX = 0;
+          }
+        }
+        // Vertical position: top or bottom edge as before
+        if (userY > height / 2) {
+          // Top edge
+          rateLabelY = LABEL_MARGIN + rateFontSize + 2 * ratePaddingY;
+        } else {
+          // Bottom edge
+          rateLabelY = height - LABEL_MARGIN;
+        }
+        // Position text inside the box
+        rateTextElem
+          .attr('x', finalRateLabelX + ratePaddingX)
+          .attr('y', rateLabelY);
+        // Position the box itself
         rateLabelGroup.insert('rect', 'text')
-          .attr('x', clampedRateX - (rateTextWidth / 2) - ratePaddingX)
+          .attr('x', finalRateLabelX)
           .attr('y', rateLabelY - rateFontSize + 4 - ratePaddingY)
           .attr('width', rateTextWidth + 2 * ratePaddingX)
           .attr('height', rateFontSize + 2 * ratePaddingY)

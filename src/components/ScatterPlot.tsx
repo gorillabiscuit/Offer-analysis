@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
-import { Box, Paper, Typography, FormControlLabel, Switch } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import * as d3 from 'd3';
 import { LoanOffer, HeatmapCell } from '../types';
 import { Currency } from '../hooks/useLoanOffers';

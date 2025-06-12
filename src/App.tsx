@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Container, Grid, Box, CircularProgress, ThemeProvider, FormControlLabel, Switch } from '@mui/material';
+import { Box, CircularProgress, ThemeProvider } from '@mui/material';
 import InputControls from './components/InputControls';
 import ScatterPlot from './components/ScatterPlot';
 import { useLoanOffers } from './hooks/useLoanOffers';

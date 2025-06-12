@@ -1,0 +1,198 @@
+{
+  "offerDate": "2025-06-10 16:10:09.852",
+  "loanPrincipalCanonicalAmount": 65000,
+  "eAPR": 13.999999991,
+  "lender": "0xb118af418c7ccd805a66408beca28f739b8ebc84"
+}
+{
+  "offerDate": "2025-06-10 14:29:52.312",
+  "loanPrincipalCanonicalAmount": 100000,
+  "eAPR": 48.5,
+  "lender": "0xf4fb9fa23edb32215e5284cf7dbfdb5607d51a5b"
+}
+{
+  "offerDate": "2025-06-10 14:21:21.524",
+  "loanPrincipalCanonicalAmount": 65000,
+  "eAPR": 17.5859,
+  "lender": "0xf4fb9fa23edb32215e5284cf7dbfdb5607d51a5b"
+}
+{
+  "offerDate": "2025-06-10 14:11:03.589",
+  "loanPrincipalCanonicalAmount": 65000,
+  "eAPR": 17.8295,
+  "lender": "0xba15e9b644685cb845af18a738abd40c6bcd78ed"
+}
+{
+  "offerDate": "2025-06-10 13:37:54.586",
+  "loanPrincipalCanonicalAmount": 36.5,
+  "eAPR": 14,
+  "lender": "0xf1a9676b03dd3b2066214d2ad8b4b59ed6642c53"
+}
+{
+  "offerDate": "2025-06-10 11:19:26.600",
+  "loanPrincipalCanonicalAmount": 39.1,
+  "eAPR": 15.611669224,
+  "lender": "0xa5166b6d0751e1cd09dc67eb09e7d25b2dc8855e"
+}
+{
+  "offerDate": "2025-06-10 00:50:12.367",
+  "loanPrincipalCanonicalAmount": 72500,
+  "eAPR": 17.1885,
+  "lender": "0xf4fb9fa23edb32215e5284cf7dbfdb5607d51a5b"
+}
+{
+  "offerDate": "2025-06-10 00:25:42.612",
+  "loanPrincipalCanonicalAmount": 60000,
+  "eAPR": 21.806,
+  "lender": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "offerDate": "2025-06-10 00:22:48.057",
+  "loanPrincipalCanonicalAmount": 40000,
+  "eAPR": 23.3229,
+  "lender": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "offerDate": "2025-06-09 13:28:28.043",
+  "loanPrincipalCanonicalAmount": 40000,
+  "eAPR": 23.6042,
+  "lender": "0x08fa1d231580ff854db5513ae8f877a25dda9576"
+}
+{
+  "offerDate": "2025-06-09 13:28:07.768",
+  "loanPrincipalCanonicalAmount": 60000,
+  "eAPR": 21.7593,
+  "lender": "0x08fa1d231580ff854db5513ae8f877a25dda9576"
+}
+{
+  "offerDate": "2025-06-09 13:27:10.280",
+  "loanPrincipalCanonicalAmount": 70000,
+  "eAPR": 17.4762,
+  "lender": "0x08fa1d231580ff854db5513ae8f877a25dda9576"
+}
+{
+  "offerDate": "2025-06-05 15:40:10.136",
+  "loanPrincipalCanonicalAmount": 36,
+  "eAPR": 14.000014352,
+  "lender": "0xf1a9676b03dd3b2066214d2ad8b4b59ed6642c53"
+}
+{
+  "offerDate": "2025-06-05 15:31:37.376",
+  "loanPrincipalCanonicalAmount": 75000,
+  "eAPR": 14.000000006,
+  "lender": "0x230d920fff07c0dc7ebe5afcde50e23a44556850"
+}
+{
+  "offerDate": "2025-06-05 15:31:05.626",
+  "loanPrincipalCanonicalAmount": 36,
+  "eAPR": 14.000014352,
+  "lender": "0x230d920fff07c0dc7ebe5afcde50e23a44556850"
+}
+{
+  "offerDate": "2025-05-29 09:36:55.126",
+  "loanPrincipalCanonicalAmount": 27.61,
+  "eAPR": 16.5757,
+  "lender": "0x533c5c699fea1fd6cd7610ec05ae59c5ca4e42bf"
+}
+{
+  "offerDate": "2025-05-29 09:36:31.252",
+  "loanPrincipalCanonicalAmount": 27.61,
+  "eAPR": 15.6622,
+  "lender": "0x533c5c699fea1fd6cd7610ec05ae59c5ca4e42bf"
+}
+{
+  "offerDate": "2025-05-29 09:36:08.798",
+  "loanPrincipalCanonicalAmount": 27.61,
+  "eAPR": 15.295,
+  "lender": "0x533c5c699fea1fd6cd7610ec05ae59c5ca4e42bf"
+}
+{
+  "offerDate": "2025-05-29 09:35:46.270",
+  "loanPrincipalCanonicalAmount": 27.61,
+  "eAPR": 16.5999,
+  "lender": "0x533c5c699fea1fd6cd7610ec05ae59c5ca4e42bf"
+}
+{
+  "offerDate": "2025-05-13 17:47:13.416",
+  "loanPrincipalCanonicalAmount": 36,
+  "eAPR": 14.000014352,
+  "lender": "0x66c7a7348250f453a37cf86410a946f9668de386"
+}
+{
+  "offerDate": "2025-05-12 22:19:06.159",
+  "loanPrincipalCanonicalAmount": 34,
+  "eAPR": 13.000011765,
+  "lender": "0x66c7a7348250f453a37cf86410a946f9668de386"
+}
+{
+  "offerDate": "2025-04-08 00:35:46.827",
+  "loanPrincipalCanonicalAmount": 42000,
+  "eAPR": 14.999999995,
+  "lender": "0xc8a4fdbe80c24e796f776f58522b8aff9c508c07"
+}
+{
+  "offerDate": "2025-04-08 00:35:33.015",
+  "loanPrincipalCanonicalAmount": 42000,
+  "eAPR": 14.999999995,
+  "lender": "0xc8a4fdbe80c24e796f776f58522b8aff9c508c07"
+}
+{
+  "offerDate": "2025-04-08 00:35:18.255",
+  "loanPrincipalCanonicalAmount": 42000,
+  "eAPR": 14.999999995,
+  "lender": "0xc8a4fdbe80c24e796f776f58522b8aff9c508c07"
+}
+{
+  "offerDate": "2025-04-08 00:35:02.830",
+  "loanPrincipalCanonicalAmount": 42000,
+  "eAPR": 14.999999995,
+  "lender": "0xc8a4fdbe80c24e796f776f58522b8aff9c508c07"
+}
+{
+  "offerDate": "2025-04-08 00:30:17.295",
+  "loanPrincipalCanonicalAmount": 42000,
+  "eAPR": 14.999999995,
+  "lender": "0xc8a4fdbe80c24e796f776f58522b8aff9c508c07"
+}
+{
+  "offerDate": "2025-04-08 00:29:57.343",
+  "loanPrincipalCanonicalAmount": 42000,
+  "eAPR": 14.999999995,
+  "lender": "0xc8a4fdbe80c24e796f776f58522b8aff9c508c07"
+}
+{
+  "offerDate": "2025-04-08 00:17:42.288",
+  "loanPrincipalCanonicalAmount": 42000,
+  "eAPR": 14.999999995,
+  "lender": "0xc8a4fdbe80c24e796f776f58522b8aff9c508c07"
+}
+{
+  "offerDate": "2025-04-03 14:11:22.760",
+  "loanPrincipalCanonicalAmount": 58000,
+  "eAPR": 14.000000005,
+  "lender": "0x230d920fff07c0dc7ebe5afcde50e23a44556850"
+}
+{
+  "offerDate": "2025-04-03 14:09:48.950",
+  "loanPrincipalCanonicalAmount": 53000,
+  "eAPR": 14.000000007,
+  "lender": "0x230d920fff07c0dc7ebe5afcde50e23a44556850"
+}
+{
+  "offerDate": "2025-04-02 14:44:19.880",
+  "loanPrincipalCanonicalAmount": 31,
+  "eAPR": 13.999987097,
+  "lender": "0x230d920fff07c0dc7ebe5afcde50e23a44556850"
+}
+{
+  "offerDate": "2025-04-02 13:26:46.852",
+  "loanPrincipalCanonicalAmount": 31,
+  "eAPR": 13.999987097,
+  "lender": "0x230d920fff07c0dc7ebe5afcde50e23a44556850"
+}
+{
+  "offerDate": "2025-03-13 03:25:28.796",
+  "loanPrincipalCanonicalAmount": 28,
+  "eAPR": 14.999979167,
+  "lender": "0x66c7a7348250f453a37cf86410a946f9668de386"
+}

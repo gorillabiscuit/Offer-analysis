@@ -10,7 +10,7 @@ import {
   InputLabel,
   SelectChangeEvent
 } from '@mui/material';
-import { formatETH, formatPercentage, formatDuration } from '../utils/formatting';
+import { formatETH, formatPercentage, formatDuration, formatCurrency } from '../utils/formatting';
 import { LoanOffer } from '../types';
 
 interface InputControlsProps {
@@ -26,6 +26,17 @@ const InputControls: React.FC<InputControlsProps> = ({
   userOffer,
   selectedCurrency
 }) => {
+  // Add local state for input display
+  const [loanAmountInput, setLoanAmountInput] = React.useState<string>('');
+  React.useEffect(() => {
+    // Sync input when userOffer.loanAmount changes externally
+    if (userOffer.loanAmount !== undefined && !isNaN(userOffer.loanAmount)) {
+      setLoanAmountInput(formatCurrency(userOffer.loanAmount, selectedCurrency));
+    } else {
+      setLoanAmountInput('');
+    }
+  }, [userOffer.loanAmount, selectedCurrency]);
+
   // Handlers for controlled fields
   const handleCollectionChange = (event: SelectChangeEvent) => {
     const value = event.target.value;
@@ -33,7 +44,8 @@ const InputControls: React.FC<InputControlsProps> = ({
   };
 
   const handleLoanAmountChange = (value: string) => {
-    const numValue = Number(value);
+    setLoanAmountInput(value);
+    const numValue = Number(value.replace(/[^0-9.]/g, ''));
     if (!isNaN(numValue)) {
       onUserOfferChange({ loanAmount: numValue });
     } else {
@@ -59,13 +71,16 @@ const InputControls: React.FC<InputControlsProps> = ({
     }
   };
 
-  // Add rounding on blur for loan amount
+  // Add rounding and formatting on blur for loan amount
   const handleLoanAmountBlur = () => {
     if (userOffer.loanAmount !== undefined && !isNaN(userOffer.loanAmount)) {
       const rounded = Math.round(userOffer.loanAmount * 1000) / 1000;
       if (rounded !== userOffer.loanAmount) {
         onUserOfferChange({ loanAmount: rounded });
       }
+      setLoanAmountInput(formatCurrency(rounded, selectedCurrency));
+    } else {
+      setLoanAmountInput('');
     }
   };
 
@@ -119,8 +134,8 @@ const InputControls: React.FC<InputControlsProps> = ({
         <TextField
           fullWidth
           label="Loan Amount"
-          type="number"
-          value={userOffer.loanAmount ?? ''}
+          type="text"
+          value={loanAmountInput}
           onChange={(e) => handleLoanAmountChange(e.target.value)}
           onBlur={handleLoanAmountBlur}
           InputProps={{
@@ -168,7 +183,7 @@ const InputControls: React.FC<InputControlsProps> = ({
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           <Typography variant="body2">
-            Loan Amount: {userOffer.loanAmount !== undefined ? `${Number(userOffer.loanAmount).toLocaleString(undefined, { maximumFractionDigits: 3 })} ${selectedCurrency}` : '-'}
+            Loan Amount: {userOffer.loanAmount !== undefined ? `${formatCurrency(Number(userOffer.loanAmount), selectedCurrency)} ${selectedCurrency}` : '-'}
           </Typography>
           <Typography variant="body2">
             Duration: {userOffer.duration !== undefined ? formatDuration(Number(userOffer.duration)) : '-'}

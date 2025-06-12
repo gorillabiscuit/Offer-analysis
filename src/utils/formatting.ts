@@ -23,4 +23,16 @@ export const formatDuration = (days: number): string => {
   return remainingDays > 0 
     ? `${months} months, ${remainingDays} days`
     : `${months} months`;
+};
+
+export const formatCurrency = (value: number, currency: 'WETH' | 'USDC'): string => {
+  if (currency === 'WETH') {
+    return value.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+  } else {
+    return value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+};
+
+export const formatPercentageAxis = (value: number): string => {
+  return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
 }; 

@@ -1,0 +1,2450 @@
+{
+  "createddate": "2025-04-30 14:55:57.608",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3000000000000000000,
+  "aprbps": 1499,
+  "lenderaddress": "0x681d3a2d1d19e7186edd13a9c08574ebe22d145e"
+}
+{
+  "createddate": "2025-05-12 20:39:37.389",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 15000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0xcc0a029d0def04171622dadfb620deb53f105abd"
+}
+{
+  "createddate": "2025-05-21 03:59:14.407",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 450000000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x65d6c6a59953535b2a64a712926b3cf8628409d5"
+}
+{
+  "createddate": "2025-05-21 04:01:04.377",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 400000000000000000,
+  "aprbps": 1200,
+  "lenderaddress": "0x65d6c6a59953535b2a64a712926b3cf8628409d5"
+}
+{
+  "createddate": "2025-05-21 04:02:57.015",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 400000000000000000,
+  "aprbps": 1250,
+  "lenderaddress": "0x65d6c6a59953535b2a64a712926b3cf8628409d5"
+}
+{
+  "createddate": "2025-05-26 15:44:46.368",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 4500000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-26 15:46:36.342",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 5800000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-27 23:26:45.062",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 5640000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-27 23:27:58.337",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 3700000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:05:11.766",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1435000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:05:44.830",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 941000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:10:12.288",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1434000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:10:36.634",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 941000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:17:55.236",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1753000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:18:23.505",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1150000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:22:00.707",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 796000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:22:24.774",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 523000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:36:47.535",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 733000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:37:18.711",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 481000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:41:43.711",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 16748000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:42:25.658",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 11247000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:54:11.841",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1686000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:54:39.839",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1133000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:56:59.878",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1939000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 00:57:30.363",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1303000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-05-28 15:28:17.913",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3300000000000000000,
+  "aprbps": 1000,
+  "lenderaddress": "0x14f3ff4737cd18d47b838645cc7a3ba737dbec06"
+}
+{
+  "createddate": "2025-05-28 15:28:57.939",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3300000000000000000,
+  "aprbps": 1200,
+  "lenderaddress": "0x14f3ff4737cd18d47b838645cc7a3ba737dbec06"
+}
+{
+  "createddate": "2025-05-28 15:29:33.492",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3300000000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x14f3ff4737cd18d47b838645cc7a3ba737dbec06"
+}
+{
+  "createddate": "2025-05-28 15:31:07.173",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3300000000000000000,
+  "aprbps": 900,
+  "lenderaddress": "0x14f3ff4737cd18d47b838645cc7a3ba737dbec06"
+}
+{
+  "createddate": "2025-05-28 15:31:48.199",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3300000000000000000,
+  "aprbps": 1000,
+  "lenderaddress": "0x14f3ff4737cd18d47b838645cc7a3ba737dbec06"
+}
+{
+  "createddate": "2025-05-28 15:32:10.950",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3300000000000000000,
+  "aprbps": 1200,
+  "lenderaddress": "0x14f3ff4737cd18d47b838645cc7a3ba737dbec06"
+}
+{
+  "createddate": "2025-05-28 15:32:32.733",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3300000000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x14f3ff4737cd18d47b838645cc7a3ba737dbec06"
+}
+{
+  "createddate": "2025-05-28 15:41:42.126",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1434000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-05-28 15:41:52.716",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 941000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-05-28 15:52:30.774",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 7500000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-05-28 16:12:44.988",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 6000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-05-28 16:12:59.370",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 4000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-05-28 17:05:34.028",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 20000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-05-28 17:05:48.261",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 15000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-05-28 19:20:49.704",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 2300000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-05-28 19:21:05.495",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 2000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-05-28 19:23:37.037",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 7500000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-05-29 09:28:00.576",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 27610000000000000000,
+  "aprbps": 999,
+  "lenderaddress": "0x533c5c699fea1fd6cd7610ec05ae59c5ca4e42bf"
+}
+{
+  "createddate": "2025-05-29 09:29:42.251",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 27610000000000000000,
+  "aprbps": 1199,
+  "lenderaddress": "0x533c5c699fea1fd6cd7610ec05ae59c5ca4e42bf"
+}
+{
+  "createddate": "2025-05-29 09:32:07.666",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 27610000000000000000,
+  "aprbps": 1199,
+  "lenderaddress": "0x533c5c699fea1fd6cd7610ec05ae59c5ca4e42bf"
+}
+{
+  "createddate": "2025-05-29 09:35:46.270",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 27610000000000000000,
+  "aprbps": 999,
+  "lenderaddress": "0x533c5c699fea1fd6cd7610ec05ae59c5ca4e42bf"
+}
+{
+  "createddate": "2025-05-29 09:36:08.798",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 27610000000000000000,
+  "aprbps": 1199,
+  "lenderaddress": "0x533c5c699fea1fd6cd7610ec05ae59c5ca4e42bf"
+}
+{
+  "createddate": "2025-05-29 09:36:31.252",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 27610000000000000000,
+  "aprbps": 1199,
+  "lenderaddress": "0x533c5c699fea1fd6cd7610ec05ae59c5ca4e42bf"
+}
+{
+  "createddate": "2025-05-29 09:36:55.126",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 27610000000000000000,
+  "aprbps": 1299,
+  "lenderaddress": "0x533c5c699fea1fd6cd7610ec05ae59c5ca4e42bf"
+}
+{
+  "createddate": "2025-06-01 12:59:33.095",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 2000000000000000000,
+  "aprbps": 1499,
+  "lenderaddress": "0xbb2d6d4c7eb53f17f4366db8e08aba7579ef327f"
+}
+{
+  "createddate": "2025-06-01 13:00:32.737",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 2000000000000000000,
+  "aprbps": 1499,
+  "lenderaddress": "0xbb2d6d4c7eb53f17f4366db8e08aba7579ef327f"
+}
+{
+  "createddate": "2025-06-02 19:49:03.710",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3000000000000000000,
+  "aprbps": 1499,
+  "lenderaddress": "0xbb2d6d4c7eb53f17f4366db8e08aba7579ef327f"
+}
+{
+  "createddate": "2025-06-02 22:45:55.122",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 60000000000,
+  "aprbps": 1550,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-02 22:46:50.953",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 58000000000,
+  "aprbps": 1525,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-02 22:47:56.146",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 55000000000,
+  "aprbps": 1600,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-02 22:49:23.948",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 45000000000,
+  "aprbps": 1600,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-03 21:14:02.636",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 34000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-03 21:14:21.593",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 28000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-03 21:15:53.536",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 25000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-03 21:45:21.791",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 6000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-03 21:56:53.429",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 900000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-04 18:28:28.512",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 620000000,
+  "aprbps": 1150,
+  "lenderaddress": "0x86486d881b8ca7b4186d6aef4b9c8e6c30be73f0"
+}
+{
+  "createddate": "2025-06-04 18:31:01.938",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 900000000,
+  "aprbps": 547,
+  "lenderaddress": "0x86486d881b8ca7b4186d6aef4b9c8e6c30be73f0"
+}
+{
+  "createddate": "2025-06-05 18:54:15.072",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 700000000000000000,
+  "aprbps": 1440,
+  "lenderaddress": "0xf9b64dc47dbe8c75f6ffc573cbc7599404bfe5a7"
+}
+{
+  "createddate": "2025-06-05 19:07:50.300",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 3300000000000000000,
+  "aprbps": 1400,
+  "lenderaddress": "0xf9b64dc47dbe8c75f6ffc573cbc7599404bfe5a7"
+}
+{
+  "createddate": "2025-06-06 00:14:02.030",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 53000000000,
+  "aprbps": 1575,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-06 23:55:28.281",
+  "timestamp": "2025-06-11 07:16:56.420",
+  "principalamount": 16500000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-06 23:56:45.250",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 14500000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-06 23:57:08.899",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 13000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:02:00.776",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 3000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:02:24.458",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 2500000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:02:42.978",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 2050000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:06:48.883",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 5400000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:12:55.775",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 5000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:13:19.109",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 4250000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:17:33.254",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 4200000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:25:52.270",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 18000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:26:26.626",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 15000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:26:48.844",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 13000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:28:12.174",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 8500000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:32:12.571",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1800000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:32:37.578",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1400000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:39:26.143",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 9500000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:39:40.417",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 8020000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:39:56.675",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 6750000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:45:24.420",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1400000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:51:29.428",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:51:50.935",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 2750000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:52:28.245",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 2300000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:58:46.176",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:59:05.774",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 2750000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 00:59:20.775",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 2300000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-07 16:30:56.215",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 800000000,
+  "aprbps": 1300,
+  "lenderaddress": "0x2d09e8859b4ecf5ab2290db94f1f2bd5312af37e"
+}
+{
+  "createddate": "2025-06-08 01:49:21.291",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 900000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 01:51:11.078",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1500000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 01:52:54.644",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 480000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 01:54:00.689",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3000000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 01:54:28.983",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 2700000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 01:54:52.681",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 2400000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 01:56:27.362",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 2700000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 01:58:34.978",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 6000000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 01:59:53.885",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 7600000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 02:00:36.917",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 6220000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 02:00:59.044",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 5038000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 02:01:55.959",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1440000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 02:03:31.895",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 558000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 02:03:52.355",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 690000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 02:04:15.729",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 452000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 02:05:36.173",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 7200000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 02:06:01.520",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 5832000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 02:06:23.624",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 4723000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 02:07:49.237",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 4200000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 02:08:09.072",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 3402000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 02:08:30.049",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 2755000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 02:10:17.689",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 4723000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 14:18:15.714",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 925000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x4f37aedc5cc53e9cb8cb8b1379d7e4b64e3fc034"
+}
+{
+  "createddate": "2025-06-08 14:22:14.601",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 950000000,
+  "aprbps": 2000,
+  "lenderaddress": "0x5c9e4460f3d6e27db74f35afb067d14b2df46caf"
+}
+{
+  "createddate": "2025-06-08 14:32:14.291",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 650000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x4f37aedc5cc53e9cb8cb8b1379d7e4b64e3fc034"
+}
+{
+  "createddate": "2025-06-08 16:13:30.527",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 860000000,
+  "aprbps": 1600,
+  "lenderaddress": "0x86486d881b8ca7b4186d6aef4b9c8e6c30be73f0"
+}
+{
+  "createddate": "2025-06-08 16:15:07.532",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 925000000,
+  "aprbps": 1350,
+  "lenderaddress": "0x86486d881b8ca7b4186d6aef4b9c8e6c30be73f0"
+}
+{
+  "createddate": "2025-06-08 16:33:33.166",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 480000000000000000,
+  "aprbps": 199,
+  "lenderaddress": "0x9fc4001133d3825b7ce4b05bcfbe227fb3cd5fdf"
+}
+{
+  "createddate": "2025-06-08 17:01:10.620",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 490000000000000000,
+  "aprbps": 1000,
+  "lenderaddress": "0xf9b64dc47dbe8c75f6ffc573cbc7599404bfe5a7"
+}
+{
+  "createddate": "2025-06-08 17:18:04.502",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0xf4fb9fa23edb32215e5284cf7dbfdb5607d51a5b"
+}
+{
+  "createddate": "2025-06-08 19:46:04.104",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 950000000,
+  "aprbps": 540,
+  "lenderaddress": "0x86486d881b8ca7b4186d6aef4b9c8e6c30be73f0"
+}
+{
+  "createddate": "2025-06-08 21:03:34.789",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 4582000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 21:04:04.898",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3760000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 21:04:41.760",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3083000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 21:05:04.611",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 2070000000,
+  "aprbps": 500,
+  "lenderaddress": "0x007ce5c372cc6fcc47d2aac5665a94a2b165a1b5"
+}
+{
+  "createddate": "2025-06-08 22:20:29.873",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 4200000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-08 22:22:52.076",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 7500000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-08 22:26:44.489",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 4500000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-09 00:59:27.013",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 900000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-09 05:08:33.931",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 200000000,
+  "aprbps": 2500,
+  "lenderaddress": "0xc8db075571794dfc0ee8c718b98967740c0c62bb"
+}
+{
+  "createddate": "2025-06-09 11:38:23.522",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 8000000000000000000,
+  "aprbps": 1400,
+  "lenderaddress": "0xda96af1d1f753d05bb9d1d4e795e5b97da3efebf"
+}
+{
+  "createddate": "2025-06-09 11:40:26.091",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 8000000000000000000,
+  "aprbps": 1400,
+  "lenderaddress": "0xda96af1d1f753d05bb9d1d4e795e5b97da3efebf"
+}
+{
+  "createddate": "2025-06-09 12:44:06.361",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 4750000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x4f37aedc5cc53e9cb8cb8b1379d7e4b64e3fc034"
+}
+{
+  "createddate": "2025-06-09 12:44:43.096",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 7500000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x4f37aedc5cc53e9cb8cb8b1379d7e4b64e3fc034"
+}
+{
+  "createddate": "2025-06-09 13:22:27.614",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 800000000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x3484fb041d3f70f89415ffc17ec36ac57c1fcac6"
+}
+{
+  "createddate": "2025-06-09 13:24:48.511",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 12200000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x08fa1d231580ff854db5513ae8f877a25dda9576"
+}
+{
+  "createddate": "2025-06-09 13:25:39.505",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 70000000000,
+  "aprbps": 1400,
+  "lenderaddress": "0x08fa1d231580ff854db5513ae8f877a25dda9576"
+}
+{
+  "createddate": "2025-06-09 13:26:00.657",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 60000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x08fa1d231580ff854db5513ae8f877a25dda9576"
+}
+{
+  "createddate": "2025-06-09 13:26:25.360",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 40000000000,
+  "aprbps": 1600,
+  "lenderaddress": "0x08fa1d231580ff854db5513ae8f877a25dda9576"
+}
+{
+  "createddate": "2025-06-09 13:27:10.280",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 70000000000,
+  "aprbps": 1400,
+  "lenderaddress": "0x08fa1d231580ff854db5513ae8f877a25dda9576"
+}
+{
+  "createddate": "2025-06-09 13:28:07.768",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 60000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x08fa1d231580ff854db5513ae8f877a25dda9576"
+}
+{
+  "createddate": "2025-06-09 13:28:28.043",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 40000000000,
+  "aprbps": 1600,
+  "lenderaddress": "0x08fa1d231580ff854db5513ae8f877a25dda9576"
+}
+{
+  "createddate": "2025-06-09 13:36:42.411",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 5000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x08fa1d231580ff854db5513ae8f877a25dda9576"
+}
+{
+  "createddate": "2025-06-09 14:20:50.141",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 8000000000000000000,
+  "aprbps": 1343,
+  "lenderaddress": "0xf9b64dc47dbe8c75f6ffc573cbc7599404bfe5a7"
+}
+{
+  "createddate": "2025-06-09 15:56:24.104",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 25000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xfc4672341c78f1ebc0c23fdbcbb03b61c6f2d50f"
+}
+{
+  "createddate": "2025-06-09 16:19:32.896",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 107000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xfc4672341c78f1ebc0c23fdbcbb03b61c6f2d50f"
+}
+{
+  "createddate": "2025-06-09 16:22:06.239",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 75000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xfc4672341c78f1ebc0c23fdbcbb03b61c6f2d50f"
+}
+{
+  "createddate": "2025-06-09 16:24:05.944",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 107000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xfc4672341c78f1ebc0c23fdbcbb03b61c6f2d50f"
+}
+{
+  "createddate": "2025-06-09 16:35:05.387",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 45000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xfc4672341c78f1ebc0c23fdbcbb03b61c6f2d50f"
+}
+{
+  "createddate": "2025-06-09 19:30:08.010",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 60000000000,
+  "aprbps": 1800,
+  "lenderaddress": "0x08fa1d231580ff854db5513ae8f877a25dda9576"
+}
+{
+  "createddate": "2025-06-09 21:10:38.182",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 25000000000,
+  "aprbps": 500,
+  "lenderaddress": "0xfc4672341c78f1ebc0c23fdbcbb03b61c6f2d50f"
+}
+{
+  "createddate": "2025-06-09 21:44:27.406",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 11164000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 22:58:51.194",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 2700000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 22:59:24.492",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 2187000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 22:59:45.809",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1771000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 23:04:06.729",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 2820000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 23:04:28.985",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 2284000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 23:04:54.294",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1849000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 23:06:33.228",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 11400000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 23:07:18.998",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 10206000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 23:07:46.335",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 8265000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 23:32:21.737",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3000000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 23:34:56.207",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1800000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 23:35:17.460",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1458000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 23:35:39.428",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1180000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 23:48:31.111",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 6300000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 23:49:26.203",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 5103000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-09 23:50:23.572",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 4132000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 00:05:57.467",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 12400000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-10 00:22:48.057",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 40000000000,
+  "aprbps": 1800,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-10 00:25:42.612",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 60000000000,
+  "aprbps": 1650,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-10 00:34:02.170",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 960000000,
+  "aprbps": 500,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-10 00:38:57.056",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 65000000000,
+  "aprbps": 1800,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-10 00:39:27.831",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 60000000000,
+  "aprbps": 1800,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-10 00:39:51.554",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 60000000000,
+  "aprbps": 1700,
+  "lenderaddress": "0xa9cdfc16685a90074c7ce329fea4fd36b47bb87d"
+}
+{
+  "createddate": "2025-06-10 00:49:33.232",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 72500000000,
+  "aprbps": 1400,
+  "lenderaddress": "0xf4fb9fa23edb32215e5284cf7dbfdb5607d51a5b"
+}
+{
+  "createddate": "2025-06-10 00:50:12.367",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 72500000000,
+  "aprbps": 1400,
+  "lenderaddress": "0xf4fb9fa23edb32215e5284cf7dbfdb5607d51a5b"
+}
+{
+  "createddate": "2025-06-10 00:56:41.736",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 120000000000,
+  "aprbps": 1400,
+  "lenderaddress": "0xf4fb9fa23edb32215e5284cf7dbfdb5607d51a5b"
+}
+{
+  "createddate": "2025-06-10 02:35:20.306",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 6500000000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x9b3b4a76e32e092fbd8256ba3d1c56bf484ac8b8"
+}
+{
+  "createddate": "2025-06-10 02:36:14.250",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 6000000000000000000,
+  "aprbps": 2000,
+  "lenderaddress": "0x9b3b4a76e32e092fbd8256ba3d1c56bf484ac8b8"
+}
+{
+  "createddate": "2025-06-10 02:38:44.679",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 5000000000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x9b3b4a76e32e092fbd8256ba3d1c56bf484ac8b8"
+}
+{
+  "createddate": "2025-06-10 02:40:55.041",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 6000000000000000000,
+  "aprbps": 1000,
+  "lenderaddress": "0x9b3b4a76e32e092fbd8256ba3d1c56bf484ac8b8"
+}
+{
+  "createddate": "2025-06-10 03:52:32.343",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 900000000,
+  "aprbps": 726,
+  "lenderaddress": "0x86486d881b8ca7b4186d6aef4b9c8e6c30be73f0"
+}
+{
+  "createddate": "2025-06-10 13:12:16.254",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 8500000000000000000,
+  "aprbps": 1300,
+  "lenderaddress": "0x9b3b4a76e32e092fbd8256ba3d1c56bf484ac8b8"
+}
+{
+  "createddate": "2025-06-10 13:13:39.431",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 7800000000000000000,
+  "aprbps": 2000,
+  "lenderaddress": "0x9b3b4a76e32e092fbd8256ba3d1c56bf484ac8b8"
+}
+{
+  "createddate": "2025-06-10 13:35:38.527",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 9600000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 13:35:58.636",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 7909000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 13:36:20.459",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 6405000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 14:11:03.589",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 65000000000,
+  "aprbps": 1315,
+  "lenderaddress": "0xba15e9b644685cb845af18a738abd40c6bcd78ed"
+}
+{
+  "createddate": "2025-06-10 14:11:27.705",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 65000000000,
+  "aprbps": 1310,
+  "lenderaddress": "0xba15e9b644685cb845af18a738abd40c6bcd78ed"
+}
+{
+  "createddate": "2025-06-10 14:20:19.880",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 65000000000,
+  "aprbps": 1300,
+  "lenderaddress": "0xf4fb9fa23edb32215e5284cf7dbfdb5607d51a5b"
+}
+{
+  "createddate": "2025-06-10 14:21:21.524",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 65000000000,
+  "aprbps": 1300,
+  "lenderaddress": "0xf4fb9fa23edb32215e5284cf7dbfdb5607d51a5b"
+}
+{
+  "createddate": "2025-06-10 14:29:52.312",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 100000000000,
+  "aprbps": 1200,
+  "lenderaddress": "0xf4fb9fa23edb32215e5284cf7dbfdb5607d51a5b"
+}
+{
+  "createddate": "2025-06-10 17:48:40.372",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3000000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 17:50:03.083",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 2400000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 17:50:29.180",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1942000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 17:55:51.066",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 16350000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:05:51.518",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 13365000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:12:30.336",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 3000000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:13:09.138",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 2430000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:14:04.975",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 2050000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:14:50.876",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1253000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:15:21.590",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1029000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:17:17.033",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 4098000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:17:41.504",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 3362000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:20:52.671",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 7320000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:21:15.903",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 6024000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:21:39.039",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 4950000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:23:04.363",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 7910000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:24:01.808",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 6405000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:26:47.850",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1800000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:27:20.372",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1400000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:27:45.890",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1232000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:28:27.786",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 7600000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:28:51.789",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 6220000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:29:12.851",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 5038000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:31:13.662",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 1149000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:31:38.026",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 930000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:34:11.353",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 14715000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:34:37.321",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 12081000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:35:06.027",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1710000000000000000,
+  "aprbps": 500,
+  "lenderaddress": "0x2940aec2db0706b0f8b24eec2241bd98a57cc244"
+}
+{
+  "createddate": "2025-06-10 18:35:32.875",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1400000000000000000,
+  "aprbps": 500,
+  "lenderaddress": "0x2940aec2db0706b0f8b24eec2241bd98a57cc244"
+}
+{
+  "createddate": "2025-06-10 18:36:01.945",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 13950000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:36:07.103",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1710000000000000000,
+  "aprbps": 500,
+  "lenderaddress": "0x2940aec2db0706b0f8b24eec2241bd98a57cc244"
+}
+{
+  "createddate": "2025-06-10 18:36:23.970",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 11430000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:38:29.591",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 550000000000000000,
+  "aprbps": 500,
+  "lenderaddress": "0x2940aec2db0706b0f8b24eec2241bd98a57cc244"
+}
+{
+  "createddate": "2025-06-10 18:38:58.117",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1700000000000000000,
+  "aprbps": 500,
+  "lenderaddress": "0x2940aec2db0706b0f8b24eec2241bd98a57cc244"
+}
+{
+  "createddate": "2025-06-10 18:39:50.135",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 900000000000000000,
+  "aprbps": 500,
+  "lenderaddress": "0x2940aec2db0706b0f8b24eec2241bd98a57cc244"
+}
+{
+  "createddate": "2025-06-10 18:40:24.945",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 750000000000000000,
+  "aprbps": 500,
+  "lenderaddress": "0x2940aec2db0706b0f8b24eec2241bd98a57cc244"
+}
+{
+  "createddate": "2025-06-10 18:40:53.347",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 7200000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:41:17.871",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 5832000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:41:47.408",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 4723000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:43:10.064",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 4200000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:43:38.903",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 3402000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:44:05.965",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 2821000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-10 18:45:51.691",
+  "timestamp": "2025-06-11 07:16:56.423",
+  "principalamount": 5715000000,
+  "aprbps": 500,
+  "lenderaddress": "0x12e6ad13e280779264e2c4ee0b40b312d4b97142"
+}
+{
+  "createddate": "2025-06-11 07:00:58.252",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 236400000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:01:01.598",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 185000000000000000,
+  "aprbps": 5000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:01:05.972",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1395000000000000000,
+  "aprbps": 5000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:01:10.240",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 253894850000000000,
+  "aprbps": 5000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:01:13.843",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 248226300000000000,
+  "aprbps": 3500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:01:21.390",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 121985150000000000,
+  "aprbps": 2500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:01:25.631",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 129499999999999980,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:01:29.524",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 282799999999999970,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:01:33.359",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 524996499999999940,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:01:38.100",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 146998600000000000,
+  "aprbps": 2500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:01:42.026",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 177726395000000000,
+  "aprbps": 2500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:01:46.073",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 137899999999999980,
+  "aprbps": 2500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:01:53.689",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 111529280000000000,
+  "aprbps": 2500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:01:57.520",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 162492704000000000,
+  "aprbps": 2500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:02:03.939",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 126080000000000000,
+  "aprbps": 2500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:02:08.638",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 154102400000000000,
+  "aprbps": 2500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:02:18.258",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 203500000000000030,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:02:24.540",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1340610000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:02:28.241",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1674000000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:02:33.149",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 264597480000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:02:39.706",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1363700000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:02:44.596",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 267926800000000030,
+  "aprbps": 3600,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:02:49.650",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 109351199999999980,
+  "aprbps": 3500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:02:56.762",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 8384999935000000000,
+  "aprbps": 3500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:03:01.210",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 209117400000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:03:05.908",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 673815380000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:03:13.699",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 599400000000000000,
+  "aprbps": 3500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:03:18.566",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 191690950000000000,
+  "aprbps": 3500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:03:23.498",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 204880000000000000,
+  "aprbps": 5000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:03:29.019",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1255500000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:03:32.684",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 976500000000000000,
+  "aprbps": 2000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:03:37.640",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 63392000000000000,
+  "aprbps": 1700,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:03:44.004",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 134398720000000000,
+  "aprbps": 2500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:03:48.453",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 134073600000000000,
+  "aprbps": 2500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:03:53.011",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 8771999932000001000,
+  "aprbps": 3500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:03:57.632",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 157604000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:04:04.450",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 58637600000000000,
+  "aprbps": 1700,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:04:09.248",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 256197560000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:04:14.093",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 98257600000000000,
+  "aprbps": 3600,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:04:19.829",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 349650000000000000,
+  "aprbps": 1300,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:04:24.701",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 118400000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:04:28.793",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 368000000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:04:34.073",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 515280000000000000,
+  "aprbps": 5000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:04:38.877",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 619475430000000000,
+  "aprbps": 3500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:04:43.222",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 298960000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:04:49.975",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 554996300000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:04:55.011",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 899994000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:04:59.614",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 484800000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:05:06.354",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 724500000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:05:10.667",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1300760000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:05:17.728",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 236406000000000000,
+  "aprbps": 3500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:05:25.641",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1228892500000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:05:30.508",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 543399500000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:05:35.212",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1116000000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:05:43.943",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 632500000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:05:49.057",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 893740000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:05:57.382",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 434719600000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:06:02.471",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 460000000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:06:07.955",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 959199120000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:06:14.959",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 839200000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:06:20.372",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 145783700000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:06:25.579",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 358643670000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:06:32.561",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 837000000000000000,
+  "aprbps": 2500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:06:39.204",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 863279208000000000,
+  "aprbps": 2000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:06:43.929",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 782022500000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:06:50.054",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 549450000000000060,
+  "aprbps": 3700,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:06:54.289",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1510738614000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:06:58.581",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 632500000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:07:05.790",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1153900000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:07:10.423",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 3777200000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:07:14.518",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 959199120000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:07:20.582",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1407640500000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:07:25.098",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 597739450000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:07:28.811",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 499500000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:07:34.755",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1318898790000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:07:39.604",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1117175000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:07:44.554",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 216705500000000030,
+  "aprbps": 3500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:07:51.255",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 5159999960000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:07:56.237",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 4514999964999999500,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:01.234",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 380379650000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:05.159",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 892800000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:09.974",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 734300000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:14.503",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 309690000000000000,
+  "aprbps": 1300,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:18.046",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 145783700000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:23.041",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1558698570000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:26.891",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 5193650000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:30.717",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 737335500000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:34.628",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 379500000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:39.216",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 379500000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:42.704",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 5949090000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:45.772",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 469530000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:49.391",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 1049000000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:54.097",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 3305050000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:08:57.561",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 692340000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:01.374",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 629400000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:05.038",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 791339274000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:08.836",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 145783700000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:12.163",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 6137950000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:15.993",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 5193650000000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:19.742",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 1198998900000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:24.911",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 4256999967000000000,
+  "aprbps": 2000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:28.711",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 299700000000000000,
+  "aprbps": 1300,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:32.605",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 670305000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:36.040",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 3305050000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:40.372",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 326039700000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:43.772",
+  "timestamp": "2025-06-11 07:16:56.422",
+  "principalamount": 753300000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:47.604",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 269730000000000030,
+  "aprbps": 1300,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:51.096",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 3116190000000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:54.923",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 7739999940000000000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:09:57.899",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 7094999945000001000,
+  "aprbps": 4000,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}
+{
+  "createddate": "2025-06-11 07:10:00.900",
+  "timestamp": "2025-06-11 07:16:56.421",
+  "principalamount": 4256999967000000000,
+  "aprbps": 1500,
+  "lenderaddress": "0x90d61e3efc07161b1397eeb278d1bc9355774f96"
+}

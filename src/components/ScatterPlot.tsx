@@ -6,6 +6,7 @@ import { Currency } from '../hooks/useLoanOffers';
 import { getMarketMedians } from '../utils/median';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import styles from './ChartLayout.module.css';
+import { formatCurrency, formatPercentageAxis } from '../utils/formatting';
 
 interface ScatterPlotProps {
   data?: LoanOffer[];
@@ -55,7 +56,7 @@ const CONTOUR_THRESHOLDS = 10;
  * - 0.5: Square root, balanced emphasis
  * - 2: Square, emphasizes high-density areas
  */
-const CONTOUR_SCALE_EXPONENT = 3;
+const CONTOUR_SCALE_EXPONENT = 1;
 
 /**
  * Color and opacity range for the contours. First color is for low density,
@@ -66,8 +67,8 @@ const CONTOUR_SCALE_EXPONENT = 3;
  * - Second opacity: 0.3-0.6 for visible high-density areas
  */
 const CONTOUR_COLORS = [
-  'rgba(77, 150, 255, 0.05)',  // Light blue, very transparent
-  'rgba(255, 107, 107, 0.4)'   // Light red, more opaque
+  'rgba(77, 150, 255, 0.01)',  // Light blue, high opacity
+  'rgba(255, 107, 107, 0.4)'   // Light red, high opacity
 ];
 
 const ScatterPlot: React.FC<ScatterPlotProps> = ({ 
@@ -239,8 +240,18 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     prevScalesRef.current = { x: xScale, y: yScale };
 
     // Update axes with transitions
-    const xAxis = d3.axisBottom(xScale);
-    const yAxis = d3.axisLeft(yScale);
+    const xAxis = d3.axisBottom(xScale)
+      .ticks(6)
+      .tickFormat((domainValue: d3.NumberValue, _i: number) => {
+        const d = typeof domainValue === 'number' ? domainValue : domainValue.valueOf();
+        return `${formatCurrency(d, selectedCurrency)} ${selectedCurrency}`;
+      });
+    const yAxis = d3.axisLeft(yScale)
+      .ticks(10)
+      .tickFormat((domainValue: d3.NumberValue, _i: number) => {
+        const d = typeof domainValue === 'number' ? domainValue : domainValue.valueOf();
+        return formatPercentageAxis(d);
+      });
 
     // Update or create axes
     const xAxisGroup = g.select<SVGGElement>('.x-axis');
@@ -278,34 +289,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     // Axis text: pure white
     g.selectAll('.x-axis text, .y-axis text')
       .attr('fill', '#FFF');
-    // Axis labels: #fff at 50% opacity
-    g.selectAll('.x-label, .y-label')
-      .attr('fill', 'rgba(255,255,255,0.5)');
-
-    // Update axis labels
-    const xLabel = g.select<SVGTextElement>('.x-label');
-    const yLabel = g.select<SVGTextElement>('.y-label');
-
-    if (xLabel.empty()) {
-      g.append('text')
-        .attr('class', 'x-label')
-        .attr('transform', `translate(${width / 2}, ${height + margin.bottom - 10})`)
-        .style('text-anchor', 'middle')
-        .text(`Loan Amount (${selectedCurrency})`);
-    } else {
-      maybeTransition(xLabel)
-        .text(`Loan Amount (${selectedCurrency})`);
-    }
-
-    if (yLabel.empty()) {
-      g.append('text')
-        .attr('class', 'y-label')
-        .attr('transform', 'rotate(-90)')
-        .attr('y', -margin.left + 15)
-        .attr('x', -(height / 2))
-        .style('text-anchor', 'middle')
-        .text('APR (%)');
-    }
+    // Remove axis labels (no .x-label or .y-label)
 
     // Calculate statistics
     const { medianLoanAmount, medianInterestRate } = getMarketMedians(data);
@@ -346,19 +330,20 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .attr('y', y)
           .attr('text-anchor', anchor)
           .style('font-size', '12px')
-          .style('fill', '#666')
+          .style('fill', 'rgba(255,255,255,0.8)')
           .text(text);
       } else {
         maybeTransition(annotation)
           .attr('x', x)
           .attr('y', y)
+          .style('fill', 'rgba(255,255,255,0.8)')
           .text(text);
       }
     };
 
     // Update median annotations
-    updateAnnotation('median-x-annotation', xScale(medianLoanAmount) + 5, 15, `Median: ${medianLoanAmount.toFixed(2)} ${selectedCurrency}`);
-    updateAnnotation('median-y-annotation', width - 5, yScale(medianInterestRate) - 5, `Median: ${medianInterestRate.toFixed(2)}%`, 'end');
+    updateAnnotation('median-x-annotation', xScale(medianLoanAmount) + 5, 15, `Median: ${formatCurrency(medianLoanAmount, selectedCurrency)} ${selectedCurrency}`);
+    updateAnnotation('median-y-annotation', width - 5, yScale(medianInterestRate) - 5, `Median: ${formatPercentageAxis(medianInterestRate)}`, 'end');
 
     // Log the keys for debugging
     const keys = data.map(d => d.id || `${d.collection}-${d.loanAmount}-${d.interestRate}-${d.duration}`);
@@ -454,6 +439,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
       // --- Crosshairs ---
       g.selectAll('.user-crosshair-x, .user-crosshair-y, .user-crosshair-x-label, .user-crosshair-y-label').remove();
+      // Remove previous crosshair label groups to prevent accumulation
+      g.selectAll('.user-crosshair-x-label-group, .user-crosshair-y-label-group').remove();
 
       // Only show crosshairs and labels while dragging
       if (isDraggingRef.current && lastDataPosRef.current) {
@@ -506,27 +493,94 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         const rateLabelY = userY > height / 2 ? 40 : height - 40;
         const rateLabelX = userX < width / 2 ? userX + 20 : userX - 20;
 
-        // Place loan label
-        g.append('text')
-          .attr('class', 'user-crosshair-x-label')
+        // Draw a group with a red rounded rect and white text for the loan label
+        const loanLabelGroup = g.append('g').attr('class', 'user-crosshair-x-label-group');
+        const loanFontSize = 13;
+        const loanPaddingX = 9;
+        const loanPaddingY = 6;
+        const loanText = loanLabel;
+        const loanTextElem = loanLabelGroup.append('text')
           .attr('x', loanLabelX)
           .attr('y', loanLabelY - 6)
-          .attr('fill', 'rgba(245,0,87,0.7)')
-          .attr('font-size', 12)
-          .attr('font-weight', 'bold')
-          .attr('text-anchor', loanLabelX < width / 2 ? 'start' : 'end')
-          .text(loanLabel);
+          .attr('font-size', loanFontSize)
+          .attr('font-family', 'Public Sans, sans-serif')
+          .attr('font-weight', 500)
+          .attr('fill', '#fff')
+          .attr('text-anchor', 'middle')
+          .text(loanText);
+        // Get text width for rect
+        const loanTextNode = loanTextElem.node();
+        let loanTextWidth = 0;
+        if (loanTextNode) {
+          loanTextWidth = loanTextNode.getBBox().width;
+        }
+        // Clamp x so box edge is at least 20px from chart edge
+        const minLoanX = 20 + (loanTextWidth / 2) + loanPaddingX;
+        const maxLoanX = width - 20 - (loanTextWidth / 2) - loanPaddingX;
+        let clampedLoanX = loanLabelX;
+        if (clampedLoanX < minLoanX) clampedLoanX = minLoanX;
+        if (clampedLoanX > maxLoanX) clampedLoanX = maxLoanX;
+        loanTextElem.attr('x', clampedLoanX);
+        // Draw rect behind text
+        loanLabelGroup.insert('rect', 'text')
+          .attr('x', clampedLoanX - (loanTextWidth / 2) - loanPaddingX)
+          .attr('y', loanLabelY - 6 - loanFontSize + 4 - loanPaddingY)
+          .attr('width', loanTextWidth + 2 * loanPaddingX)
+          .attr('height', loanFontSize + 2 * loanPaddingY)
+          .attr('rx', 8)
+          .attr('fill', 'rgba(200,30,30,0.8)')
+          .attr('filter', 'url(#crosshair-label-shadow)');
+
         // Place rate label
-        g.append('text')
-          .attr('class', 'user-crosshair-y-label')
+        // Draw a group with a red rounded rect and white text for the rate label
+        const rateLabelGroup = g.append('g').attr('class', 'user-crosshair-y-label-group');
+        const rateFontSize = 13;
+        const ratePaddingX = 9;
+        const ratePaddingY = 6;
+        const rateText = rateLabel;
+        const rateTextElem = rateLabelGroup.append('text')
           .attr('x', rateLabelX)
           .attr('y', rateLabelY)
-          .attr('fill', 'rgba(245,0,87,0.7)')
-          .attr('font-size', 12)
-          .attr('font-weight', 'bold')
-          .attr('text-anchor', rateLabelX < width / 2 ? 'start' : 'end')
-          .text(rateLabel);
-        // --- End Crosshairs ---
+          .attr('font-size', rateFontSize)
+          .attr('font-family', 'Public Sans, sans-serif')
+          .attr('font-weight', 500)
+          .attr('fill', '#fff')
+          .attr('text-anchor', 'middle')
+          .text(rateText);
+        // Get text width for rect
+        const rateTextNode = rateTextElem.node();
+        let rateTextWidth = 0;
+        if (rateTextNode) {
+          rateTextWidth = rateTextNode.getBBox().width;
+        }
+        // Clamp x so box edge is at least 20px from chart edge
+        const minRateX = 20 + (rateTextWidth / 2) + ratePaddingX;
+        const maxRateX = width - 20 - (rateTextWidth / 2) - ratePaddingX;
+        let clampedRateX = rateLabelX;
+        if (clampedRateX < minRateX) clampedRateX = minRateX;
+        if (clampedRateX > maxRateX) clampedRateX = maxRateX;
+        rateTextElem.attr('x', clampedRateX);
+        // Draw rect behind text
+        rateLabelGroup.insert('rect', 'text')
+          .attr('x', clampedRateX - (rateTextWidth / 2) - ratePaddingX)
+          .attr('y', rateLabelY - rateFontSize + 4 - ratePaddingY)
+          .attr('width', rateTextWidth + 2 * ratePaddingX)
+          .attr('height', rateFontSize + 2 * ratePaddingY)
+          .attr('rx', 8)
+          .attr('fill', 'rgba(200,30,30,0.8)')
+          .attr('filter', 'url(#crosshair-label-shadow)');
+
+        // Add drop shadow filter definition if not present
+        if (svg.select('defs').empty()) {
+          svg.append('defs');
+        }
+        if (svg.select('defs #crosshair-label-shadow').empty()) {
+          svg.select('defs').append('filter')
+            .attr('id', 'crosshair-label-shadow')
+            .html(`
+              <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.18"/>
+            `);
+        }
       }
 
       // Anchor-based drag logic
@@ -598,7 +652,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
             dragTooltipRef.current.style.fontFamily = 'Public Sans, sans-serif';
             dragTooltipRef.current.style.fontWeight = '500';
             dragTooltipRef.current.style.boxShadow = '0px 4px 16px rgba(0,0,0,0.24)';
-            dragTooltipRef.current.innerHTML = `<div style='margin-bottom:4px;'>Your Offer</div><div>${newDataX.toLocaleString(undefined, {maximumFractionDigits: 2})} ${selectedCurrency}</div><div>${newDataY.toFixed(2)}% APR</div>`;
+            dragTooltipRef.current.innerHTML = `<div style='margin-bottom:4px;'>Your Offer</div><div>${formatCurrency(newDataX, selectedCurrency)} ${selectedCurrency}</div><div>${newDataY.toFixed(2)}% APR</div>`;
           }
           // Throttle domain expansion
           if (typeof onUserOfferDrag === 'function') {

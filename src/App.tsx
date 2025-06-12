@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Container, Grid, Box, CircularProgress, ThemeProvider } from '@mui/material';
+import { Container, Grid, Box, CircularProgress, ThemeProvider, FormControlLabel, Switch } from '@mui/material';
 import InputControls from './components/InputControls';
 import ScatterPlot from './components/ScatterPlot';
 import { useLoanOffers } from './hooks/useLoanOffers';
@@ -49,9 +49,10 @@ function getInitialDomain(offers: LoanOffer[], userOffer: UserOfferState) {
 }
 
 function App() {
-  const { loanOffers: currencyOffers, collections, loading, error, selectedCurrency, setSelectedCurrency, allLoanOffers } = useLoanOffers();
+  const { loanOffers: currencyOffers, collections, loading, error, selectedCurrency, setSelectedCurrency, allLoanOffers, heatmap } = useLoanOffers();
   const { userOffer, updateUserOffer } = useUserOffer();
   const [domain, setDomain] = useState(() => getInitialDomain(currencyOffers, userOffer));
+  const [showHeatmap, setShowHeatmap] = useState(true);
 
   // --- Continuous domain expansion state ---
   const dragActiveRef = useRef(false);
@@ -179,20 +180,34 @@ function App() {
   const handleCurrencyChange = useCallback((newCurrency: 'WETH' | 'USDC') => {
     if (selectedCurrency === newCurrency) return;
     // Use allLoanOffers (unfiltered) for conversion
+    console.log('[CurrencyToggle] selectedCurrency:', selectedCurrency, 'newCurrency:', newCurrency);
+    console.log('[CurrencyToggle] userOffer.loanAmount before:', userOffer.loanAmount);
+    console.log('[CurrencyToggle] allLoanOffers.length:', allLoanOffers?.length);
+    
     const rate = getMedianEthUsdcRate(allLoanOffers || []);
+    console.log('[CurrencyToggle] Calculated median ETH/USD rate:', rate);
+    
     let newAmount = userOffer.loanAmount;
-    console.log('Currency toggle:', selectedCurrency, '->', newCurrency);
-    console.log('Calculated median ETH/USD rate:', rate);
     if (rate) {
       if (selectedCurrency === 'WETH' && newCurrency === 'USDC') {
         // ETH to USDC: multiply by rate (USD per ETH)
         newAmount = userOffer.loanAmount * rate;
+        console.log('[CurrencyToggle] Converting WETH to USDC:', {
+          originalAmount: userOffer.loanAmount,
+          rate,
+          newAmount
+        });
       } else if (selectedCurrency === 'USDC' && newCurrency === 'WETH') {
         // USDC to ETH: divide by rate (USD per ETH)
         newAmount = userOffer.loanAmount / rate;
+        console.log('[CurrencyToggle] Converting USDC to WETH:', {
+          originalAmount: userOffer.loanAmount,
+          rate,
+          newAmount
+        });
       }
     }
-    console.log('Converted amount:', newAmount);
+    console.log('[CurrencyToggle] Final converted amount:', newAmount);
     updateUserOffer({ loanAmount: newAmount });
     setSelectedCurrency(newCurrency);
   }, [selectedCurrency, allLoanOffers, userOffer.loanAmount, setSelectedCurrency, updateUserOffer]);

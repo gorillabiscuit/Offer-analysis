@@ -102,8 +102,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       tooltip = document.createElement('div');
       tooltip.style.position = 'absolute';
       tooltip.style.visibility = 'hidden';
-      tooltip.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-      tooltip.style.border = '1px solid #ddd';
+      tooltip.style.backgroundColor = '#302B4D';
       tooltip.style.borderRadius = '4px';
       tooltip.style.padding = '12px';
       tooltip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
@@ -112,6 +111,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       tooltip.style.lineHeight = '1.4';
       tooltip.style.pointerEvents = 'none';
       tooltip.style.maxWidth = '300px';
+      tooltip.style.color = '#fff';
       document.body.appendChild(tooltip);
       tooltipRef.current = tooltip;
     }
@@ -121,7 +121,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       dragTooltip = document.createElement('div');
       dragTooltip.style.position = 'absolute';
       dragTooltip.style.visibility = 'hidden';
-      dragTooltip.style.backgroundColor = 'rgba(245, 0, 87, 0.95)';
+      dragTooltip.style.backgroundColor = '#302B4D';
       dragTooltip.style.color = 'white';
       dragTooltip.style.borderRadius = '4px';
       dragTooltip.style.padding = '8px 12px';
@@ -537,7 +537,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .attr('width', loanTextWidth + 2 * loanPaddingX)
           .attr('height', loanBoxHeight)
           .attr('rx', 8)
-          .attr('fill', 'rgba(200,30,30,0.8)')
+          .attr('fill', '#302B4D')
           .attr('filter', 'url(#crosshair-label-shadow)');
 
         // Place rate label at top or bottom edge
@@ -600,7 +600,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .attr('width', rateTextWidth + 2 * ratePaddingX)
           .attr('height', rateBoxHeight)
           .attr('rx', 8)
-          .attr('fill', 'rgba(200,30,30,0.8)')
+          .attr('fill', '#302B4D')
           .attr('filter', 'url(#crosshair-label-shadow)');
 
         // Add drop shadow filter definition if not present

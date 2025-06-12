@@ -62,12 +62,11 @@ function normalizeMarketOffer(offer: any): LoanOffer & { createdAt: string; time
 }
 
 export const useLoanOffers = () => {
-  const [loanOffers, setLoanOffers] = useState<LoanOffer[]>([]);
-  const [filteredOffers, setFilteredOffers] = useState<LoanOffer[]>([]);
-  const [collections, setCollections] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>('WETH');
+  const [selectedCurrency, setSelectedCurrency] = useState<'WETH' | 'USDC'>('WETH');
+  const [allLoanOffers, setAllLoanOffers] = useState<LoanOffer[]>([]);
+  const [collections, setCollections] = useState<string[]>([]);
   const [heatmap, setHeatmap] = useState<HeatmapCell[]>([]);
   const [allMarketOffers, setAllMarketOffers] = useState<any[]>([]);
   const [allGondiOffers, setAllGondiOffers] = useState<any[]>([]);
@@ -125,7 +124,7 @@ export const useLoanOffers = () => {
       ...o,
       depth: depthMap[[o.loanAmount, o.interestRate, o.duration, o.currency].join('|')]
     }));
-    setFilteredOffers(offersWithDepth);
+    setAllLoanOffers(offersWithDepth);
 
     // Normalize Gondi offers for the heatmap
     const gondiOffersNorm = allGondiOffers.map(normalizeGondiOffer);
@@ -172,7 +171,7 @@ export const useLoanOffers = () => {
   }, [allMarketOffers, allGondiOffers, selectedCurrency]);
 
   console.log('Returning from useLoanOffers:', {
-    loanOffers: filteredOffers.length,
+    loanOffers: allLoanOffers.length,
     allLoanOffers: allMarketOffers.length,
     collections: collections.length,
     loading,
@@ -182,7 +181,7 @@ export const useLoanOffers = () => {
   });
 
   return {
-    loanOffers: filteredOffers,
+    loanOffers: allLoanOffers,
     allLoanOffers: allMarketOffers,
     collections,
     loading,

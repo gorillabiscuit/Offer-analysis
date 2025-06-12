@@ -49,10 +49,9 @@ function getInitialDomain(offers: LoanOffer[], userOffer: UserOfferState) {
 }
 
 function App() {
-  const { loanOffers: currencyOffers, collections, loading, error, selectedCurrency, setSelectedCurrency, allLoanOffers, heatmap } = useLoanOffers();
+  const { loanOffers: currencyOffers, collections, loading, error, selectedCurrency, setSelectedCurrency, allLoanOffers } = useLoanOffers();
   const { userOffer, updateUserOffer } = useUserOffer();
   const [domain, setDomain] = useState(() => getInitialDomain(currencyOffers, userOffer));
-  const [showHeatmap, setShowHeatmap] = useState(true);
   const [showContours, setShowContours] = useState(true);
 
   // --- Continuous domain expansion state ---

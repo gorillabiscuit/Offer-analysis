@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 import * as d3 from 'd3';
-import { LoanOffer, HeatmapCell } from '../types';
+import { LoanOffer } from '../types';
 import { Currency } from '../hooks/useLoanOffers';
 import { getMarketMedians } from '../utils/median';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
@@ -88,9 +88,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   const dragTooltipRef = useRef<HTMLDivElement | null>(null);
   const prevScalesRef = useRef<{ x: d3.ScaleLinear<number, number>; y: d3.ScaleLinear<number, number> } | null>(null);
   const isDraggingRef = useRef(false);
-  const lastDragPosRef = useRef<{ x: number; y: number } | null>(null);
-  const pendingDragEndRef = useRef<{ x: number; y: number } | null>(null);
-  const dragAnchorRef = useRef<{ svgX: number; svgY: number; dataX: number; dataY: number } | null>(null);
   const lastDataPosRef = useRef<{ dataX: number; dataY: number } | null>(null);
   const lastDomainRef = useRef(domain);
   const throttleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -150,15 +147,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       dragTooltipRef.current = null;
     };
   }, []);
-
-  // Function to calculate domain with padding
-  const calculateDomainWithPadding = (values: number[]): [number, number] => {
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    const range = max - min;
-    const padding = range * PADDING_PERCENTAGE;
-    return [Math.max(0, min - padding), max + padding];
-  };
 
   // Helper to format age as 'xx days ago', 'xx hours ago', or 'xx minutes ago'
   function formatAge(timestamp?: number): string {
@@ -504,11 +492,9 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .text(loanText);
         const loanTextNode = loanTextElem.node();
         let loanTextWidth = 0;
-        let loanTextHeight = 0;
         if (loanTextNode) {
           const bbox = loanTextNode.getBBox();
           loanTextWidth = bbox.width;
-          loanTextHeight = bbox.height;
         }
         // Now position text and rect at the edge, fully visible
         let finalLoanLabelY;
@@ -572,11 +558,9 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .text(rateText);
         const rateTextNode = rateTextElem.node();
         let rateTextWidth = 0;
-        let rateTextHeight = 0;
         if (rateTextNode) {
           const bbox = rateTextNode.getBBox();
           rateTextWidth = bbox.width;
-          rateTextHeight = bbox.height;
         }
         // --- NEW LOGIC: Offset label box to left or right of crosshair line ---
         let finalRateLabelX;
@@ -637,11 +621,10 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .on('start', function (event, d) {
           event.sourceEvent.stopPropagation();
           isDraggingRef.current = true;
-          pendingDragEndRef.current = null;
           d3.select(this).interrupt();
           d3.select(this).raise();
           // Record anchor
-          dragAnchorRef.current = {
+          const anchor = {
             svgX: event.x,
             svgY: event.y,
             dataX: xScale.invert(event.x),
@@ -656,26 +639,22 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         })
         .on('drag', function (event, d) {
           // Calculate delta from anchor
-          const anchor = dragAnchorRef.current;
-          if (!anchor) return;
-          // If domain changed, update anchor SVG position to keep bubble under cursor
-          const [xMin, xMax] = lastDomainRef.current.x;
-          const [yMin, yMax] = lastDomainRef.current.y;
-          const width = svgRef.current!.clientWidth - margin.left - margin.right;
-          const height = svgRef.current!.clientHeight - margin.top - margin.bottom;
-          const xScaleCurrent = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
-          const yScaleCurrent = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
-
-          // Calculate new data value using delta from anchor
+          const anchor = {
+            svgX: event.x,
+            svgY: event.y,
+            dataX: xScale.invert(event.x),
+            dataY: yScale.invert(event.y)
+          };
+          const { dataX, dataY } = lastDataPosRef.current || { dataX: userOffer.loanAmount, dataY: userOffer.interestRate };
           const dx = event.x - anchor.svgX;
           const dy = event.y - anchor.svgY;
-          const newDataX = anchor.dataX + xScaleCurrent.invert(dx) - xScaleCurrent.invert(0);
-          const newDataY = anchor.dataY + yScaleCurrent.invert(dy) - yScaleCurrent.invert(0);
+          const newDataX = anchor.dataX + xScale.invert(dx) - xScale.invert(0);
+          const newDataY = anchor.dataY + yScale.invert(dy) - yScale.invert(0);
           lastDataPosRef.current = { dataX: newDataX, dataY: newDataY };
 
           // Clamp to chart area
-          const clampedX = Math.max(0, Math.min(width, xScaleCurrent(newDataX)));
-          const clampedY = Math.max(0, Math.min(height, yScaleCurrent(newDataY)));
+          const clampedX = Math.max(0, Math.min(width, xScale(newDataX)));
+          const clampedY = Math.max(0, Math.min(height, yScale(newDataY)));
 
           d3.select(this)
             .attr('cx', clampedX)
@@ -725,7 +704,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           if (typeof onUserOfferDrag === 'function') {
             onUserOfferDrag({ loanAmount: dataX, interestRate: dataY });
           }
-          dragAnchorRef.current = null;
           lastDataPosRef.current = null;
           // Hide drag tooltip
           if (dragTooltipRef.current) {

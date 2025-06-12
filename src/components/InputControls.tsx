@@ -12,7 +12,7 @@ import {
   FormControlLabel,
   Switch
 } from '@mui/material';
-import { formatETH, formatPercentage, formatDuration, formatCurrency, formatPercentageAxis } from '../utils/formatting';
+import { formatPercentage, formatDuration, formatCurrency, formatPercentageAxis } from '../utils/formatting';
 import { LoanOffer } from '../types';
 
 interface InputControlsProps {
@@ -203,7 +203,7 @@ const InputControls: React.FC<InputControlsProps> = ({
                 color="primary"
               />
             }
-            label={<span style={{ color: '#fff' }}>Show Loan Density Contours</span>}
+            label={<span style={{ color: '#fff' }}>Show Loan Density</span>}
           />
         </Box>
       </Box>

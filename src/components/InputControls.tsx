@@ -10,13 +10,14 @@ import {
   InputLabel,
   SelectChangeEvent,
   FormControlLabel,
-  Switch
+  Switch,
+  CircularProgress
 } from '@mui/material';
 import { formatPercentage, formatDuration, formatCurrency, formatPercentageAxis } from '../utils/formatting';
-import { LoanOffer } from '../types';
+import { LoanOffer, Collection } from '../types';
+import { useCollections } from '../hooks/useCollections';
 
 interface InputControlsProps {
-  collections: string[];
   onUserOfferChange: (userOffer: Partial<LoanOffer>) => void;
   userOffer: Partial<LoanOffer>;
   selectedCurrency: 'WETH' | 'USDC';
@@ -25,16 +26,18 @@ interface InputControlsProps {
 }
 
 const InputControls: React.FC<InputControlsProps> = ({ 
-  collections, 
   onUserOfferChange,
   userOffer,
   selectedCurrency,
   showContours = true,
   onShowContoursChange
 }) => {
+  const { collections, loading, error } = useCollections();
+  
   // Add local state for input display
   const [loanAmountInput, setLoanAmountInput] = React.useState<string>('');
   const [interestRateInput, setInterestRateInput] = React.useState<string>('');
+  
   React.useEffect(() => {
     // Sync input when userOffer.loanAmount changes externally
     if (userOffer.loanAmount !== undefined && !isNaN(userOffer.loanAmount)) {
@@ -53,7 +56,13 @@ const InputControls: React.FC<InputControlsProps> = ({
   // Handlers for controlled fields
   const handleCollectionChange = (event: SelectChangeEvent) => {
     const value = event.target.value;
-    onUserOfferChange({ collection: value });
+    const selectedCollection = collections.find(c => c.contract_address === value);
+    if (selectedCollection) {
+      onUserOfferChange({ 
+        collection: selectedCollection.name,
+        collectionAddress: selectedCollection.contract_address 
+      });
+    }
   };
 
   const handleLoanAmountChange = (value: string) => {
@@ -71,44 +80,9 @@ const InputControls: React.FC<InputControlsProps> = ({
     if (value === 'all') {
       onUserOfferChange({ duration: undefined });
     } else {
-      onUserOfferChange({ duration: Number(value) });
-    }
-  };
-
-  const handleInterestRateChange = (value: string) => {
-    setInterestRateInput(value);
-    // Remove all non-numeric and non-dot/decimal chars
-    const numValue = Number(value.replace(/[^0-9.]/g, ''));
-    if (!isNaN(numValue)) {
-      onUserOfferChange({ interestRate: numValue });
-    } else {
-      onUserOfferChange({ interestRate: undefined });
-    }
-  };
-
-  // Add rounding and formatting on blur for loan amount
-  const handleLoanAmountBlur = () => {
-    if (userOffer.loanAmount !== undefined && !isNaN(userOffer.loanAmount)) {
-      const rounded = Math.round(userOffer.loanAmount * 1000) / 1000;
-      if (rounded !== userOffer.loanAmount) {
-        onUserOfferChange({ loanAmount: rounded });
-      }
-      setLoanAmountInput(formatCurrency(rounded, selectedCurrency));
-    } else {
-      setLoanAmountInput('');
-    }
-  };
-
-  // Add rounding and formatting on blur for interest rate
-  const handleInterestRateBlur = () => {
-    if (userOffer.interestRate !== undefined && !isNaN(userOffer.interestRate)) {
-      const rounded = Math.round(userOffer.interestRate * 100) / 100;
-      if (rounded !== userOffer.interestRate) {
-        onUserOfferChange({ interestRate: rounded });
-      }
-      setInterestRateInput(formatPercentageAxis(rounded));
-    } else {
-      setInterestRateInput('');
+      // Convert seconds to days for storage
+      const durationInDays = Number(value) / 86400;
+      onUserOfferChange({ duration: durationInDays });
     }
   };
 
@@ -136,15 +110,28 @@ const InputControls: React.FC<InputControlsProps> = ({
           <Select
             labelId="collection-select-label"
             id="collection-select"
-            value={userOffer.collection || ''}
+            value={userOffer.collectionAddress || ''}
             label="Collection"
             onChange={handleCollectionChange}
+            disabled={loading}
           >
-            {collections.map((coll) => (
-              <MenuItem key={coll} value={coll}>
-                {coll.charAt(0).toUpperCase() + coll.slice(1)}
+            {loading ? (
+              <MenuItem disabled>
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+                Loading collections...
               </MenuItem>
-            ))}
+            ) : error ? (
+              <MenuItem disabled>Error loading collections</MenuItem>
+            ) : (
+              collections.map((collection) => (
+                <MenuItem 
+                  key={`${collection.contract_address}-${collection.name}`} 
+                  value={collection.contract_address}
+                >
+                  {collection.name}
+                </MenuItem>
+              ))
+            )}
           </Select>
         </FormControl>
 
@@ -155,7 +142,6 @@ const InputControls: React.FC<InputControlsProps> = ({
           type="text"
           value={loanAmountInput}
           onChange={(e) => handleLoanAmountChange(e.target.value)}
-          onBlur={handleLoanAmountBlur}
           InputProps={{
             endAdornment: <Typography variant="body2">{selectedCurrency}</Typography>,
           }}
@@ -167,16 +153,14 @@ const InputControls: React.FC<InputControlsProps> = ({
           <Select
             labelId="duration-select-label"
             id="duration-select"
-            value={userOffer.duration === undefined ? 'all' : String(userOffer.duration)}
+            value={userOffer.duration ? (userOffer.duration * 86400).toString() : 'all'}
             label="Duration"
             onChange={handleDurationDropdownChange}
           >
-            <MenuItem value="all">All durations</MenuItem>
-            <MenuItem value="7">7 days</MenuItem>
-            <MenuItem value="14">14 days</MenuItem>
-            <MenuItem value="30">30 days</MenuItem>
-            <MenuItem value="60">60 days</MenuItem>
-            <MenuItem value="180">180 days</MenuItem>
+            <MenuItem value="all">All Durations</MenuItem>
+            <MenuItem value="2592000">30 Days</MenuItem>
+            <MenuItem value="5184000">60 Days</MenuItem>
+            <MenuItem value="7776000">90 Days</MenuItem>
           </Select>
         </FormControl>
 
@@ -186,44 +170,32 @@ const InputControls: React.FC<InputControlsProps> = ({
           label="Interest Rate"
           type="text"
           value={interestRateInput}
-          onChange={(e) => handleInterestRateChange(e.target.value)}
-          onBlur={handleInterestRateBlur}
+          onChange={(e) => {
+            setInterestRateInput(e.target.value);
+            const numValue = Number(e.target.value.replace(/[^0-9.]/g, ''));
+            if (!isNaN(numValue)) {
+              onUserOfferChange({ interestRate: numValue });
+            } else {
+              onUserOfferChange({ interestRate: undefined });
+            }
+          }}
           InputProps={{
             endAdornment: <Typography variant="body2">%</Typography>,
           }}
         />
 
-        {/* Toggle for loan density contours */}
-        <Box sx={{ mt: 2 }}>
+        {/* Show Contours Switch */}
+        {onShowContoursChange && (
           <FormControlLabel
             control={
               <Switch
                 checked={showContours}
-                onChange={(_, checked) => onShowContoursChange && onShowContoursChange(checked)}
-                color="primary"
+                onChange={(e) => onShowContoursChange(e.target.checked)}
               />
             }
-            label={<span style={{ color: '#fff' }}>Show Loan Density</span>}
+            label="Show Loan Depth"
           />
-        </Box>
-      </Box>
-
-      {/* Summary Section */}
-      <Box sx={{ mt: 'auto', pt: 2, borderTop: 1, borderColor: 'divider' }}>
-        <Typography variant="subtitle2" gutterBottom>
-          Your Offer Summary
-        </Typography>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <Typography variant="body2">
-            Loan Amount: {userOffer.loanAmount !== undefined ? `${formatCurrency(Number(userOffer.loanAmount), selectedCurrency)} ${selectedCurrency}` : '-'}
-          </Typography>
-          <Typography variant="body2">
-            Duration: {userOffer.duration !== undefined ? formatDuration(Number(userOffer.duration)) : '-'}
-          </Typography>
-          <Typography variant="body2">
-            Interest Rate: {userOffer.interestRate !== undefined ? formatPercentage(Number(userOffer.interestRate)) : '-'}
-          </Typography>
-        </Box>
+        )}
       </Box>
     </Paper>
   );

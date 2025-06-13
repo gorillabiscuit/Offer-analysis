@@ -91,6 +91,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   const lastDataPosRef = useRef<{ dataX: number; dataY: number } | null>(null);
   const lastDomainRef = useRef(domain);
   const throttleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasAnimatedContours = useRef(false);
 
   // Create tooltips once when component mounts
   useEffect(() => {
@@ -286,16 +287,26 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       
   }, [userOffer, handleDrag, onUserOfferDrag]);
 
-  // Main chart update effect
+  // Reset contour animation state on data/collection/domain change
   useEffect(() => {
-    if (!svgRef.current || data.length === 0 || !tooltipRef.current) return;
-    
+    hasAnimatedContours.current = false;
+  }, [data, domain, selectedCurrency]);
+
+  // Reset contour animation state when toggling contours on
+  useEffect(() => {
+    if (showContours) {
+      hasAnimatedContours.current = false;
+    }
+  }, [showContours]);
+
+  // Contour drawing and animation effect
+  useEffect(() => {
+    if (!svgRef.current || data.length === 0) return;
     const margin = { top: 20, right: 20, bottom: 60, left: 60 };
     const width = chartSize.width - margin.left - margin.right;
     const height = chartSize.height - margin.top - margin.bottom;
     if (width <= 0 || height <= 0) return;
 
-    // Create or get SVG
     const svg = d3.select(svgRef.current);
     const g = svg.select<SVGGElement>('g').empty() 
       ? svg
@@ -305,18 +316,87 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .attr('transform', `translate(${margin.left},${margin.top})`)
       : svg.select<SVGGElement>('g');
 
-    // Use domain from props instead of calculating from data
+    // Remove contours if showContours is false
+    if (!showContours) {
+      g.selectAll('.contour').remove();
+      return;
+    }
+
+    // Use domain from props
     const [xMin, xMax] = domain.x;
     const [yMin, yMax] = domain.y;
+    const xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
+    const yScale = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
 
-    // Create scales with padding
-    const xScale = d3.scaleLinear()
-      .domain([xMin, xMax])
-      .range([0, width]);
+    // Remove old contours before drawing new ones
+    g.selectAll('.contour').remove();
 
-    const yScale = d3.scaleLinear()
-      .domain([yMin, yMax])
-      .range([height, 0]);
+    // Create density estimator
+    const density = d3.contourDensity<LoanOffer>()
+      .x(d => xScale(d.loanAmount))
+      .y(d => yScale(d.interestRate))
+      .size([width, height])
+      .bandwidth(CONTOUR_BANDWIDTH)
+      .thresholds(CONTOUR_THRESHOLDS);
+    const contours = density(data);
+    const maxDensity = d3.max(contours, d => d.value) || 1;
+    const contourColorScale = d3.scalePow<string>()
+      .exponent(CONTOUR_SCALE_EXPONENT)
+      .domain([0, maxDensity])
+      .range(CONTOUR_COLORS);
+
+    // Draw contours
+    const contourPaths = g.selectAll('.contour')
+      .data(contours)
+      .enter()
+      .append('path')
+      .attr('class', 'contour')
+      .attr('d', d3.geoPath())
+      .attr('fill', d => contourColorScale(d.value))
+      .attr('stroke', 'none')
+      .attr('opacity', hasAnimatedContours.current ? 1 : 0)
+      .lower();
+
+    if (!hasAnimatedContours.current) {
+      contourPaths.transition()
+        .delay(TRANSITION_DURATION * 0.7)
+        .duration(TRANSITION_DURATION)
+        .attr('opacity', 1)
+        .on('end', () => {
+          hasAnimatedContours.current = true;
+        });
+    }
+  }, [data, domain, chartSize, showContours, selectedCurrency]);
+
+  // Main chart update effect (axes, points, user bubble, labels)
+  useEffect(() => {
+    if (!svgRef.current || !tooltipRef.current) return;
+    const margin = { top: 20, right: 20, bottom: 60, left: 60 };
+    const width = chartSize.width - margin.left - margin.right;
+    const height = chartSize.height - margin.top - margin.bottom;
+    if (width <= 0 || height <= 0) return;
+
+    const svg = d3.select(svgRef.current);
+    const g = svg.select<SVGGElement>('g').empty() 
+      ? svg
+          .attr('width', width + margin.left + margin.right)
+          .attr('height', height + margin.top + margin.bottom)
+          .append('g')
+          .attr('transform', `translate(${margin.left},${margin.top})`)
+      : svg.select<SVGGElement>('g');
+
+    // If no data, clear all points and contours and return
+    if (data.length === 0) {
+      g.selectAll('.data-point').remove();
+      g.selectAll('.contour').remove();
+      return;
+    }
+
+    // Use domain from props
+    const [xMin, xMax] = domain.x;
+    const [yMin, yMax] = domain.y;
+    const xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
+    const yScale = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
 
     // Store current scales for next update
     prevScalesRef.current = { x: xScale, y: yScale };
@@ -450,16 +530,21 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       .transition()
       .duration(TRANSITION_DURATION)
       .attr('r', 0)
+      .attr('opacity', 0)
       .remove();
 
     // Add new dots
     const dotsEnter = dots.enter()
       .append('circle')
       .attr('class', 'data-point')
-      .attr('r', 10)
-      // Color by age
+      .attr('r', 0) // Start with radius 0 for animation
+      .attr('cx', (d: LoanOffer) => xScale(d.loanAmount))
+      .attr('cy', (d: LoanOffer) => yScale(d.interestRate))
       .attr('fill', d => timeScale(d.timestamp ?? 0))
-      .attr('opacity', 0.7)
+      .attr('fill-opacity', 0.55)
+      .attr('stroke', d => timeScale(d.timestamp ?? 0))
+      .attr('stroke-opacity', 0.8)
+      .attr('stroke-width', 3)
       .on('mouseover', function(event, d) {
         if (!tooltipRef.current) return;
         const tooltip = tooltipRef.current;
@@ -489,13 +574,22 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         tooltipRef.current.style.visibility = 'hidden';
       });
 
+    // Animate new dots to their full size
+    dotsEnter.transition()
+      .duration(TRANSITION_DURATION)
+      .attr('r', 10);
+
     // Update all dots (including new ones)
     dots.merge(dotsEnter)
-      // Use maybeTransition to decide if we animate or not
       .call(sel => maybeTransition(sel)
         .attr('cx', (d: LoanOffer) => xScale(d.loanAmount))
         .attr('cy', (d: LoanOffer) => yScale(d.interestRate))
         .attr('fill', (d: LoanOffer) => timeScale(d.timestamp ?? 0))
+        .attr('fill-opacity', 0.35)
+        .attr('r', 10)
+        .attr('stroke', (d: LoanOffer) => timeScale(d.timestamp ?? 0))
+        .attr('stroke-opacity', 0.8)
+        .attr('stroke-width', 1)
       );
 
     // Update user offer point if it exists
@@ -510,6 +604,10 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .attr('class', 'user-point')
         .attr('r', 12)
         .attr('fill', '#f50057')
+        .attr('fill-opacity', 0.45)
+        .attr('stroke', '#f50057')
+        .attr('stroke-opacity', 0.95)
+        .attr('stroke-width', 1)
         .style('cursor', 'move');
 
       // Update user offer point position
@@ -525,6 +623,11 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         merged
           .attr('cx', d => xScale(d.loanAmount))
           .attr('cy', d => yScale(d.interestRate))
+          .attr('fill', '#f50057')
+          .attr('fill-opacity', 0.45)
+          .attr('stroke', '#f50057')
+          .attr('stroke-opacity', 0.95)
+          .attr('stroke-width', 1)
           .raise();
         
         // Update label
@@ -550,45 +653,208 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       // Remove user point and label if no user offer
       g.selectAll('.user-point, .user-label').remove();
     }
+  }, [data, userOffer, selectedCurrency, domain, chartSize]);
 
-    // Update contours if enabled
-    if (showContours) {
-      // Remove old contours before drawing new ones
-      g.selectAll('.contour').remove();
+  // Dedicated effect for crosshairs and median labels during drag
+  useEffect(() => {
+    if (!svgRef.current) return;
+    const margin = { top: 20, right: 20, bottom: 60, left: 60 };
+    const width = chartSize.width - margin.left - margin.right;
+    const height = chartSize.height - margin.top - margin.bottom;
+    if (width <= 0 || height <= 0) return;
+    const svg = d3.select(svgRef.current);
+    const g = svg.select<SVGGElement>('g').empty() 
+      ? svg
+          .attr('width', width + margin.left + margin.right)
+          .attr('height', height + margin.top + margin.bottom)
+          .append('g')
+          .attr('transform', `translate(${margin.left},${margin.top})`)
+      : svg.select<SVGGElement>('g');
 
-      // Create density estimator with parameters from constants
-      const density = d3.contourDensity<LoanOffer>()
-        .x(d => xScale(d.loanAmount))
-        .y(d => yScale(d.interestRate))
-        .size([width, height])
-        .bandwidth(CONTOUR_BANDWIDTH)
-        .thresholds(CONTOUR_THRESHOLDS);
+    // Remove all crosshair/label elements by default
+    g.selectAll('.user-crosshair-x, .user-crosshair-y, .user-crosshair-x-label, .user-crosshair-y-label').remove();
+    g.selectAll('.user-crosshair-x-label-group, .user-crosshair-y-label-group').remove();
 
-      // Generate contours
-      const contours = density(data);
+    // Only draw crosshairs/labels during drag
+    if (!isDraggingRef.current || !lastDataPosRef.current) return;
 
-      // Create non-linear color scale using constants
-      const maxDensity = d3.max(contours, d => d.value) || 1;
-      const contourColorScale = d3.scalePow<string>()
-        .exponent(CONTOUR_SCALE_EXPONENT)
-        .domain([0, maxDensity])
-        .range(CONTOUR_COLORS);
+    // Scales
+    const [xMin, xMax] = domain.x;
+    const [yMin, yMax] = domain.y;
+    const xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
+    const yScale = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
+    const { dataX: userLoan, dataY: userRate } = lastDataPosRef.current;
+    const userX = xScale(userLoan);
+    const userY = yScale(userRate);
 
-      // Draw contours
-      g.selectAll('.contour')
-        .data(contours)
-        .enter()
-        .append('path')
-        .attr('class', 'contour')
-        .attr('d', d3.geoPath())
-        .attr('fill', d => contourColorScale(d.value))
-        .attr('stroke', 'none')
-        .lower(); // Ensure contours are behind points
+    // Medians
+    const { medianLoanAmount, medianInterestRate } = getMarketMedians(data);
+
+    // Draw vertical crosshair (loan amount)
+    g.append('line')
+      .attr('class', 'user-crosshair-x')
+      .attr('x1', userX)
+      .attr('x2', userX)
+      .attr('y1', 0)
+      .attr('y2', height)
+      .attr('stroke', 'rgba(245,0,87,0.7)')
+      .attr('stroke-width', 1.5)
+      .attr('stroke-dasharray', '4,2');
+    // Draw horizontal crosshair (interest rate)
+    g.append('line')
+      .attr('class', 'user-crosshair-y')
+      .attr('x1', 0)
+      .attr('x2', width)
+      .attr('y1', userY)
+      .attr('y2', userY)
+      .attr('stroke', 'rgba(245,0,87,0.7)')
+      .attr('stroke-width', 1.5)
+      .attr('stroke-dasharray', '4,2');
+
+    // --- Crosshair Labels ---
+    // Calculate differences from median
+    const loanDiff = userLoan - medianLoanAmount;
+    const rateDiff = userRate - medianInterestRate;
+    const loanDiffAbs = Math.abs(loanDiff).toFixed(2);
+    const rateDiffAbs = Math.abs(rateDiff).toFixed(2);
+    const loanLabel = `${loanDiff >= 0 ? '+' : '-'}${loanDiffAbs} ${selectedCurrency} ${loanDiff >= 0 ? 'above' : 'below'} median`;
+    const rateLabel = `${rateDiff >= 0 ? '+' : '-'}${rateDiffAbs}% ${rateDiff >= 0 ? 'above' : 'below'} median`;
+
+    const LABEL_MARGIN = 20;
+    // For vertical (loan) label: always at left or right edge
+    let loanLabelX = userX > width / 2 ? LABEL_MARGIN : width - LABEL_MARGIN;
+    // For horizontal (APR) label: always at top or bottom edge
+    let rateLabelX = userX;
+    let rateLabelY = userY > height / 2 ? LABEL_MARGIN : height - LABEL_MARGIN;
+
+    // Draw a group with a red rounded rect and white text for the loan label
+    const loanLabelGroup = g.append('g').attr('class', 'user-crosshair-x-label-group');
+    const loanFontSize = 13;
+    const loanPaddingX = 9;
+    const loanPaddingY = 6;
+    const loanText = loanLabel;
+    // Render text at (0,0) to measure
+    const loanTextElem = loanLabelGroup.append('text')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('font-size', loanFontSize)
+      .attr('font-family', 'Public Sans, sans-serif')
+      .attr('font-weight', 500)
+      .attr('fill', '#fff')
+      .attr('text-anchor', 'start')
+      .text(loanText);
+    const loanTextNode = loanTextElem.node();
+    let loanTextWidth = 0;
+    if (loanTextNode) {
+      const bbox = loanTextNode.getBBox();
+      loanTextWidth = bbox.width;
     }
-  }, [data, userOffer, selectedCurrency, domain, chartSize, showContours]);
+    // Now position text and rect at the edge, fully visible
+    let finalLoanLabelY;
+    if (userY < height / 2) {
+      // Crosshair in top half: label below the line
+      finalLoanLabelY = userY + LABEL_MARGIN;
+      if (finalLoanLabelY + loanFontSize + 2 * loanPaddingY > height) {
+        finalLoanLabelY = height - loanFontSize - 2 * loanPaddingY;
+      }
+    } else {
+      // Crosshair in bottom half: label above the line
+      finalLoanLabelY = userY - LABEL_MARGIN - loanFontSize - 2 * loanPaddingY;
+      if (finalLoanLabelY < 0) {
+        finalLoanLabelY = 0;
+      }
+    }
+    // Horizontal position: left or right edge as before
+    if (userX > width / 2) {
+      loanLabelX = LABEL_MARGIN;
+    } else {
+      loanLabelX = width - LABEL_MARGIN - loanTextWidth - 2 * loanPaddingX;
+    }
+    // Position text inside the box (vertically centered)
+    const loanBoxY = finalLoanLabelY;
+    const loanBoxHeight = loanFontSize + 2 * loanPaddingY;
+    loanTextElem
+      .attr('x', loanLabelX + loanPaddingX)
+      .attr('y', loanBoxY + loanBoxHeight / 2 + loanFontSize / 2.8);
+    // Position the box itself
+    loanLabelGroup.insert('rect', 'text')
+      .attr('x', loanLabelX)
+      .attr('y', loanBoxY)
+      .attr('width', loanTextWidth + 2 * loanPaddingX)
+      .attr('height', loanBoxHeight)
+      .attr('rx', 8)
+      .attr('fill', '#302B4D')
+      .attr('filter', 'url(#crosshair-label-shadow)');
+
+    // Place rate label at top or bottom edge
+    const rateLabelGroup = g.append('g').attr('class', 'user-crosshair-y-label-group');
+    const rateFontSize = 13;
+    const ratePaddingX = 9;
+    const ratePaddingY = 6;
+    const rateText = rateLabel;
+    // Render text at (0,0) to measure
+    const rateTextElem = rateLabelGroup.append('text')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('font-size', rateFontSize)
+      .attr('font-family', 'Public Sans, sans-serif')
+      .attr('font-weight', 500)
+      .attr('fill', '#fff')
+      .attr('text-anchor', 'start')
+      .text(rateText);
+    const rateTextNode = rateTextElem.node();
+    let rateTextWidth = 0;
+    if (rateTextNode) {
+      const bbox = rateTextNode.getBBox();
+      rateTextWidth = bbox.width;
+    }
+    // Offset label box to left or right of crosshair line
+    let finalRateLabelX;
+    if (rateLabelX < width / 2) {
+      finalRateLabelX = rateLabelX + LABEL_MARGIN;
+      if (finalRateLabelX + rateTextWidth + 2 * ratePaddingX > width) {
+        finalRateLabelX = width - rateTextWidth - 2 * ratePaddingX;
+      }
+    } else {
+      finalRateLabelX = rateLabelX - LABEL_MARGIN - rateTextWidth - 2 * ratePaddingX;
+      if (finalRateLabelX < 0) {
+        finalRateLabelX = 0;
+      }
+    }
+    if (userY > height / 2) {
+      rateLabelY = LABEL_MARGIN + rateFontSize + 2 * ratePaddingY;
+    } else {
+      rateLabelY = height - LABEL_MARGIN;
+    }
+    const rateBoxY = rateLabelY - rateFontSize - 2 * ratePaddingY;
+    const rateBoxHeight = rateFontSize + 2 * ratePaddingY;
+    rateTextElem
+      .attr('x', finalRateLabelX + ratePaddingX)
+      .attr('y', rateBoxY + rateBoxHeight / 2 + rateFontSize / 2.8);
+    rateLabelGroup.insert('rect', 'text')
+      .attr('x', finalRateLabelX)
+      .attr('y', rateBoxY)
+      .attr('width', rateTextWidth + 2 * ratePaddingX)
+      .attr('height', rateBoxHeight)
+      .attr('rx', 8)
+      .attr('fill', '#302B4D')
+      .attr('filter', 'url(#crosshair-label-shadow)');
+
+    // Add drop shadow filter definition if not present
+    if (svg.select('defs').empty()) {
+      svg.append('defs');
+    }
+    if (svg.select('defs #crosshair-label-shadow').empty()) {
+      svg.select('defs').append('filter')
+        .attr('id', 'crosshair-label-shadow')
+        .html(`
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.18"/>
+        `);
+    }
+  }, [chartSize, domain, selectedCurrency, data, isDraggingRef.current, lastDataPosRef.current]);
 
   return (
-    <Paper elevation={3} sx={{ p: 2, height: '100%', background: 'none', boxShadow: 'none' }}>
+    <Paper elevation={3} sx={{ p: 2, height: '100%', background: 'none', boxShadow: 'none', position: 'relative' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h6">Market Offers</Typography>
         <ToggleButtonGroup
@@ -614,8 +880,31 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           </ToggleButton>
         </ToggleButtonGroup>
       </Box>
-      <Box ref={containerRef} sx={{ width: '100%', height: 'calc(100% - 48px)' }}>
-        <svg ref={svgRef} width={chartSize.width} height={chartSize.height} style={{ width: '100%', height: '100%' }} />
+      <Box ref={containerRef} sx={{ width: '100%', height: 'calc(100% - 48px)', position: 'relative' }}>
+        {data.length > 0 && (
+          <svg ref={svgRef} width={chartSize.width} height={chartSize.height} style={{ width: '100%', height: '100%' }} />
+        )}
+        {data.length === 0 && (
+          <Box sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+            zIndex: 2,
+            background: 'none',
+          }}>
+            <Typography variant="h6" color="text.secondary" align="center">
+              {selectedCurrency === 'WETH'
+                ? 'There are presently no ETH loan offers for this collection'
+                : 'There are presently no USDC loan offers for this collection'}
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Paper>
   );

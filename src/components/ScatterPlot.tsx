@@ -196,8 +196,100 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     return () => resizeObserver.disconnect();
   }, []);
 
+  // Optimize drag handler
+  const handleDrag = useCallback((event: any, d: LoanOffer) => {
+    if (!svgRef.current) return;
+    
+    const margin = { top: 20, right: 20, bottom: 60, left: 60 };
+    const width = svgRef.current.clientWidth - margin.left - margin.right;
+    const height = svgRef.current.clientHeight - margin.top - margin.bottom;
+    
+    const [xMin, xMax] = lastDomainRef.current.x;
+    const [yMin, yMax] = lastDomainRef.current.y;
+    const xScaleCurrent = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
+    const yScaleCurrent = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
+    
+    const newDataX = xScaleCurrent.invert(event.x);
+    const newDataY = yScaleCurrent.invert(event.y);
+    
+    // Clamp values to domain
+    const clampedX = Math.max(xMin, Math.min(xMax, newDataX));
+    const clampedY = Math.max(yMin, Math.min(yMax, newDataY));
+    
+    // Update last data position
+    lastDataPosRef.current = { dataX: clampedX, dataY: clampedY };
+    
+    // Update drag tooltip
+    if (dragTooltipRef.current) {
+      const svgRect = svgRef.current.getBoundingClientRect();
+      const tooltipX = svgRect.left + margin.left + event.x + 28;
+      const tooltipY = svgRect.top + margin.top + event.y - 10;
+      
+      dragTooltipRef.current.style.left = tooltipX + 'px';
+      dragTooltipRef.current.style.top = tooltipY + 'px';
+      dragTooltipRef.current.innerHTML = `
+        <div style='margin-bottom:4px;'>Your Offer</div>
+        <div>${formatCurrency(clampedX, selectedCurrency)} ${selectedCurrency}</div>
+        <div>${clampedY.toFixed(2)}% APR</div>
+      `;
+    }
+    
+    // Throttle domain expansion
+    if (typeof onUserOfferDrag === 'function') {
+      throttledExpand(() => {
+        onUserOfferDrag({
+          loanAmount: clampedX,
+          interestRate: clampedY,
+          dragX: event.x,
+          dragY: event.y,
+          width,
+          height,
+          dragging: true
+        });
+      });
+    }
+  }, [selectedCurrency, onUserOfferDrag, throttledExpand]);
+
+  // Update drag handler
+  useEffect(() => {
+    if (!svgRef.current || !userOffer) return;
+    
+    const drag = d3.drag<SVGCircleElement, LoanOffer>()
+      .on('start', function(event) {
+        event.sourceEvent.stopPropagation();
+        isDraggingRef.current = true;
+        d3.select(this).interrupt();
+        d3.select(this).raise();
+        
+        if (dragTooltipRef.current) {
+          dragTooltipRef.current.style.visibility = 'visible';
+        }
+      })
+      .on('drag', handleDrag)
+      .on('end', function() {
+        isDraggingRef.current = false;
+        const { dataX, dataY } = lastDataPosRef.current || { dataX: userOffer.loanAmount, dataY: userOffer.interestRate };
+        
+        if (typeof onUserOfferDrag === 'function') {
+          onUserOfferDrag({ loanAmount: dataX, interestRate: dataY });
+        }
+        
+        lastDataPosRef.current = null;
+        
+        if (dragTooltipRef.current) {
+          dragTooltipRef.current.style.visibility = 'hidden';
+        }
+      });
+    
+    const selection = d3.select(svgRef.current).selectAll<SVGCircleElement, LoanOffer>('.user-point');
+    selection.call(drag as any);
+      
+  }, [userOffer, handleDrag, onUserOfferDrag]);
+
+  // Main chart update effect
   useEffect(() => {
     if (!svgRef.current || data.length === 0 || !tooltipRef.current) return;
+    
     const margin = { top: 20, right: 20, bottom: 60, left: 60 };
     const width = chartSize.width - margin.left - margin.right;
     const height = chartSize.height - margin.top - margin.bottom;
@@ -234,13 +326,18 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       .ticks(6)
       .tickFormat((domainValue: d3.NumberValue, _i: number) => {
         const d = typeof domainValue === 'number' ? domainValue : domainValue.valueOf();
-        return `${formatCurrency(d, selectedCurrency)} ${selectedCurrency}`;
+        const formatted = `${formatCurrency(d, selectedCurrency)} ${selectedCurrency}`;
+        console.log('[ScatterPlot] X-axis tick:', { raw: d, formatted });
+        return formatted;
       });
+
     const yAxis = d3.axisLeft(yScale)
       .ticks(10)
       .tickFormat((domainValue: d3.NumberValue, _i: number) => {
         const d = typeof domainValue === 'number' ? domainValue : domainValue.valueOf();
-        return formatPercentageAxis(d);
+        const formatted = formatPercentageAxis(d);
+        console.log('[ScatterPlot] Y-axis tick:', { raw: d, formatted });
+        return formatted;
       });
 
     // Update or create axes
@@ -335,9 +432,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     updateAnnotation('median-x-annotation', xScale(medianLoanAmount) + 20, 15, `Median: ${formatCurrency(medianLoanAmount, selectedCurrency)} ${selectedCurrency === 'WETH' ? 'wETH' : selectedCurrency}`);
     updateAnnotation('median-y-annotation', width - 5, yScale(medianInterestRate) - 20, `Median: ${formatPercentageAxis(medianInterestRate)}`, 'end');
 
-    // Log the keys for debugging
-    const keys = data.map(d => d.id || `${d.collection}-${d.loanAmount}-${d.interestRate}-${d.duration}`);
-    console.log('Loan keys:', keys);
 
     // Color scale for offer age (newest: red, oldest: blue)
     const timestamps = data.map(d => d.timestamp ?? 0);
@@ -418,325 +512,22 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .attr('fill', '#f50057')
         .style('cursor', 'move');
 
-      // --- Crosshairs ---
-      g.selectAll('.user-crosshair-x, .user-crosshair-y, .user-crosshair-x-label, .user-crosshair-y-label').remove();
-      // Remove previous crosshair label groups to prevent accumulation
-      g.selectAll('.user-crosshair-x-label-group, .user-crosshair-y-label-group').remove();
-
-      // Only show crosshairs and labels while dragging
-      if (isDraggingRef.current && lastDataPosRef.current) {
-        const [xMin, xMax] = lastDomainRef.current.x;
-        const [yMin, yMax] = lastDomainRef.current.y;
-        const width = svgRef.current!.clientWidth - margin.left - margin.right;
-        const height = svgRef.current!.clientHeight - margin.top - margin.bottom;
-        const xScaleCurrent = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
-        const yScaleCurrent = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
-        const userLoan = lastDataPosRef.current.dataX;
-        const userRate = lastDataPosRef.current.dataY;
-        const userX = xScaleCurrent(userLoan);
-        const userY = yScaleCurrent(userRate);
-
-        // Draw vertical crosshair (loan amount)
-        g.append('line')
-          .attr('class', 'user-crosshair-x')
-          .attr('x1', userX)
-          .attr('x2', userX)
-          .attr('y1', 0)
-          .attr('y2', height)
-          .attr('stroke', 'rgba(245,0,87,0.7)')
-          .attr('stroke-width', 1.5)
-          .attr('stroke-dasharray', '4,2');
-        // Draw horizontal crosshair (interest rate)
-        g.append('line')
-          .attr('class', 'user-crosshair-y')
-          .attr('x1', 0)
-          .attr('x2', width)
-          .attr('y1', userY)
-          .attr('y2', userY)
-          .attr('stroke', 'rgba(245,0,87,0.7)')
-          .attr('stroke-width', 1.5)
-          .attr('stroke-dasharray', '4,2');
-
-        // --- Crosshair Labels ---
-        // Calculate differences from median
-        const loanDiff = userLoan - medianLoanAmount;
-        const rateDiff = userRate - medianInterestRate;
-        const loanDiffAbs = Math.abs(loanDiff).toFixed(2);
-        const rateDiffAbs = Math.abs(rateDiff).toFixed(2);
-        const loanLabel = `${loanDiff >= 0 ? '+' : '-'}${loanDiffAbs} ${selectedCurrency} ${loanDiff >= 0 ? 'above' : 'below'} median`;
-        const rateLabel = `${rateDiff >= 0 ? '+' : '-'}${rateDiffAbs}% ${rateDiff >= 0 ? 'above' : 'below'} median`;
-
-        const LABEL_MARGIN = 20;
-        // For vertical (loan) label: always at left or right edge
-        const loanLabelY = userY;
-        let loanLabelX = userX > width / 2 ? LABEL_MARGIN : width - LABEL_MARGIN;
-        // For horizontal (APR) label: always at top or bottom edge
-        const rateLabelX = userX;
-        let rateLabelY = userY > height / 2 ? LABEL_MARGIN : height - LABEL_MARGIN;
-
-        // Draw a group with a red rounded rect and white text for the loan label
-        const loanLabelGroup = g.append('g').attr('class', 'user-crosshair-x-label-group');
-        const loanFontSize = 13;
-        const loanPaddingX = 9;
-        const loanPaddingY = 6;
-        const loanText = loanLabel;
-        // Render text at (0,0) to measure
-        const loanTextElem = loanLabelGroup.append('text')
-          .attr('x', 0)
-          .attr('y', 0)
-          .attr('font-size', loanFontSize)
-          .attr('font-family', 'Public Sans, sans-serif')
-          .attr('font-weight', 500)
-          .attr('fill', '#fff')
-          .attr('text-anchor', 'start')
-          .text(loanText);
-        const loanTextNode = loanTextElem.node();
-        let loanTextWidth = 0;
-        if (loanTextNode) {
-          const bbox = loanTextNode.getBBox();
-          loanTextWidth = bbox.width;
-        }
-        // Now position text and rect at the edge, fully visible
-        let finalLoanLabelY;
-        if (userY < height / 2) {
-          // Crosshair in top half: label below the line
-          finalLoanLabelY = userY + LABEL_MARGIN;
-          // Clamp so label doesn't go off bottom edge
-          if (finalLoanLabelY + loanFontSize + 2 * loanPaddingY > height) {
-            finalLoanLabelY = height - loanFontSize - 2 * loanPaddingY;
-          }
-        } else {
-          // Crosshair in bottom half: label above the line
-          finalLoanLabelY = userY - LABEL_MARGIN - loanFontSize - 2 * loanPaddingY;
-          // Clamp so label doesn't go off top edge
-          if (finalLoanLabelY < 0) {
-            finalLoanLabelY = 0;
-          }
-        }
-
-        // Horizontal position: left or right edge as before
-        if (userX > width / 2) {
-          // Left edge
-          loanLabelX = LABEL_MARGIN;
-        } else {
-          // Right edge
-          loanLabelX = width - LABEL_MARGIN - loanTextWidth - 2 * loanPaddingX;
-        }
-
-        // Position text inside the box (vertically centered)
-        const loanBoxY = finalLoanLabelY;
-        const loanBoxHeight = loanFontSize + 2 * loanPaddingY;
-        loanTextElem
-          .attr('x', loanLabelX + loanPaddingX)
-          .attr('y', loanBoxY + loanBoxHeight / 2 + loanFontSize / 2.8);
-        
-        // Position the box itself
-        loanLabelGroup.insert('rect', 'text')
-          .attr('x', loanLabelX)
-          .attr('y', loanBoxY)
-          .attr('width', loanTextWidth + 2 * loanPaddingX)
-          .attr('height', loanBoxHeight)
-          .attr('rx', 8)
-          .attr('fill', '#302B4D')
-          .attr('filter', 'url(#crosshair-label-shadow)');
-
-        // Place rate label at top or bottom edge
-        const rateLabelGroup = g.append('g').attr('class', 'user-crosshair-y-label-group');
-        const rateFontSize = 13;
-        const ratePaddingX = 9;
-        const ratePaddingY = 6;
-        const rateText = rateLabel;
-        // Render text at (0,0) to measure
-        const rateTextElem = rateLabelGroup.append('text')
-          .attr('x', 0)
-          .attr('y', 0)
-          .attr('font-size', rateFontSize)
-          .attr('font-family', 'Public Sans, sans-serif')
-          .attr('font-weight', 500)
-          .attr('fill', '#fff')
-          .attr('text-anchor', 'start')
-          .text(rateText);
-        const rateTextNode = rateTextElem.node();
-        let rateTextWidth = 0;
-        if (rateTextNode) {
-          const bbox = rateTextNode.getBBox();
-          rateTextWidth = bbox.width;
-        }
-        // --- NEW LOGIC: Offset label box to left or right of crosshair line ---
-        let finalRateLabelX;
-        if (rateLabelX < width / 2) {
-          // Crosshair in left half: label to the right of the line
-          finalRateLabelX = rateLabelX + LABEL_MARGIN;
-          // Clamp so label doesn't go off right edge
-          if (finalRateLabelX + rateTextWidth + 2 * ratePaddingX > width) {
-            finalRateLabelX = width - rateTextWidth - 2 * ratePaddingX;
-          }
-        } else {
-          // Crosshair in right half: label to the left of the line
-          finalRateLabelX = rateLabelX - LABEL_MARGIN - rateTextWidth - 2 * ratePaddingX;
-          // Clamp so label doesn't go off left edge
-          if (finalRateLabelX < 0) {
-            finalRateLabelX = 0;
-          }
-        }
-        // Vertical position: top or bottom edge as before
-        if (userY > height / 2) {
-          // Top edge
-          rateLabelY = LABEL_MARGIN + rateFontSize + 2 * ratePaddingY;
-        } else {
-          // Bottom edge
-          rateLabelY = height - LABEL_MARGIN;
-        }
-        // Position text inside the box (vertically centered)
-        const rateBoxY = rateLabelY - rateFontSize - 2 * ratePaddingY;
-        const rateBoxHeight = rateFontSize + 2 * ratePaddingY;
-        rateTextElem
-          .attr('x', finalRateLabelX + ratePaddingX)
-          .attr('y', rateBoxY + rateBoxHeight / 2 + rateFontSize / 2.8);
-        // Position the box itself
-        rateLabelGroup.insert('rect', 'text')
-          .attr('x', finalRateLabelX)
-          .attr('y', rateBoxY)
-          .attr('width', rateTextWidth + 2 * ratePaddingX)
-          .attr('height', rateBoxHeight)
-          .attr('rx', 8)
-          .attr('fill', '#302B4D')
-          .attr('filter', 'url(#crosshair-label-shadow)');
-
-        // Add drop shadow filter definition if not present
-        if (svg.select('defs').empty()) {
-          svg.append('defs');
-        }
-        if (svg.select('defs #crosshair-label-shadow').empty()) {
-          svg.select('defs').append('filter')
-            .attr('id', 'crosshair-label-shadow')
-            .html(`
-              <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.18"/>
-            `);
-        }
-      }
-
-      // Anchor-based drag logic
-      const drag = d3.drag<SVGCircleElement, LoanOffer>()
-        .on('start', function (event, d) {
-          event.sourceEvent.stopPropagation();
-          isDraggingRef.current = true;
-          d3.select(this).interrupt();
-          d3.select(this).raise();
-          // Record anchor
-          const anchor = {
-            svgX: event.x,
-            svgY: event.y,
-            dataX: xScale.invert(event.x),
-            dataY: yScale.invert(event.y)
-          };
-          lastDataPosRef.current = { dataX: xScale.invert(event.x), dataY: yScale.invert(event.y) };
-          // Show drag tooltip
-          if (dragTooltipRef.current) {
-            dragTooltipRef.current.className = '';
-            dragTooltipRef.current.style.visibility = 'visible';
-          }
-        })
-        .on('drag', function (event, d) {
-          // Calculate delta from anchor
-          const anchor = {
-            svgX: event.x,
-            svgY: event.y,
-            dataX: xScale.invert(event.x),
-            dataY: yScale.invert(event.y)
-          };
-          const { dataX, dataY } = lastDataPosRef.current || { dataX: userOffer.loanAmount, dataY: userOffer.interestRate };
-          const dx = event.x - anchor.svgX;
-          const dy = event.y - anchor.svgY;
-          const newDataX = anchor.dataX + xScale.invert(dx) - xScale.invert(0);
-          const newDataY = anchor.dataY + yScale.invert(dy) - yScale.invert(0);
-          lastDataPosRef.current = { dataX: newDataX, dataY: newDataY };
-
-          // Clamp to chart area
-          const clampedX = Math.max(0, Math.min(width, xScale(newDataX)));
-          const clampedY = Math.max(0, Math.min(height, yScale(newDataY)));
-
-          d3.select(this)
-            .attr('cx', clampedX)
-            .attr('cy', clampedY);
-          // Move label instantly as well
-          g.selectAll('.user-label')
-            .attr('x', clampedX)
-            .attr('y', clampedY);
-          // Update drag tooltip
-          if (dragTooltipRef.current && svgRef.current) {
-            // Convert SVG coordinates to page coordinates
-            const svgRect = svgRef.current.getBoundingClientRect();
-            // Offset tooltip to top-right of bubble, with extra padding
-            const tooltipX = svgRect.left + margin.left + clampedX + 28; // 24px bubble + 4px gap
-            const tooltipY = svgRect.top + margin.top + clampedY - 10;
-            dragTooltipRef.current.style.left = tooltipX + 'px';
-            dragTooltipRef.current.style.top = tooltipY + 'px';
-            dragTooltipRef.current.style.background = 'rgba(200,30,30,0.8)';
-            dragTooltipRef.current.style.borderRadius = '6px';
-            dragTooltipRef.current.style.padding = '6px 9px';
-            dragTooltipRef.current.style.color = '#fff';
-            dragTooltipRef.current.style.fontSize = '13px';
-            dragTooltipRef.current.style.fontFamily = 'Public Sans, sans-serif';
-            dragTooltipRef.current.style.fontWeight = '500';
-            dragTooltipRef.current.style.boxShadow = '0px 4px 16px rgba(0,0,0,0.24)';
-            dragTooltipRef.current.innerHTML = `<div style='margin-bottom:4px;'>Your Offer</div><div>${formatCurrency(newDataX, selectedCurrency)} ${selectedCurrency}</div><div>${newDataY.toFixed(2)}% APR</div>`;
-          }
-          // Throttle domain expansion
-          if (typeof onUserOfferDrag === 'function') {
-            throttledExpand(() => {
-              onUserOfferDrag({
-                loanAmount: newDataX,
-                interestRate: newDataY,
-                dragX: clampedX,
-                dragY: clampedY,
-                width,
-                height,
-                dragging: true
-              });
-            });
-          }
-        })
-        .on('end', function (event, d) {
-          isDraggingRef.current = false;
-          // Use last data position for final update
-          const { dataX, dataY } = lastDataPosRef.current || { dataX: userOffer.loanAmount, dataY: userOffer.interestRate };
-          if (typeof onUserOfferDrag === 'function') {
-            onUserOfferDrag({ loanAmount: dataX, interestRate: dataY });
-          }
-          lastDataPosRef.current = null;
-          // Hide drag tooltip
-          if (dragTooltipRef.current) {
-            dragTooltipRef.current.className = '';
-            dragTooltipRef.current.style.visibility = 'hidden';
-          }
-        });
-
       // Update user offer point position
       const merged = userPoint.merge(userPointEnter);
-      // If dragging, use lastDataPosRef for position
       if (isDraggingRef.current && lastDataPosRef.current) {
-        const [xMin, xMax] = lastDomainRef.current.x;
-        const [yMin, yMax] = lastDomainRef.current.y;
-        const width = svgRef.current!.clientWidth - margin.left - margin.right;
-        const height = svgRef.current!.clientHeight - margin.top - margin.bottom;
-        const xScaleCurrent = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
-        const yScaleCurrent = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
         const { dataX, dataY } = lastDataPosRef.current;
         merged
-          .attr('cx', xScaleCurrent(dataX))
-          .attr('cy', yScaleCurrent(dataY))
-          .call(drag)
+          .attr('cx', xScale(dataX))
+          .attr('cy', yScale(dataY))
           .raise();
         g.selectAll('.user-label').remove(); // Hide label while dragging
       } else {
-        // If not dragging, update position immediately (no transition)
         merged
           .attr('cx', d => xScale(d.loanAmount))
           .attr('cy', d => yScale(d.interestRate))
-          .call(drag)
           .raise();
-        // Update label instantly as well
+        
+        // Update label
         const userLabel = g.selectAll<SVGTextElement, LoanOffer>('.user-label')
           .data([userOffer]);
 
@@ -760,11 +551,11 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       g.selectAll('.user-point, .user-label').remove();
     }
 
-    // After removing old heatmap code, add contour density visualization
-    // Remove any existing contours
-    g.selectAll('.contour').remove();
-
+    // Update contours if enabled
     if (showContours) {
+      // Remove old contours before drawing new ones
+      g.selectAll('.contour').remove();
+
       // Create density estimator with parameters from constants
       const density = d3.contourDensity<LoanOffer>()
         .x(d => xScale(d.loanAmount))
@@ -794,7 +585,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .attr('stroke', 'none')
         .lower(); // Ensure contours are behind points
     }
-  }, [data, userOffer, selectedCurrency, onUserOfferDrag, domain, throttledExpand, chartSize, showContours]);
+  }, [data, userOffer, selectedCurrency, domain, chartSize, showContours]);
 
   return (
     <Paper elevation={3} sx={{ p: 2, height: '100%', background: 'none', boxShadow: 'none' }}>

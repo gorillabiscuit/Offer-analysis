@@ -34,44 +34,102 @@ const EXPAND_THROTTLE_MS = 1;
 
 // Move getInitialDomain outside the component to avoid dependency issues
 function getInitialDomain(offers: LoanOffer[], userOffer: UserOfferState) {
+  // Only calculate domain if we have data
+  if (offers.length === 0 && !userOffer) {
+    return {
+      x: [0, 1] as [number, number],
+      y: [0, 5] as [number, number]
+    };
+  }
+
   const allLoanAmounts = [...offers.map(o => o.loanAmount), userOffer?.loanAmount ?? 0];
   const allInterestRates = [...offers.map(o => o.interestRate), userOffer?.interestRate ?? 0];
+  
   const minLoan = Math.min(...allLoanAmounts);
   const maxLoan = Math.max(...allLoanAmounts);
   const minRate = Math.min(...allInterestRates);
   const maxRate = Math.max(...allInterestRates);
+  
   const loanRange = maxLoan - minLoan;
-  const rateRange = maxRate - minRate;
-  return {
-    x: [Math.max(0, minLoan - loanRange * 0.1), maxLoan + loanRange * 0.1] as [number, number],
-    y: [Math.max(0, minRate - rateRange * 0.1), maxRate + rateRange * 0.1] as [number, number],
+  let rateRange = maxRate - minRate;
+
+  // Add a small buffer if all APRs are identical
+  let yMin = minRate;
+  let yMax = maxRate;
+  if (minRate === maxRate) {
+    yMin = minRate - 1;
+    yMax = maxRate + 1;
+    rateRange = yMax - yMin;
+  }
+
+  // Add a minimum range to prevent too tight domains
+  const minLoanRange = Math.max(loanRange, 0.1);
+  const minRateRange = Math.max(rateRange, 2);
+
+  const domain = {
+    x: [Math.max(0, minLoan - minLoanRange * 0.1), maxLoan + minLoanRange * 0.1] as [number, number],
+    y: [Math.max(0, yMin - minRateRange * 0.1), yMax + minRateRange * 0.1] as [number, number],
   };
+  
+  return domain;
 }
 
 function App() {
   const { userOffer, updateUserOffer, initializeWithMedianValues } = useUserOffer();
   const { loanOffers: currencyOffers, loading, error, selectedCurrency, setSelectedCurrency, allLoanOffers } = useLoanOffers(userOffer.collectionAddress);
-  const [domain, setDomain] = useState(() => getInitialDomain(currencyOffers, userOffer));
+  
+  // Memoize the initial domain calculation
+  const initialDomain = useMemo(() => 
+    getInitialDomain(currencyOffers, userOffer),
+    [currencyOffers, userOffer]
+  );
+  
+  const [domain, setDomain] = useState(initialDomain);
+  
+  // Update domain only when data changes significantly
+  useEffect(() => {
+    const newDomain = getInitialDomain(currencyOffers, userOffer);
+    // Only update if the change is significant
+    const isSignificantChange = 
+      Math.abs(newDomain.x[0] - domain.x[0]) > domain.x[1] * 0.1 ||
+      Math.abs(newDomain.x[1] - domain.x[1]) > domain.x[1] * 0.1 ||
+      Math.abs(newDomain.y[0] - domain.y[0]) > domain.y[1] * 0.1 ||
+      Math.abs(newDomain.y[1] - domain.y[1]) > domain.y[1] * 0.1;
+    
+    if (isSignificantChange) {
+      setDomain(newDomain);
+    }
+  }, [currencyOffers, userOffer]);
+
   const [showContours, setShowContours] = useState(true);
 
   // Memoize filteredOffers to prevent runaway renders
-  const filteredOffers = useMemo(() => (
-    (userOffer.duration === undefined
+  const filteredOffers = useMemo(() => {
+    const filtered = (userOffer.duration === undefined
       ? currencyOffers
       : currencyOffers.filter(offer => Number(offer.duration) === Number(userOffer.duration))
-    ).filter(offer => offer.id)
-  ), [currencyOffers, userOffer.duration]);
+    ).filter(offer => offer.id);
+    
+    console.log('[filteredOffers] Collection:', userOffer.collectionAddress);
+    console.log('[filteredOffers] Number of offers:', filtered.length);
+    console.log('[filteredOffers] Sample offer:', filtered[0]);
+    
+    return filtered;
+  }, [currencyOffers, userOffer.duration, userOffer.collectionAddress]);
 
   // Debug: Log filtered offers
   useEffect(() => {
-    console.log('[App] Filtered offers for chart and median:', filteredOffers);
     if (filteredOffers.length > 0) {
       const amounts = filteredOffers.map(o => o.loanAmount);
       const rates = filteredOffers.map(o => o.interestRate);
-      console.log('[App] Loan amounts:', amounts);
-      console.log('[App] Interest rates:', rates);
+      console.log('[App] Filtered offers for chart:', {
+        count: filteredOffers.length,
+        amounts,
+        rates,
+        collection: userOffer.collectionAddress
+      });
     }
-  }, [filteredOffers]);
+  }, [filteredOffers, userOffer.collectionAddress]);
 
   // --- Centralized filtering logic ---
   // 1. Filter by duration (if set)
@@ -182,10 +240,10 @@ function App() {
       dragPosRef.current = { x: update.dragX, y: update.dragY, width: update.width, height: update.height };
       startExpandInterval();
     } else {
-      // On drag end: round values before updating state
+      // On drag end: store full-precision values (do not round)
       updateUserOffer({
-        loanAmount: roundETH(Math.max(0, update.loanAmount)),
-        interestRate: roundPercentage(Math.max(0, update.interestRate)),
+        loanAmount: Math.max(0, update.loanAmount),
+        interestRate: Math.max(0, update.interestRate),
       });
       // Clear drag state and stop interval
       dragActiveRef.current = false;
@@ -194,43 +252,25 @@ function App() {
     }
   };
 
-  // Reset domain if data changes significantly (optional, for robustness)
-  React.useEffect(() => {
-    setDomain(getInitialDomain(filteredOffers, userOffer));
-  }, [filteredOffers, userOffer]);
-
   // Intercept currency change to convert user offer amount
   const handleCurrencyChange = useCallback((newCurrency: 'WETH' | 'USDC') => {
     if (selectedCurrency === newCurrency) return;
     // Use allLoanOffers (unfiltered) for conversion
-    console.log('[CurrencyToggle] selectedCurrency:', selectedCurrency, 'newCurrency:', newCurrency);
-    console.log('[CurrencyToggle] userOffer.loanAmount before:', userOffer.loanAmount);
-    console.log('[CurrencyToggle] allLoanOffers.length:', allLoanOffers?.length);
     
     const rate = getMedianEthUsdcRate(allLoanOffers || []);
-    console.log('[CurrencyToggle] Calculated median ETH/USD rate:', rate);
     
     let newAmount = userOffer.loanAmount;
     if (rate) {
       if (selectedCurrency === 'WETH' && newCurrency === 'USDC') {
         // ETH to USDC: multiply by rate (USD per ETH)
         newAmount = userOffer.loanAmount * rate;
-        console.log('[CurrencyToggle] Converting WETH to USDC:', {
-          originalAmount: userOffer.loanAmount,
-          rate,
-          newAmount
-        });
+      
       } else if (selectedCurrency === 'USDC' && newCurrency === 'WETH') {
         // USDC to ETH: divide by rate (USD per ETH)
         newAmount = userOffer.loanAmount / rate;
-        console.log('[CurrencyToggle] Converting USDC to WETH:', {
-          originalAmount: userOffer.loanAmount,
-          rate,
-          newAmount
-        });
+
       }
     }
-    console.log('[CurrencyToggle] Final converted amount:', newAmount);
     updateUserOffer({ loanAmount: newAmount });
     setSelectedCurrency(newCurrency);
   }, [selectedCurrency, allLoanOffers, userOffer.loanAmount, setSelectedCurrency, updateUserOffer]);

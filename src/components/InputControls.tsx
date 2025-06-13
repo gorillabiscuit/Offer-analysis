@@ -53,6 +53,28 @@ const InputControls: React.FC<InputControlsProps> = ({
     }
   }, [userOffer.loanAmount, userOffer.interestRate, selectedCurrency]);
 
+  // Filter out unwanted collections by name or slug
+  const filteredCollections = collections.filter(
+    (c) => {
+      const name = c.name.toLowerCase();
+      const slug = c.slug?.toLowerCase?.() || '';
+      // Exclude 'cryptopunks', 'cryptopunks 721' (but NOT wrapped cryptopunks), and 'art blocks curated'
+      if (
+        name === 'cryptopunks' ||
+        slug === 'cryptopunks' ||
+        name === 'cryptopunks 721' ||
+        slug === 'cryptopunks-721' ||
+        name === 'art blocks curated' ||
+        slug === 'art-blocks-curated'
+      ) {
+        // Allow wrapped cryptopunks (e.g., "CryptoPunks V1 (wrapped)")
+        if (name.includes('wrapped')) return true;
+        return false;
+      }
+      return true;
+    }
+  );
+
   // Handlers for controlled fields
   const handleCollectionChange = (event: SelectChangeEvent) => {
     const value = event.target.value;
@@ -123,7 +145,7 @@ const InputControls: React.FC<InputControlsProps> = ({
             ) : error ? (
               <MenuItem disabled>Error loading collections</MenuItem>
             ) : (
-              collections.map((collection) => (
+              filteredCollections.map((collection) => (
                 <MenuItem 
                   key={`${collection.contract_address}-${collection.name}`} 
                   value={collection.contract_address}

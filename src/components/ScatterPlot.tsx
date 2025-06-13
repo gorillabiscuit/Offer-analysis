@@ -299,14 +299,25 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     }
   }, [showContours]);
 
-  // Contour drawing and animation effect
-  useEffect(() => {
-    if (!svgRef.current || data.length === 0) return;
+  // Utility to get chart geometry and scales
+  function getChartGeometry(
+    chartSize: { width: number; height: number },
+    domain: { x: [number, number]; y: [number, number] }
+  ) {
     const margin = { top: 20, right: 20, bottom: 60, left: 60 };
     const width = chartSize.width - margin.left - margin.right;
     const height = chartSize.height - margin.top - margin.bottom;
-    if (width <= 0 || height <= 0) return;
+    const [xMin, xMax] = domain.x;
+    const [yMin, yMax] = domain.y;
+    const xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
+    const yScale = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
+    return { margin, width, height, xScale, yScale };
+  }
 
+  // Contour drawing and animation effect
+  useEffect(() => {
+    if (!svgRef.current) return;
+    const { margin, width, height, xScale, yScale } = getChartGeometry(chartSize, domain);
     const svg = d3.select(svgRef.current);
     const g = svg.select<SVGGElement>('g').empty() 
       ? svg
@@ -316,20 +327,13 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           .attr('transform', `translate(${margin.left},${margin.top})`)
       : svg.select<SVGGElement>('g');
 
-    // Remove contours if showContours is false
-    if (!showContours) {
-      g.selectAll('.contour').remove();
+    // Always remove old contours first
+    g.selectAll('.contour').remove();
+
+    // Remove and return if any of these are true
+    if (!showContours || data.length === 0 || width <= 0 || height <= 0) {
       return;
     }
-
-    // Use domain from props
-    const [xMin, xMax] = domain.x;
-    const [yMin, yMax] = domain.y;
-    const xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
-    const yScale = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
-
-    // Remove old contours before drawing new ones
-    g.selectAll('.contour').remove();
 
     // Create density estimator
     const density = d3.contourDensity<LoanOffer>()
@@ -371,9 +375,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   // Main chart update effect (axes, points, user bubble, labels)
   useEffect(() => {
     if (!svgRef.current || !tooltipRef.current) return;
-    const margin = { top: 20, right: 20, bottom: 60, left: 60 };
-    const width = chartSize.width - margin.left - margin.right;
-    const height = chartSize.height - margin.top - margin.bottom;
+    const { margin, width, height, xScale, yScale } = getChartGeometry(chartSize, domain);
     if (width <= 0 || height <= 0) return;
 
     const svg = d3.select(svgRef.current);
@@ -391,12 +393,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       g.selectAll('.contour').remove();
       return;
     }
-
-    // Use domain from props
-    const [xMin, xMax] = domain.x;
-    const [yMin, yMax] = domain.y;
-    const xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
-    const yScale = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
 
     // Store current scales for next update
     prevScalesRef.current = { x: xScale, y: yScale };
@@ -658,9 +654,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   // Dedicated effect for crosshairs and median labels during drag
   useEffect(() => {
     if (!svgRef.current) return;
-    const margin = { top: 20, right: 20, bottom: 60, left: 60 };
-    const width = chartSize.width - margin.left - margin.right;
-    const height = chartSize.height - margin.top - margin.bottom;
+    const { margin, width, height, xScale, yScale } = getChartGeometry(chartSize, domain);
     if (width <= 0 || height <= 0) return;
     const svg = d3.select(svgRef.current);
     const g = svg.select<SVGGElement>('g').empty() 
@@ -679,10 +673,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     if (!isDraggingRef.current || !lastDataPosRef.current) return;
 
     // Scales
-    const [xMin, xMax] = domain.x;
-    const [yMin, yMax] = domain.y;
-    const xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
-    const yScale = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
     const { dataX: userLoan, dataY: userRate } = lastDataPosRef.current;
     const userX = xScale(userLoan);
     const userY = yScale(userRate);

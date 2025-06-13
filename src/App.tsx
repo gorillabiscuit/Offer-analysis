@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { Box, CircularProgress, ThemeProvider } from '@mui/material';
 import InputControls from './components/InputControls';
 import ScatterPlot from './components/ScatterPlot';
@@ -49,25 +49,54 @@ function getInitialDomain(offers: LoanOffer[], userOffer: UserOfferState) {
 }
 
 function App() {
-  const { loanOffers: currencyOffers, collections, loading, error, selectedCurrency, setSelectedCurrency, allLoanOffers } = useLoanOffers();
-  const { userOffer, updateUserOffer } = useUserOffer();
+  const { userOffer, updateUserOffer, initializeWithMedianValues } = useUserOffer();
+  const { loanOffers: currencyOffers, loading, error, selectedCurrency, setSelectedCurrency, allLoanOffers } = useLoanOffers(userOffer.collectionAddress);
   const [domain, setDomain] = useState(() => getInitialDomain(currencyOffers, userOffer));
   const [showContours, setShowContours] = useState(true);
+
+  // Memoize filteredOffers to prevent runaway renders
+  const filteredOffers = useMemo(() => (
+    (userOffer.duration === undefined
+      ? currencyOffers
+      : currencyOffers.filter(offer => Number(offer.duration) === Number(userOffer.duration))
+    ).filter(offer => offer.id)
+  ), [currencyOffers, userOffer.duration]);
+
+  // Debug: Log filtered offers
+  useEffect(() => {
+    console.log('[App] Filtered offers for chart and median:', filteredOffers);
+    if (filteredOffers.length > 0) {
+      const amounts = filteredOffers.map(o => o.loanAmount);
+      const rates = filteredOffers.map(o => o.interestRate);
+      console.log('[App] Loan amounts:', amounts);
+      console.log('[App] Interest rates:', rates);
+    }
+  }, [filteredOffers]);
+
+  // --- Centralized filtering logic ---
+  // 1. Filter by duration (if set)
+  // 2. Filter out offers without IDs
+  const filteredOffersForChart = (userOffer.duration === undefined
+    ? currencyOffers
+    : currencyOffers.filter(offer => Number(offer.duration) === Number(userOffer.duration))
+  ).filter(offer => offer.id);
 
   // --- Continuous domain expansion state ---
   const dragActiveRef = useRef(false);
   const dragPosRef = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const expandIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Only initialize user offer once, after offers are loaded and stable
-  const hasInitializedUserOffer = React.useRef(false);
+  // Initialize user offer with median values when collection changes or when offers are first loaded
   useEffect(() => {
-    if (!hasInitializedUserOffer.current && !loading && currencyOffers.length > 0) {
-      const { medianLoanAmount, medianInterestRate } = getMarketMedians(currencyOffers);
-      updateUserOffer({ loanAmount: medianLoanAmount, interestRate: medianInterestRate });
-      hasInitializedUserOffer.current = true;
+    if (!loading && filteredOffers.length > 0) {
+      // Preserve the current collection address when initializing with median values
+      const currentCollectionAddress = userOffer.collectionAddress;
+      initializeWithMedianValues(filteredOffers);
+      if (currentCollectionAddress) {
+        updateUserOffer({ collectionAddress: currentCollectionAddress });
+      }
     }
-  }, [loading, currencyOffers, updateUserOffer]);
+  }, [loading, filteredOffers, initializeWithMedianValues, userOffer.collectionAddress, updateUserOffer]);
 
   // Add a constant for the expansion percentage
   const DOMAIN_EXPAND_PERCENT = 0.01; // 1%
@@ -167,14 +196,8 @@ function App() {
 
   // Reset domain if data changes significantly (optional, for robustness)
   React.useEffect(() => {
-    setDomain(getInitialDomain(currencyOffers, userOffer));
-  }, [currencyOffers, userOffer]);
-
-  // Filter offers by selected duration
-  const filteredOffers =
-    userOffer.duration === undefined
-      ? currencyOffers
-      : currencyOffers.filter(offer => Number(offer.duration) === Number(userOffer.duration));
+    setDomain(getInitialDomain(filteredOffers, userOffer));
+  }, [filteredOffers, userOffer]);
 
   // Intercept currency change to convert user offer amount
   const handleCurrencyChange = useCallback((newCurrency: 'WETH' | 'USDC') => {
@@ -225,7 +248,6 @@ function App() {
         <div className={styles.menuDesktop}>
           <div className={styles.leftPanel}>
             <InputControls
-              collections={collections}
               onUserOfferChange={updateUserOffer}
               userOffer={userOffer}
               selectedCurrency={selectedCurrency}

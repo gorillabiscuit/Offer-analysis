@@ -4,6 +4,7 @@ export interface LoanOffer {
   interestRate: number;
   duration?: number;
   collection?: string;
+  collectionAddress?: string;
   timestamp?: number;
   lender?: string;
   createdAt?: string;

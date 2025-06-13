@@ -61,7 +61,7 @@ function normalizeMarketOffer(offer: any): LoanOffer & { createdAt: string; time
   };
 }
 
-export const useLoanOffers = () => {
+export const useLoanOffers = (collectionAddress?: string) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCurrency, setSelectedCurrency] = useState<'WETH' | 'USDC'>('WETH');
@@ -77,7 +77,7 @@ export const useLoanOffers = () => {
       setLoading(true);
       try {
         const [marketRes, gondiRes] = await Promise.all([
-          fetch(`https://api.us-east.tinybird.co/v0/pipes/market_offers_pipe.json?token=${MARKET_OFFERS_TOKEN}&collection_address=${COLLECTION_ADDRESS}`),
+          fetch(`https://api.us-east.tinybird.co/v0/pipes/market_offers_pipe.json?token=${MARKET_OFFERS_TOKEN}&collection_address=${collectionAddress || COLLECTION_ADDRESS}`),
           fetch(`https://api.us-east.tinybird.co/v0/pipes/gondi_offers_pipe.json?token=${GONDI_OFFERS_TOKEN}&limit=1000`)
         ]);
         if (!marketRes.ok || !gondiRes.ok) throw new Error('Failed to fetch offers');
@@ -105,7 +105,7 @@ export const useLoanOffers = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [collectionAddress]);
 
   // Filter and compute chart/heatmap data in-memory on currency toggle
   useEffect(() => {

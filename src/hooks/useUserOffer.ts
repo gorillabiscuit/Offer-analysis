@@ -7,6 +7,7 @@ export interface UserOfferState {
   interestRate: number;
   duration?: number;
   collection?: string;
+  collectionAddress?: string;
 }
 
 export const useUserOffer = () => {

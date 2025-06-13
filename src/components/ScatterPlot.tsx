@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 import * as d3 from 'd3';
 import { LoanOffer } from '../types';
@@ -92,6 +92,17 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   const lastDomainRef = useRef(domain);
   const throttleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasAnimatedContours = useRef(false);
+
+  // Memoize medians and color scale
+  const medians = useMemo(() => getMarketMedians(data), [data]);
+  const timeScale = useMemo(() => {
+    const timestamps = data.map(d => d.timestamp ?? 0);
+    const minTimestamp = d3.min(timestamps) ?? 0;
+    const maxTimestamp = d3.max(timestamps) ?? 0;
+    return d3.scaleLinear<string>()
+      .domain([minTimestamp, maxTimestamp])
+      .range(["#4D96FF", "#FF6B6B"]);
+  }, [data]);
 
   // Create tooltips once when component mounts
   useEffect(() => {
@@ -455,7 +466,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     // Remove axis labels (no .x-label or .y-label)
 
     // Calculate statistics
-    const { medianLoanAmount, medianInterestRate } = getMarketMedians(data);
+    const { medianLoanAmount, medianInterestRate } = medians;
     
     // Update reference lines with transitions or immediate
     const updateReferenceLine = (className: string, x1: number, x2: number, y1: number, y2: number, color: string, dashArray: string) => {
@@ -507,15 +518,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     // Update median annotations
     updateAnnotation('median-x-annotation', xScale(medianLoanAmount) + 20, 15, `Median: ${formatCurrency(medianLoanAmount, selectedCurrency)} ${selectedCurrency === 'WETH' ? 'wETH' : selectedCurrency}`);
     updateAnnotation('median-y-annotation', width - 5, yScale(medianInterestRate) - 20, `Median: ${formatPercentageAxis(medianInterestRate)}`, 'end');
-
-
-    // Color scale for offer age (newest: red, oldest: blue)
-    const timestamps = data.map(d => d.timestamp ?? 0);
-    const minTimestamp = d3.min(timestamps) ?? 0;
-    const maxTimestamp = d3.max(timestamps) ?? 0;
-    const timeScale = d3.scaleLinear<string>()
-      .domain([minTimestamp, maxTimestamp])
-      .range(["#4D96FF", "#FF6B6B"]); // Oldest: blue, Newest: red
 
     // Update dots with transitions
     const dots = g.selectAll<SVGCircleElement, LoanOffer>('.data-point')
@@ -597,17 +599,12 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
       const userPointEnter = userPoint.enter()
         .append('circle')
-        .attr('class', 'user-point')
-        .attr('r', 12)
-        .attr('fill', '#f50057')
-        .attr('fill-opacity', 0.45)
-        .attr('stroke', '#f50057')
-        .attr('stroke-opacity', 0.95)
-        .attr('stroke-width', 1)
-        .style('cursor', 'move');
+        .attr('class', 'user-point');
+      applyUserOfferBubbleAttrs(userPointEnter);
 
       // Update user offer point position
       const merged = userPoint.merge(userPointEnter);
+      applyUserOfferBubbleAttrs(merged);
       if (isDraggingRef.current && lastDataPosRef.current) {
         const { dataX, dataY } = lastDataPosRef.current;
         merged
@@ -619,11 +616,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         merged
           .attr('cx', d => xScale(d.loanAmount))
           .attr('cy', d => yScale(d.interestRate))
-          .attr('fill', '#f50057')
-          .attr('fill-opacity', 0.45)
-          .attr('stroke', '#f50057')
-          .attr('stroke-opacity', 0.95)
-          .attr('stroke-width', 1)
           .raise();
         
         // Update label
@@ -678,7 +670,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     const userY = yScale(userRate);
 
     // Medians
-    const { medianLoanAmount, medianInterestRate } = getMarketMedians(data);
+    const { medianLoanAmount, medianInterestRate } = medians;
 
     // Draw vertical crosshair (loan amount)
     g.append('line')
@@ -842,6 +834,18 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         `);
     }
   }, [chartSize, domain, selectedCurrency, data, isDraggingRef.current, lastDataPosRef.current]);
+
+  // DRY: Function to apply all attributes for the user offer bubble
+  function applyUserOfferBubbleAttrs(sel: d3.Selection<SVGCircleElement, LoanOffer, any, any>) {
+    sel
+      .attr('r', 12)
+      .attr('fill', '#f50057')
+      .attr('fill-opacity', 0.45)
+      .attr('stroke', '#f50057')
+      .attr('stroke-opacity', 0.95)
+      .attr('stroke-width', 1)
+      .style('cursor', 'move');
+  }
 
   return (
     <Paper elevation={3} sx={{ p: 2, height: '100%', background: 'none', boxShadow: 'none', position: 'relative' }}>

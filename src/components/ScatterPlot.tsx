@@ -371,20 +371,43 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
   // ResizeObserver to track container size
   useEffect(() => {
-    const handleResize = () => {
-      if (containerRef.current) {
-        setChartSize({
-          width: containerRef.current.clientWidth,
-          height: containerRef.current.clientHeight,
-        });
-      }
+    const measure = (width?: number, height?: number) => {
+      const nextWidth = width ?? containerRef.current?.getBoundingClientRect().width ?? 0;
+      const nextHeight = height ?? containerRef.current?.getBoundingClientRect().height ?? 0;
+      setChartSize((prev) => {
+        const roundedWidth = Math.round(nextWidth);
+        const roundedHeight = Math.round(nextHeight);
+        if (prev.width === roundedWidth && prev.height === roundedHeight) {
+          return prev;
+        }
+        return { width: roundedWidth, height: roundedHeight };
+      });
     };
+
+    const handleResize = () => {
+      measure();
+      // Ensure we re-measure after layout settles during window resizes.
+      requestAnimationFrame(() => measure());
+    };
+
     handleResize();
-    const resizeObserver = new window.ResizeObserver(handleResize);
+    const resizeObserver = new window.ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) {
+        handleResize();
+        return;
+      }
+      measure(entry.contentRect.width, entry.contentRect.height);
+      requestAnimationFrame(handleResize);
+    });
     if (containerRef.current) {
       resizeObserver.observe(containerRef.current);
     }
-    return () => resizeObserver.disconnect();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   // Canonical d3.zoom integration using a dedicated background capture layer.
@@ -396,11 +419,13 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     const svgSelection = d3.select(svgRef.current);
     const g = svgSelection.select<SVGGElement>('g').empty()
       ? svgSelection
-          .attr('width', width + margin.left + margin.right)
-          .attr('height', height + margin.top + margin.bottom)
           .append('g')
           .attr('transform', `translate(${margin.left},${margin.top})`)
       : svgSelection.select<SVGGElement>('g');
+    svgSelection
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom);
+    g.attr('transform', `translate(${margin.left},${margin.top})`);
 
     const zoomCapture = g.selectAll<SVGRectElement, null>('.zoom-capture')
       .data([null])
@@ -632,11 +657,13 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     const svg = d3.select(svgRef.current);
     const g = svg.select<SVGGElement>('g').empty() 
       ? svg
-          .attr('width', width + margin.left + margin.right)
-          .attr('height', height + margin.top + margin.bottom)
           .append('g')
           .attr('transform', `translate(${margin.left},${margin.top})`)
       : svg.select<SVGGElement>('g');
+    svg
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom);
+    g.attr('transform', `translate(${margin.left},${margin.top})`);
     const defs = svg.select<SVGDefsElement>('defs').empty()
       ? svg.append('defs')
       : svg.select<SVGDefsElement>('defs');
@@ -716,11 +743,13 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     const svg = d3.select(svgRef.current);
     const g = svg.select<SVGGElement>('g').empty() 
       ? svg
-          .attr('width', width + margin.left + margin.right)
-          .attr('height', height + margin.top + margin.bottom)
           .append('g')
           .attr('transform', `translate(${margin.left},${margin.top})`)
       : svg.select<SVGGElement>('g');
+    svg
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom);
+    g.attr('transform', `translate(${margin.left},${margin.top})`);
     const clipPathId = clipPathIdRef.current;
     const clipPathUrl = `url(#${clipPathId})`;
     const defs = svg.select<SVGDefsElement>('defs').empty()
@@ -785,6 +814,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         .call(xAxis);
     } else {
       maybeTransition(xAxisGroup)
+        .attr('transform', `translate(0,${height})`)
         .call(xAxis as any);
     }
 

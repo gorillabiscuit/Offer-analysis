@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-03-16T10:33:43.072Z",
+  "sources": {
+    "market_offers": [
+      "Derived from GONDI GraphQL ListActiveLoans",
+      "NFTFI_LOANS_DUE_URL=https://sdk-api.nftfi.com/data/v0/pipes/loans_due_endpoint.json"
+    ],
+    "gondi_offers": "Derived from GONDI GraphQL ListActiveLoans",
+    "collections": "https://nft-collection-resolver.onrender.com/collections",
+    "eth_usd": "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+  },
+  "record_counts": {
+    "market_offers": 6717,
+    "market_offers_gondi_derived": 1506,
+    "market_offers_nftfi_derived": 5211,
+    "gondi_offers": 1506,
+    "collections": 24
+  },
+  "warnings": []
+}

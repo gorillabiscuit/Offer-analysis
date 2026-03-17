@@ -1,5 +1,6 @@
 export interface LoanOffer {
   id?: string;
+  marketType?: 'loan' | 'offer';
   loanAmount: number;
   interestRate: number;
   duration?: number;
@@ -13,21 +14,6 @@ export interface LoanOffer {
   fxRateToUSD?: number;
   maximumRepayment?: number;
   loanPrincipalUSD?: number;
-}
-
-export interface Collection {
-  id: string;
-  name: string;
-  symbol: string;
-  floorPrice?: number;
-}
-
-export interface ScatterPlotData {
-  x: number;
-  y: number;
-  size?: number;
-  color?: string;
-  label?: string;
 }
 
 export interface HeatmapCell {

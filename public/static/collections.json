@@ -1,0 +1,267 @@
+[
+  {
+    "name": "CryptoPunks",
+    "slug": "cryptopunks",
+    "contract_address": "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb",
+    "aliases": [
+      "punks",
+      "cp",
+      "cryptopunk",
+      "larva labs punks",
+      "crypto punks",
+      "punk"
+    ]
+  },
+  {
+    "name": "Wrapped CryptoPunks",
+    "slug": "wrapped-cryptopunks",
+    "contract_address": "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6",
+    "aliases": [
+      "wpunks",
+      "wrapped punks",
+      "w-punks",
+      "punk wrappers",
+      "wrapped cryptopunk",
+      "wrapped cp"
+    ]
+  },
+  {
+    "name": "CryptoPunks 721",
+    "slug": "cryptopunks-721",
+    "contract_address": "0x000000000000003607fce1ac9e043a86675c5c2f",
+    "aliases": [
+      "official wrapped cryptopunks",
+      "cryptopunks wrapper",
+      "cp 721",
+      "punk 721"
+    ]
+  },
+  {
+    "name": "Bored Ape Yacht Club",
+    "slug": "bored-ape-yacht-club",
+    "contract_address": "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d",
+    "aliases": [
+      "bayc",
+      "bored apes",
+      "bored ape",
+      "apes",
+      "bored ape yc",
+      "yacht club"
+    ]
+  },
+  {
+    "name": "Mutant Ape Yacht Club",
+    "slug": "mutant-ape-yacht-club",
+    "contract_address": "0x60e4d786628fea6478f785a6d7e704777c86a7c6",
+    "aliases": [
+      "mayc",
+      "mutant apes",
+      "mutant ape",
+      "mutants",
+      "mutant yc",
+      "mayc mutants"
+    ]
+  },
+  {
+    "name": "Bored Ape Kennel Club",
+    "slug": "bored-ape-kennel-club",
+    "contract_address": "0xba30e5f9bb24caa003e9f2f0497ad287fdf95623",
+    "aliases": [
+      "bakc",
+      "kennel club",
+      "bored ape kennel",
+      "dogs",
+      "ape dogs",
+      "kennel"
+    ]
+  },
+  {
+    "name": "Azuki",
+    "slug": "azuki",
+    "contract_address": "0xed5af388653567af2f388e6224dc7c4b3241c544",
+    "aliases": [
+      "azuki collection",
+      "azuki nft",
+      "chiru labs",
+      "azukis"
+    ]
+  },
+  {
+    "name": "CloneX",
+    "slug": "clonex",
+    "contract_address": "0x49cf6f5d44e70224e2e23fdcdd2c053f30ada28b",
+    "aliases": [
+      "clone x",
+      "rtfkt clonex",
+      "rtfkt",
+      "clones",
+      "clone x - x takashi murakami"
+    ]
+  },
+  {
+    "name": "Doodles",
+    "slug": "doodles-official",
+    "contract_address": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e",
+    "aliases": [
+      "doodles nft",
+      "doodle",
+      "doodles collection"
+    ]
+  },
+  {
+    "name": "Art Blocks Curated",
+    "slug": "artblocks-curated",
+    "contract_address": "0xa7d8d9ef8d8ce3b6004c0b4b01c10d2d6d40b848",
+    "aliases": [
+      "artblocks curated",
+      "ab curated",
+      "art blocks curated",
+      "art blocks",
+      "artblocks"
+    ]
+  },
+  {
+    "name": "Chromie Squiggle by Snowfro",
+    "slug": "chromie-squiggle-by-snowfro",
+    "contract_address": "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a",
+    "aliases": [
+      "squiggles",
+      "chromie squiggles",
+      "art blocks squiggle",
+      "snowfro squiggle",
+      "chromie squiggle",
+      "chromie squiggle by snowfro"
+    ]
+  },
+  {
+    "name": "Cool Cats NFT",
+    "slug": "cool-cats",
+    "contract_address": "0x1a92f7381b9f03921564a437210bb9396471050c",
+    "aliases": [
+      "cool cats",
+      "coolcats",
+      "cats",
+      "cool cat"
+    ]
+  },
+  {
+    "name": "World of Women",
+    "slug": "world-of-women",
+    "contract_address": "0xe785e82358879f061bc3dcac6f0444462d4b5330",
+    "aliases": [
+      "wow",
+      "world of women nft",
+      "women",
+      "wow nft"
+    ]
+  },
+  {
+    "name": "Moonbirds",
+    "slug": "moonbirds",
+    "contract_address": "0x23581767a106ae21c074b2276d25e5c3e136a68b",
+    "aliases": [
+      "moonbird",
+      "moon birds",
+      "moonbirdz",
+      "proof collective"
+    ]
+  },
+  {
+    "name": "VeeFriends",
+    "slug": "veefriends",
+    "contract_address": "0xa3aee8bce55beea1951ef834b99f3ac60d1abeeb",
+    "aliases": [
+      "vee friends",
+      "gary vee",
+      "gary vaynerchuk",
+      "vf"
+    ]
+  },
+  {
+    "name": "Pudgy Penguins",
+    "slug": "pudgy-penguins",
+    "contract_address": "0xbd3531da5cf5857e7cfaa92426877b022e612cf8",
+    "aliases": [
+      "pudgy",
+      "penguins",
+      "pudgy penguin",
+      "ppg",
+      "pudgies"
+    ]
+  },
+  {
+    "name": "Lil Pudgys",
+    "slug": "lil-pudgys",
+    "contract_address": "0x524cab2ec69124574082676e6f654a18df49a048",
+    "aliases": [
+      "lil pudgy",
+      "little pudgys",
+      "lil penguins",
+      "baby pudgys",
+      "lil pudgies"
+    ]
+  },
+  {
+    "name": "Milady Maker",
+    "slug": "milady-maker",
+    "contract_address": "0x5af05d7ba0543edb0a20ff3d65d0c4db9bca25a5",
+    "aliases": [
+      "miladys",
+      "milady"
+    ]
+  },
+  {
+    "name": "Autoglyphs",
+    "slug": "autoglyphs",
+    "contract_address": "0xd4e4078ca3495de5b1d4db434bebc5a986197782",
+    "aliases": [
+      "larva labs autoglyphs",
+      "glyphs"
+    ]
+  },
+  {
+    "name": "Fidenza by Tyler Hobbs",
+    "slug": "fidenza-by-tyler-hobbs",
+    "contract_address": "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    "aliases": [
+      "fidenza",
+      "tyler hobbs fidenza"
+    ]
+  },
+  {
+    "name": "DeGods",
+    "slug": "degods-eth",
+    "contract_address": "0x8821bee2ba0df28761afff119d66390d594cd280",
+    "aliases": [
+      "deadgods",
+      "degod"
+    ]
+  },
+  {
+    "name": "y00ts",
+    "slug": "y00ts-eth",
+    "contract_address": "0xfd1b0b0dfa524e1fd42e7d51155a663c581bbd50",
+    "aliases": [
+      "yoots",
+      "y00t"
+    ]
+  },
+  {
+    "name": "FAKE IT TILL YOU MAKE IT by Maya Man",
+    "slug": "fake-it-till-you-make-it-by-maya-man",
+    "contract_address": "0xa7d8d9ef8d8ce3992df33d8b8cf4aebabd5bd270",
+    "aliases": [
+      "fake it till you make it",
+      "maya man fake it"
+    ]
+  },
+  {
+    "name": "alignDRAW",
+    "slug": "aligndraw",
+    "contract_address": "0x9cf0ab1cc434db83097b7e9c831a764481dec747",
+    "aliases": [
+      "align draw",
+      "aligndraw collection"
+    ]
+  }
+]

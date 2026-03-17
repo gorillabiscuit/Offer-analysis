@@ -1,6 +1,38 @@
 import { createTheme } from '@mui/material/styles';
 
-const darkTheme = createTheme({
+const baseThemeOptions = {
+  shape: {
+    borderRadius: 8,
+  },
+  typography: {
+    fontFamily: 'Public Sans, sans-serif',
+    h6: {
+      fontWeight: 700,
+      fontSize: '18px',
+      lineHeight: '28px',
+    },
+    body1: {
+      fontSize: '14px',
+      lineHeight: '22px',
+    },
+    body2: {
+      fontSize: '13px',
+      lineHeight: '22px',
+    },
+  },
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+        },
+      },
+    },
+  },
+} as const;
+
+export const darkTheme = createTheme({
+  ...baseThemeOptions,
   palette: {
     mode: 'dark',
     background: {
@@ -19,34 +51,8 @@ const darkTheme = createTheme({
       main: '#919EAB',
     },
   },
-  shape: {
-    borderRadius: 8,
-  },
-  typography: {
-    fontFamily: 'Public Sans, sans-serif',
-    h6: {
-      fontWeight: 700,
-      fontSize: '18px',
-      lineHeight: '28px',
-    },
-    body1: {
-      fontSize: '14px',
-      lineHeight: '22px',
-    },
-    body2: {
-      fontSize: '13px',
-      lineHeight: '22px',
-      color: '#919EAB',
-    },
-  },
   components: {
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundImage: 'none',
-        },
-      },
-    },
+    ...baseThemeOptions.components,
     MuiInputBase: {
       styleOverrides: {
         root: {
@@ -118,4 +124,97 @@ const darkTheme = createTheme({
   },
 });
 
-export default darkTheme; 
+export const lightTheme = createTheme({
+  ...baseThemeOptions,
+  palette: {
+    mode: 'light',
+    background: {
+      paper: '#FFFFFF',
+      default: '#EFF1F7',
+    },
+    text: {
+      primary: '#1F2330',
+      secondary: '#586072',
+    },
+    divider: 'rgba(31,35,48,0.18)',
+    primary: {
+      main: '#1F2330',
+    },
+    secondary: {
+      main: '#586072',
+    },
+  },
+  components: {
+    ...baseThemeOptions.components,
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          background: '#FFFFFF',
+          color: '#1F2330',
+          '&.Mui-focused': {
+            background: '#FFFFFF',
+          },
+        },
+        input: {
+          color: '#1F2330',
+          '&::placeholder': {
+            color: '#586072',
+            opacity: 1,
+          },
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          '& fieldset': {
+            borderColor: 'rgba(31,35,48,0.2)',
+          },
+          '&:hover fieldset': {
+            borderColor: 'rgba(31,35,48,0.35)',
+          },
+          '&.Mui-focused fieldset': {
+            borderColor: 'rgba(31,35,48,0.5)',
+          },
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: '#586072',
+          '&.Mui-focused': {
+            color: '#1F2330',
+          },
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        icon: {
+          color: '#1F2330',
+        },
+      },
+    },
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          color: '#586072',
+        },
+      },
+    },
+    MuiToggleButton: {
+      styleOverrides: {
+        root: {
+          color: '#1F2330',
+          '&.Mui-selected': {
+            color: '#FFFFFF',
+            background: '#1F2330',
+          },
+        },
+      },
+    },
+  },
+});
+
+export default darkTheme;

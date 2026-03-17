@@ -7,7 +7,7 @@ export const roundPercentage = (value: number): number => {
 };
 
 export const formatETH = (value: number): string => {
-  return `${value.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} ETH`;
+  return `${value.toFixed(3)} ETH`;
 };
 
 export const formatPercentage = (value: number): string => {
@@ -27,7 +27,7 @@ export const formatDuration = (days: number): string => {
 
 export const formatCurrency = (value: number, currency: 'WETH' | 'USDC'): string => {
   if (currency === 'WETH') {
-    return value.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+    return value.toFixed(3);
   } else {
     return value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   }

@@ -4,16 +4,22 @@ import CssBaseline from '@mui/material/CssBaseline';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const params = new URLSearchParams(window.location.search);
+const useVanillaRenderer = params.get('renderer') === 'vanilla';
 
-root.render(
-  <React.StrictMode>
-    <CssBaseline />
-    <App />
-  </React.StrictMode>
-);
+if (useVanillaRenderer) {
+  import('./vanilla').then(({ bootstrapVanillaApp }) => {
+    bootstrapVanillaApp();
+  });
+} else {
+  const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+  root.render(
+    <React.StrictMode>
+      <CssBaseline />
+      <App />
+    </React.StrictMode>
+  );
+}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

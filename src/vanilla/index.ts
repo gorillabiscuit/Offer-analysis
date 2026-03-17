@@ -1,0 +1,1 @@
+export { bootstrapVanillaApp } from './bootstrap';

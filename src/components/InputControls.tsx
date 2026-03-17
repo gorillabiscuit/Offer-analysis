@@ -2,35 +2,28 @@ import React from 'react';
 import { 
   Box, 
   Typography, 
-  Paper, 
   TextField, 
   Select, 
   MenuItem, 
   FormControl, 
   InputLabel,
   SelectChangeEvent,
-  FormControlLabel,
-  Switch,
   CircularProgress
 } from '@mui/material';
-import { formatPercentage, formatDuration, formatCurrency, formatPercentageAxis } from '../utils/formatting';
-import { LoanOffer, Collection } from '../types';
+import { formatCurrency, formatPercentageAxis } from '../utils/formatting';
+import { LoanOffer } from '../types';
 import { useCollections } from '../hooks/useCollections';
 
 interface InputControlsProps {
   onUserOfferChange: (userOffer: Partial<LoanOffer>) => void;
   userOffer: Partial<LoanOffer>;
   selectedCurrency: 'WETH' | 'USDC';
-  showContours?: boolean;
-  onShowContoursChange?: (show: boolean) => void;
 }
 
 const InputControls: React.FC<InputControlsProps> = ({ 
   onUserOfferChange,
   userOffer,
   selectedCurrency,
-  showContours = true,
-  onShowContoursChange
 }) => {
   const { collections, loading, error } = useCollections();
   
@@ -75,10 +68,24 @@ const InputControls: React.FC<InputControlsProps> = ({
     }
   );
 
+  React.useEffect(() => {
+    if (loading || filteredCollections.length === 0) return;
+    const hasValidSelection = filteredCollections.some(
+      (collection) => collection.contract_address === userOffer.collectionAddress
+    );
+    if (!hasValidSelection) {
+      const firstCollection = filteredCollections[0];
+      onUserOfferChange({
+        collection: firstCollection.name,
+        collectionAddress: firstCollection.contract_address,
+      });
+    }
+  }, [loading, filteredCollections, userOffer.collectionAddress, onUserOfferChange]);
+
   // Handlers for controlled fields
   const handleCollectionChange = (event: SelectChangeEvent) => {
     const value = event.target.value;
-    const selectedCollection = collections.find(c => c.contract_address === value);
+    const selectedCollection = filteredCollections.find(c => c.contract_address === value);
     if (selectedCollection) {
       onUserOfferChange({ 
         collection: selectedCollection.name,
@@ -109,23 +116,38 @@ const InputControls: React.FC<InputControlsProps> = ({
   };
 
   return (
-    <Paper 
-      elevation={3} 
+    <Box
       sx={{ 
         p: 3, 
+        width: '100%',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         gap: 3,
-        boxShadow: '0px 0px 2px rgba(0,0,0,0.24), 0px 12px 24px -4px rgba(0,0,0,0.24)',
-        borderRadius: '16px',
+        color: (theme) => theme.palette.text.primary,
+        boxSizing: 'border-box',
       }}
     >
-      <Typography variant="h6" gutterBottom>
-        Your Offer
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+        <Typography variant="h6" sx={{ mb: 0 }}>
+          Your Offer
+        </Typography>
+      </Box>
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 3,
+          gridTemplateColumns: '1fr',
+          '@media (max-width:900px)': {
+            gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+            gap: 2,
+          },
+          '& .MuiFormControl-root, & .MuiTextField-root': {
+            minWidth: 0,
+          },
+        }}
+      >
         {/* Collection Selection */}
         <FormControl fullWidth>
           <InputLabel id="collection-select-label">Collection</InputLabel>
@@ -180,9 +202,11 @@ const InputControls: React.FC<InputControlsProps> = ({
             onChange={handleDurationDropdownChange}
           >
             <MenuItem value="all">All Durations</MenuItem>
-            <MenuItem value="2592000">30 Days</MenuItem>
-            <MenuItem value="5184000">60 Days</MenuItem>
-            <MenuItem value="7776000">90 Days</MenuItem>
+            <MenuItem value="604800">7 Days or Less</MenuItem>
+            <MenuItem value="1209600">14 Days or Less</MenuItem>
+            <MenuItem value="2592000">30 Days or Less</MenuItem>
+            <MenuItem value="5184000">60 Days or Less</MenuItem>
+            <MenuItem value="7776000">90 Days or Less</MenuItem>
           </Select>
         </FormControl>
 
@@ -206,20 +230,8 @@ const InputControls: React.FC<InputControlsProps> = ({
           }}
         />
 
-        {/* Show Contours Switch */}
-        {onShowContoursChange && (
-          <FormControlLabel
-            control={
-              <Switch
-                checked={showContours}
-                onChange={(e) => onShowContoursChange(e.target.checked)}
-              />
-            }
-            label="Show Loan Depth"
-          />
-        )}
       </Box>
-    </Paper>
+    </Box>
   );
 };
 

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { LoanOffer } from '../types';
-import * as d3 from 'd3';
+import { getMarketMedians } from '../utils/median';
 
 export interface UserOfferState {
   loanAmount: number;
@@ -39,9 +39,7 @@ export const useUserOffer = () => {
     const validMarketOffers = marketOffers.filter(offer => offer.id);
     if (validMarketOffers.length === 0) return;
 
-    // Use d3.median for both medians
-    const medianAmount = d3.median(validMarketOffers, o => o.loanAmount) || 0;
-    const medianRate = d3.median(validMarketOffers, o => o.interestRate) || 0;
+    const { medianLoanAmount: medianAmount, medianInterestRate: medianRate } = getMarketMedians(validMarketOffers);
 
     // Get most common duration from market offers only
     const durations = validMarketOffers
@@ -52,21 +50,6 @@ export const useUserOffer = () => {
           arr.filter(v => v === a).length >= arr.filter(v => v === b).length ? a : b
         )
       : undefined;
-
-    // Debug logs
-    console.log('--- Median Calculation Debug (D3) ---');
-    console.log('Loan Amounts:', validMarketOffers.map(o => o.loanAmount));
-    console.log('Median Loan Amount (d3):', medianAmount);
-    console.log('Interest Rates:', validMarketOffers.map(o => o.interestRate));
-    console.log('Median Interest Rate (d3):', medianRate);
-    console.log('Durations:', durations);
-    console.log('Most Common Duration:', mostCommonDuration);
-    console.log('User Offer Set To:', {
-      loanAmount: medianAmount,
-      interestRate: medianRate,
-      duration: mostCommonDuration,
-    });
-    console.log('-------------------------------');
 
     setUserOffer({
       loanAmount: medianAmount,

@@ -5,10 +5,12 @@ import ScatterPlot from './components/ScatterPlot';
 import { useLoanOffers } from './hooks/useLoanOffers';
 import { useUserOffer, UserOfferState } from './hooks/useUserOffer';
 import { LoanOffer } from './types';
-import { roundETH, roundPercentage } from './utils/formatting';
 import { getMarketMedians, getMedianEthUsdcRate } from './utils/median';
 import styles from './components/ChartLayout.module.css';
-import darkTheme from './styles/theme';
+import { darkTheme, lightTheme } from './styles/theme';
+
+type ThemeMode = 'system' | 'light' | 'dark';
+type ResolvedTheme = 'light' | 'dark';
 
 // === Domain Expansion Tuning Parameters ===
 /**
@@ -24,26 +26,23 @@ const PIXEL_INCREMENT = 1;
  * Example: 0.02 = 2% from the edge.
  */
 const EDGE_THRESHOLD = 0.01;
+const CHART_PADDING_RATIO = 0.15;
 
-/**
- * Minimum time (ms) between domain expansions while dragging at the edge.
- * Higher values = slower expansion, lower CPU usage.
- */
-const EXPAND_THROTTLE_MS = 1;
 // === End Domain Expansion Tuning Parameters ===
 
 // Move getInitialDomain outside the component to avoid dependency issues
-function getInitialDomain(offers: LoanOffer[], userOffer: UserOfferState) {
+// and keep baseline zoom stable while the user drags their own offer point.
+function getInitialDomain(offers: LoanOffer[]) {
   // Only calculate domain if we have data
-  if (offers.length === 0 && !userOffer) {
+  if (offers.length === 0) {
     return {
       x: [0, 1] as [number, number],
       y: [0, 5] as [number, number]
     };
   }
 
-  const allLoanAmounts = [...offers.map(o => o.loanAmount), userOffer?.loanAmount ?? 0];
-  const allInterestRates = [...offers.map(o => o.interestRate), userOffer?.interestRate ?? 0];
+  const allLoanAmounts = offers.map(o => o.loanAmount);
+  const allInterestRates = offers.map(o => o.interestRate);
   
   const minLoan = Math.min(...allLoanAmounts);
   const maxLoan = Math.max(...allLoanAmounts);
@@ -66,98 +65,266 @@ function getInitialDomain(offers: LoanOffer[], userOffer: UserOfferState) {
   const minLoanRange = Math.max(loanRange, 0.1);
   const minRateRange = Math.max(rateRange, 2);
 
+  // Convert desired visual padding to data-space padding.
+  // If we want points inset by p on each side of the chart,
+  // padding in data units must be: range * p / (1 - 2p).
+  const toDataPadding = (range: number) => {
+    const denominator = 1 - 2 * CHART_PADDING_RATIO;
+    return denominator > 0 ? (range * CHART_PADDING_RATIO) / denominator : range;
+  };
+  const xPadding = toDataPadding(minLoanRange);
+  const yPadding = toDataPadding(minRateRange);
+
   const domain = {
-    x: [Math.max(0, minLoan - minLoanRange * 0.1), maxLoan + minLoanRange * 0.1] as [number, number],
-    y: [Math.max(0, yMin - minRateRange * 0.1), yMax + minRateRange * 0.1] as [number, number],
+    x: [minLoan - xPadding, maxLoan + xPadding] as [number, number],
+    y: [yMin - yPadding, yMax + yPadding] as [number, number],
   };
   
   return domain;
 }
 
+function domainsAreClose(
+  a: { x: [number, number]; y: [number, number] },
+  b: { x: [number, number]; y: [number, number] },
+  epsilon = 1e-6
+) {
+  return (
+    Math.abs(a.x[0] - b.x[0]) < epsilon &&
+    Math.abs(a.x[1] - b.x[1]) < epsilon &&
+    Math.abs(a.y[0] - b.y[0]) < epsilon &&
+    Math.abs(a.y[1] - b.y[1]) < epsilon
+  );
+}
+
+function getIqrBounds(values: number[]): { lower: number; upper: number } | null {
+  if (values.length < 4) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const quantile = (p: number) => {
+    const index = (sorted.length - 1) * p;
+    const lower = Math.floor(index);
+    const upper = Math.ceil(index);
+    if (lower === upper) return sorted[lower];
+    const weight = index - lower;
+    return sorted[lower] * (1 - weight) + sorted[upper] * weight;
+  };
+
+  const q1 = quantile(0.25);
+  const q3 = quantile(0.75);
+  const iqr = q3 - q1;
+  return {
+    lower: q1 - 1.5 * iqr,
+    upper: q3 + 1.5 * iqr,
+  };
+}
+
+function parseThemeToken(rawValue: string | null | undefined): ResolvedTheme | null {
+  if (!rawValue) return null;
+  const value = rawValue.toLowerCase();
+  if (value.includes('dark')) return 'dark';
+  if (value.includes('light')) return 'light';
+  return null;
+}
+
+function detectHostTheme(): ResolvedTheme | null {
+  if (typeof document === 'undefined') return null;
+  const targets = [document.documentElement, document.body].filter(
+    (element): element is HTMLElement => Boolean(element)
+  );
+  for (const element of targets) {
+    const attrTheme =
+      parseThemeToken(element.getAttribute('data-theme')) ??
+      parseThemeToken(element.getAttribute('data-color-mode')) ??
+      parseThemeToken(element.getAttribute('color-scheme'));
+    if (attrTheme) return attrTheme;
+
+    for (const className of Array.from(element.classList)) {
+      const classTheme = parseThemeToken(className);
+      if (classTheme) return classTheme;
+    }
+  }
+  return null;
+}
+
 function App() {
-  const { userOffer, updateUserOffer, initializeWithMedianValues } = useUserOffer();
+  const { userOffer, updateUserOffer } = useUserOffer();
   const { loanOffers: currencyOffers, loading, error, selectedCurrency, setSelectedCurrency, allLoanOffers } = useLoanOffers(userOffer.collectionAddress);
+
+  useEffect(() => {
+    if (selectedCurrency !== 'WETH') {
+      setSelectedCurrency('WETH');
+    }
+  }, [selectedCurrency, setSelectedCurrency]);
   
-  // Memoize the initial domain calculation
+  // Use exactly the same offer subset for plotting and domain calculations.
+  const [excludeOutliers, setExcludeOutliers] = useState(false);
+  const [showLoans, setShowLoans] = useState(true);
+  const [showOffers, setShowOffers] = useState(true);
+
+  const filteredOffers = useMemo(() => {
+    const durationFiltered = (userOffer.duration === undefined
+      ? currencyOffers
+      : currencyOffers.filter((offer) => {
+          if (offer.duration === undefined || offer.duration === null) return false;
+          return Number(offer.duration) <= Number(userOffer.duration);
+        })
+    ).filter(offer => offer.id);
+
+    if (!excludeOutliers || durationFiltered.length < 4) {
+      return durationFiltered;
+    }
+
+    const amountBounds = getIqrBounds(durationFiltered.map((offer) => offer.loanAmount));
+    const rateBounds = getIqrBounds(durationFiltered.map((offer) => offer.interestRate));
+    if (!amountBounds || !rateBounds) {
+      return durationFiltered;
+    }
+
+    return durationFiltered.filter((offer) => {
+      const amountInRange =
+        offer.loanAmount >= amountBounds.lower && offer.loanAmount <= amountBounds.upper;
+      const rateInRange =
+        offer.interestRate >= rateBounds.lower && offer.interestRate <= rateBounds.upper;
+      return amountInRange && rateInRange;
+    });
+  }, [currencyOffers, userOffer.duration, userOffer.collectionAddress, excludeOutliers]);
+
+  const displayedOffers = useMemo(
+    () =>
+      filteredOffers.filter((offer) => {
+        const isLoan = offer.marketType === 'loan';
+        return isLoan ? showLoans : showOffers;
+      }),
+    [filteredOffers, showLoans, showOffers]
+  );
+
+  // Baseline domain for reset zoom.
   const initialDomain = useMemo(() => 
-    getInitialDomain(currencyOffers, userOffer),
-    [currencyOffers, userOffer]
+    getInitialDomain(displayedOffers),
+    [displayedOffers]
   );
   
   const [domain, setDomain] = useState(initialDomain);
-  
-  // Update domain only when data changes significantly
+
+  // Keep domain aligned with the active dataset baseline.
   useEffect(() => {
-    const newDomain = getInitialDomain(currencyOffers, userOffer);
-    // Only update if the change is significant
-    const isSignificantChange = 
-      Math.abs(newDomain.x[0] - domain.x[0]) > domain.x[1] * 0.1 ||
-      Math.abs(newDomain.x[1] - domain.x[1]) > domain.x[1] * 0.1 ||
-      Math.abs(newDomain.y[0] - domain.y[0]) > domain.y[1] * 0.1 ||
-      Math.abs(newDomain.y[1] - domain.y[1]) > domain.y[1] * 0.1;
-    
-    if (isSignificantChange) {
-      setDomain(newDomain);
+    setDomain(initialDomain);
+  }, [initialDomain]);
+
+  const showResetZoom = useMemo(
+    () => !domainsAreClose(domain, initialDomain),
+    [domain, initialDomain]
+  );
+
+  const [showContours, setShowContours] = useState(false);
+  const [themeMode, setThemeMode] = useState<ThemeMode>('system');
+  const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+  const [hostTheme, setHostTheme] = useState<ResolvedTheme | null>(() => detectHostTheme());
+  const resolvedTheme = useMemo<ResolvedTheme>(() => {
+    if (themeMode === 'system') {
+      return hostTheme ?? systemTheme;
     }
-  }, [currencyOffers, userOffer]);
+    return themeMode;
+  }, [themeMode, hostTheme, systemTheme]);
+  const isLightMode = resolvedTheme === 'light';
+  const appTheme = useMemo(() => (isLightMode ? lightTheme : darkTheme), [isLightMode]);
 
-  const [showContours, setShowContours] = useState(true);
+  const handleToggleLoans = useCallback(() => {
+    setShowLoans((current) => {
+      const next = !current;
+      if (!next && !showOffers) {
+        setShowOffers(true);
+      }
+      return next;
+    });
+  }, [showOffers]);
 
-  // Memoize filteredOffers to prevent runaway renders
-  const filteredOffers = useMemo(() => {
-    const filtered = (userOffer.duration === undefined
-      ? currencyOffers
-      : currencyOffers.filter(offer => Number(offer.duration) === Number(userOffer.duration))
-    ).filter(offer => offer.id);
-    
-    console.log('[filteredOffers] Collection:', userOffer.collectionAddress);
-    console.log('[filteredOffers] Number of offers:', filtered.length);
-    console.log('[filteredOffers] Sample offer:', filtered[0]);
-    
-    return filtered;
-  }, [currencyOffers, userOffer.duration, userOffer.collectionAddress]);
+  const handleToggleOffers = useCallback(() => {
+    setShowOffers((current) => {
+      const next = !current;
+      if (!next && !showLoans) {
+        setShowLoans(true);
+      }
+      return next;
+    });
+  }, [showLoans]);
 
-  // Debug: Log filtered offers
+  const handleCycleThemeMode = useCallback(() => {
+    setThemeMode((current) => (current === 'system' ? 'light' : current === 'light' ? 'dark' : 'system'));
+  }, []);
+
   useEffect(() => {
-    if (filteredOffers.length > 0) {
-      const amounts = filteredOffers.map(o => o.loanAmount);
-      const rates = filteredOffers.map(o => o.interestRate);
-      console.log('[App] Filtered offers for chart:', {
-        count: filteredOffers.length,
-        amounts,
-        rates,
-        collection: userOffer.collectionAddress
-      });
-    }
-  }, [filteredOffers, userOffer.collectionAddress]);
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (event: MediaQueryListEvent) => {
+      setSystemTheme(event.matches ? 'dark' : 'light');
+    };
+    setSystemTheme(mediaQuery.matches ? 'dark' : 'light');
+    mediaQuery.addEventListener('change', handleChange);
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
+  }, []);
 
-  // --- Centralized filtering logic ---
-  // 1. Filter by duration (if set)
-  // 2. Filter out offers without IDs
-  const filteredOffersForChart = (userOffer.duration === undefined
-    ? currencyOffers
-    : currencyOffers.filter(offer => Number(offer.duration) === Number(userOffer.duration))
-  ).filter(offer => offer.id);
+  useEffect(() => {
+    if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') return;
+    const handleThemeMutation = () => setHostTheme(detectHostTheme());
+    const observer = new MutationObserver(handleThemeMutation);
+    const targets = [document.documentElement, document.body].filter(
+      (element): element is HTMLElement => Boolean(element)
+    );
+    targets.forEach((target) =>
+      observer.observe(target, {
+        attributes: true,
+        attributeFilter: ['class', 'data-theme', 'data-color-mode', 'color-scheme'],
+      })
+    );
+    handleThemeMutation();
+    return () => observer.disconnect();
+  }, []);
+
+  const handleDomainChange = useCallback((nextDomain: { x: [number, number]; y: [number, number] }) => {
+    setDomain(prev => (domainsAreClose(prev, nextDomain) ? prev : nextDomain));
+  }, []);
+
+  const handleResetZoom = useCallback(() => {
+    setDomain(initialDomain);
+  }, [initialDomain]);
 
   // --- Continuous domain expansion state ---
   const dragActiveRef = useRef(false);
   const dragPosRef = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const expandIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const initializedCollectionRef = useRef<string | null>(null);
 
-  // Initialize user offer with median values when collection changes or when offers are first loaded
+  // Recenter "Your Offer" on collection switch using market medians
+  // while preserving user-selected duration.
   useEffect(() => {
-    if (!loading && filteredOffers.length > 0) {
-      // Preserve the current collection address when initializing with median values
-      const currentCollectionAddress = userOffer.collectionAddress;
-      initializeWithMedianValues(filteredOffers);
-      if (currentCollectionAddress) {
-        updateUserOffer({ collectionAddress: currentCollectionAddress });
-      }
+    const currentCollectionAddress = userOffer.collectionAddress ?? null;
+    if (!currentCollectionAddress) {
+      initializedCollectionRef.current = null;
+      return;
     }
-  }, [loading, filteredOffers, initializeWithMedianValues, userOffer.collectionAddress, updateUserOffer]);
 
-  // Add a constant for the expansion percentage
-  const DOMAIN_EXPAND_PERCENT = 0.01; // 1%
+    if (
+      !loading &&
+      displayedOffers.length > 0 &&
+      initializedCollectionRef.current !== currentCollectionAddress
+    ) {
+      const validOffers = displayedOffers.filter((offer) => offer.id);
+      if (validOffers.length > 0) {
+        const { medianLoanAmount, medianInterestRate } = getMarketMedians(validOffers);
+        updateUserOffer({
+          collectionAddress: currentCollectionAddress,
+          loanAmount: medianLoanAmount,
+          interestRate: medianInterestRate,
+        });
+      }
+      initializedCollectionRef.current = currentCollectionAddress;
+    }
+  }, [loading, displayedOffers, userOffer.collectionAddress, updateUserOffer]);
 
   // --- Helper: Edge detection and expansion ---
   const checkAndExpandDomain = useCallback(() => {
@@ -230,12 +397,9 @@ function App() {
   // --- Modified drag handler ---
   const handleUserOfferDrag = (update: { loanAmount: number; interestRate: number, dragX?: number, dragY?: number, width?: number, height?: number, dragging?: boolean }) => {
     if (update.dragging && update.dragX !== undefined && update.dragY !== undefined && update.width !== undefined && update.height !== undefined) {
-      // During drag: update user offer state with live, unrounded value for real-time feedback
-      updateUserOffer({
-        loanAmount: Math.max(0, update.loanAmount),
-        interestRate: Math.max(0, update.interestRate),
-      });
-      // Store drag state for interval
+      // During drag, avoid React state updates to keep interaction smooth.
+      // The SVG bubble position is updated directly in D3 and we only commit
+      // values to React state on drag end.
       dragActiveRef.current = true;
       dragPosRef.current = { x: update.dragX, y: update.dragY, width: update.width, height: update.height };
       startExpandInterval();
@@ -283,16 +447,14 @@ function App() {
   }, [stopExpandInterval]);
 
   return (
-    <ThemeProvider theme={darkTheme}>
-      <div className={styles.mainContainer}>
+    <ThemeProvider theme={appTheme}>
+      <div className={`${styles.mainContainer} ${isLightMode ? styles.mainContainerLight : ''}`}>
         <div className={styles.menuDesktop}>
           <div className={styles.leftPanel}>
             <InputControls
               onUserOfferChange={updateUserOffer}
               userOffer={userOffer}
               selectedCurrency={selectedCurrency}
-              showContours={showContours}
-              onShowContoursChange={setShowContours}
             />
           </div>
           <div className={styles.chartArea}>
@@ -304,13 +466,27 @@ function App() {
               <Box sx={{ color: 'error.main', p: 2 }}>{error}</Box>
             ) : (
               <ScatterPlot
-                data={filteredOffers}
+                data={displayedOffers}
                 userOffer={userOffer}
                 selectedCurrency={selectedCurrency}
                 onCurrencyChange={handleCurrencyChange}
                 onUserOfferDrag={handleUserOfferDrag}
                 domain={domain}
+                baselineDomain={initialDomain}
                 showContours={showContours}
+                onShowContoursChange={setShowContours}
+                showLoans={showLoans}
+                showOffers={showOffers}
+                onToggleLoans={handleToggleLoans}
+                onToggleOffers={handleToggleOffers}
+                onDomainChange={handleDomainChange}
+                onResetZoom={handleResetZoom}
+                showResetZoom={showResetZoom}
+                excludeOutliers={excludeOutliers}
+                onToggleExcludeOutliers={() => setExcludeOutliers((current) => !current)}
+                isLightMode={isLightMode}
+                themeMode={themeMode}
+                onCycleThemeMode={handleCycleThemeMode}
               />
             )}
           </div>

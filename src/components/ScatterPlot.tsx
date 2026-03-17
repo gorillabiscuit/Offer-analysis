@@ -750,8 +750,10 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     prevScalesRef.current = { x: xScale, y: yScale };
 
     // Update axes with transitions
+    const xTickCount = Math.max(3, Math.floor(width / 220));
     const xAxis = d3.axisBottom(xScale)
-      .ticks(6)
+      .ticks(xTickCount)
+      .tickPadding(8)
       .tickFormat((domainValue: d3.NumberValue, _i: number) => {
         const d = typeof domainValue === 'number' ? domainValue : domainValue.valueOf();
         return `${formatCurrency(d, selectedCurrency)} ${selectedCurrency}`;
@@ -1418,9 +1420,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       </Box>
       <Box
         sx={{
-          mt: 1,
-          pt: 1,
-          borderTop: `1px solid ${chartColors.legendBorder}`,
+          mt: 0,
+          pt: 0,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
